@@ -1,5 +1,5 @@
-import 'package:kore_client/kore_client.dart';
-import 'package:kore_client/src/llm/http/api_error.dart';
+import 'package:llm_clients/llm_clients.dart';
+import 'package:llm_clients/src/http/api_error.dart';
 import 'package:test/test.dart';
 
 void main() {
@@ -10,7 +10,7 @@ void main() {
           'error': {'message': 'Overloaded'},
         }),
         throwsA(
-          isA<KoreClientException>().having((e) => e.message, 'message', 'Overloaded'),
+          isA<LlmApiException>().having((e) => e.message, 'message', 'Overloaded'),
         ),
       );
     });

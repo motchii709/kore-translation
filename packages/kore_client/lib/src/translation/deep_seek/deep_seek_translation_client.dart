@@ -1,8 +1,7 @@
-import 'package:kore_client/src/llm/http/deep_seek/deep_seek_llm_client.dart';
-import 'package:kore_client/src/llm/http/deep_seek/deep_seek_stream_models.dart';
 import 'package:kore_client/src/translation/translation_client.dart';
 import 'package:kore_client/src/translation/translation_delta.dart';
 import 'package:kore_client/src/translation/translation_models.dart';
+import 'package:llm_clients/llm_clients.dart';
 
 /// [TranslationClient] backed by the DeepSeek API. Reasoning models
 /// (deepseek-reasoner) stream their thinking via `reasoning_content`.
@@ -17,6 +16,8 @@ final class DeepSeekTranslationClient implements TranslationClient {
     required String text,
     bool thinking = true,
   }) {
+    // No responseFormat: deepseek-reasoner rejects it; the prompt and the
+    // fence-tolerant parser keep the reply usable.
     final chunks = llm.streamChatCompletions(
       systemPrompt: systemPrompt,
       userText: text,

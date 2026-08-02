@@ -2,12 +2,12 @@ import 'dart:convert';
 
 import 'package:dio/dio.dart';
 import 'package:json_annotation/json_annotation.dart';
-import 'package:kore_client/src/exceptions.dart';
-import 'package:kore_client/src/llm/http/api_error.dart';
-import 'package:kore_client/src/llm/http/gemini/gemini_stream_models.dart';
-import 'package:kore_client/src/llm/http/sse.dart';
-import 'package:kore_client/src/llm/llm_client_config.dart';
-import 'package:kore_client/src/safe_json.dart';
+import 'package:llm_clients/src/exceptions.dart';
+import 'package:llm_clients/src/http/api_error.dart';
+import 'package:llm_clients/src/http/gemini/gemini_stream_models.dart';
+import 'package:llm_clients/src/http/sse.dart';
+import 'package:llm_clients/src/llm_client_config.dart';
+import 'package:llm_clients/src/safe_json.dart';
 
 /// Thin wrapper over the Google AI (Gemini) generateContent API.
 final class GeminiLlmClient {
@@ -18,11 +18,13 @@ final class GeminiLlmClient {
 
   /// Streams the chunks of one generateContent call.
   ///
-  /// [thinkingConfig] is passed through as `generationConfig.thinkingConfig`
-  /// (e.g. `{"includeThoughts": true}`); null omits it.
+  /// [responseMimeType] and [thinkingConfig] are passed through inside
+  /// `generationConfig` (e.g. `"application/json"`,
+  /// `{"includeThoughts": true}`); null omits them.
   Stream<GeminiStreamChunk> streamGenerateContent({
     required String systemPrompt,
     required String userText,
+    String? responseMimeType,
     Map<String, Object?>? thinkingConfig,
   }) async* {
     try {
@@ -48,14 +50,14 @@ final class GeminiLlmClient {
             },
           ],
           'generationConfig': {
-            'responseMimeType': 'application/json',
+            'responseMimeType': ?responseMimeType,
             'thinkingConfig': ?thinkingConfig,
           },
         },
       );
       final body = response.data;
       if (body == null) {
-        throw const KoreClientException('Empty API response body');
+        throw const LlmApiException('Empty API response body');
       }
       await for (final event in sseDataEvents(body.stream)) {
         final json = tryJsonDecode(event);

@@ -2,12 +2,12 @@ import 'dart:convert';
 
 import 'package:dio/dio.dart';
 import 'package:json_annotation/json_annotation.dart';
-import 'package:kore_client/src/exceptions.dart';
-import 'package:kore_client/src/llm/http/api_error.dart';
-import 'package:kore_client/src/llm/http/deep_seek/deep_seek_stream_models.dart';
-import 'package:kore_client/src/llm/http/sse.dart';
-import 'package:kore_client/src/llm/llm_client_config.dart';
-import 'package:kore_client/src/safe_json.dart';
+import 'package:llm_clients/src/exceptions.dart';
+import 'package:llm_clients/src/http/api_error.dart';
+import 'package:llm_clients/src/http/deep_seek/deep_seek_stream_models.dart';
+import 'package:llm_clients/src/http/sse.dart';
+import 'package:llm_clients/src/llm_client_config.dart';
+import 'package:llm_clients/src/safe_json.dart';
 
 /// Thin wrapper over the DeepSeek Chat Completions API.
 final class DeepSeekLlmClient {
@@ -17,9 +17,13 @@ final class DeepSeekLlmClient {
   final Dio dio;
 
   /// Streams the chunks of one chat completion.
+  ///
+  /// [responseFormat] is passed through as the API's `response_format`
+  /// parameter; null omits it (deepseek-reasoner rejects the parameter).
   Stream<DeepSeekChatChunk> streamChatCompletions({
     required String systemPrompt,
     required String userText,
+    Map<String, Object?>? responseFormat,
   }) async* {
     try {
       final response = await dio.post<ResponseBody>(
@@ -31,8 +35,7 @@ final class DeepSeekLlmClient {
         data: {
           'model': config.model,
           'stream': true,
-          // No response_format: deepseek-reasoner rejects it; the prompt and
-          // the fence-tolerant parser keep the output usable.
+          'response_format': ?responseFormat,
           'messages': [
             {'role': 'system', 'content': systemPrompt},
             {'role': 'user', 'content': userText},
@@ -41,7 +44,7 @@ final class DeepSeekLlmClient {
       );
       final body = response.data;
       if (body == null) {
-        throw const KoreClientException('Empty API response body');
+        throw const LlmApiException('Empty API response body');
       }
       await for (final event in sseDataEvents(body.stream)) {
         // Skip non-JSON lines such as "[DONE]".

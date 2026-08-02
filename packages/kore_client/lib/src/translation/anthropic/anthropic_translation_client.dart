@@ -1,8 +1,7 @@
-import 'package:kore_client/src/llm/http/anthropic/anthropic_llm_client.dart';
-import 'package:kore_client/src/llm/http/anthropic/anthropic_stream_models.dart';
 import 'package:kore_client/src/translation/translation_client.dart';
 import 'package:kore_client/src/translation/translation_delta.dart';
 import 'package:kore_client/src/translation/translation_models.dart';
+import 'package:llm_clients/llm_clients.dart';
 
 /// [TranslationClient] backed by the Anthropic Messages API.
 final class AnthropicTranslationClient implements TranslationClient {
@@ -19,6 +18,8 @@ final class AnthropicTranslationClient implements TranslationClient {
     final events = llm.streamMessages(
       systemPrompt: systemPrompt,
       userText: text,
+      // Thinking tokens count toward max_tokens, so leave generous headroom.
+      maxTokens: 16384,
       // Claude 5 models only accept adaptive thinking, and their `display`
       // defaults to "omitted" (empty thinking blocks) — "summarized" opts in
       // to receiving the thinking text.

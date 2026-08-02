@@ -1,6 +1,6 @@
 import 'dart:io';
 
-import 'package:kore_client/kore_client.dart';
+import 'package:llm_clients/llm_clients.dart';
 
 /// Conventional API key environment variables per backend — a CLI concern,
 /// kept out of kore_client.

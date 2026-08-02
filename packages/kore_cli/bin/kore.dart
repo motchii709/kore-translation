@@ -7,6 +7,7 @@ import 'package:kore_cli/src/interactive.dart';
 import 'package:kore_cli/src/output.dart';
 import 'package:kore_cli/src/prompt.dart';
 import 'package:kore_client/kore_client.dart';
+import 'package:llm_clients/llm_clients.dart';
 
 Future<void> main(List<String> arguments) async {
   final parser = ArgParser()
@@ -137,6 +138,9 @@ Future<void> main(List<String> arguments) async {
     }
     printer.printResult(result, asJson: args.flag('json'));
   } on KoreClientException catch (e) {
+    printer.printError(e.message);
+    exitCode = 1;
+  } on LlmApiException catch (e) {
     printer.printError(e.message);
     exitCode = 1;
   } on DioException catch (e) {

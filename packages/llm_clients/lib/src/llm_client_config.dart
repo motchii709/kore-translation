@@ -1,5 +1,5 @@
 import 'package:freezed_annotation/freezed_annotation.dart';
-import 'package:kore_client/src/llm/llm_provider.dart';
+import 'package:llm_clients/src/llm_provider.dart';
 
 part 'llm_client_config.freezed.dart';
 

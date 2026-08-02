@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
-import 'package:kore_client/kore_client.dart';
 import 'package:kore_honyaku/app/constants/llm_provider_ui.dart';
 import 'package:kore_honyaku/app/constants/translation_prompt.dart';
 import 'package:kore_honyaku/app/models/app_settings.dart';
 import 'package:kore_honyaku/app/providers/app_settings_provider.dart';
 import 'package:kore_honyaku/app/ui/components/app_section_header.dart';
+import 'package:llm_clients/llm_clients.dart';
 
 /// Edits [AppSettings]. The LLM backend is freely selectable; base URL and
 /// model fall back to the provider defaults when left empty.

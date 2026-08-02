@@ -3,6 +3,7 @@ import 'dart:typed_data';
 
 import 'package:dio/dio.dart';
 import 'package:kore_client/kore_client.dart';
+import 'package:llm_clients/llm_clients.dart';
 import 'package:test/test.dart';
 
 /// Serves a canned SSE (or plain) body for any request.
@@ -233,7 +234,7 @@ void main() {
         adapter,
       ).streamTranslation(systemPrompt: prompt, text: 'こんにちは').last,
       throwsA(
-        isA<KoreClientException>().having((e) => e.message, 'message', 'Overloaded'),
+        isA<LlmApiException>().having((e) => e.message, 'message', 'Overloaded'),
       ),
     );
   });

@@ -1,8 +1,7 @@
-import 'package:kore_client/src/llm/http/open_ai/open_ai_llm_client.dart';
-import 'package:kore_client/src/llm/http/open_ai/open_ai_stream_models.dart';
 import 'package:kore_client/src/translation/translation_client.dart';
 import 'package:kore_client/src/translation/translation_delta.dart';
 import 'package:kore_client/src/translation/translation_models.dart';
+import 'package:llm_clients/llm_clients.dart';
 
 /// [TranslationClient] backed by an OpenAI-compatible API.
 final class OpenAiTranslationClient implements TranslationClient {
@@ -19,6 +18,7 @@ final class OpenAiTranslationClient implements TranslationClient {
     final chunks = llm.streamChatCompletions(
       systemPrompt: systemPrompt,
       userText: text,
+      responseFormat: const {'type': 'json_object'},
     );
     return assembleTranslationEvents(chunks.expand(_deltasOf));
   }

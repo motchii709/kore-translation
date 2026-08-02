@@ -1,6 +1,6 @@
-import 'package:kore_client/kore_client.dart';
 import 'package:kore_honyaku/app/models/app_settings.dart';
 import 'package:kore_honyaku/app/providers/secure_storage_provider.dart';
+import 'package:llm_clients/llm_clients.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 part 'app_settings_provider.g.dart';

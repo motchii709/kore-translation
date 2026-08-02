@@ -4,6 +4,7 @@ import 'package:dio/dio.dart';
 import 'package:kore_cli/src/output.dart';
 import 'package:kore_cli/src/prompt.dart';
 import 'package:kore_client/kore_client.dart';
+import 'package:llm_clients/llm_clients.dart';
 
 /// Simple interactive TUI: type text to translate, use `:` commands to
 /// change settings.
@@ -84,6 +85,8 @@ class InteractiveSession {
           printer.printResult(result);
         }
       } on KoreClientException catch (e) {
+        printer.printError(e.message);
+      } on LlmApiException catch (e) {
         printer.printError(e.message);
       } on DioException catch (e) {
         printer.printError('$e\n${e.response?.data ?? ''}');

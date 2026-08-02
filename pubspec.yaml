@@ -11,6 +11,7 @@ workspace:
   - packages/kore_cli
   - packages/kore_client
   - packages/kore_lints
+  - packages/llm_clients
   - packages/partial_json
 
 dependencies:
@@ -25,6 +26,7 @@ dependencies:
   hooks_riverpod: ^3.3.2 # riverpod_annotation 4.0.3 pins riverpod 3.3.2
   json_annotation: ^4.12.0
   kore_client: ^0.1.0
+  llm_clients: ^0.1.0
   riverpod_annotation: ^4.0.3 # riverpod_generator 4.0.5 pins 4.0.3
 
 dev_dependencies:

@@ -1,4 +1,4 @@
-import 'package:kore_client/kore_client.dart';
+import 'package:llm_clients/llm_clients.dart';
 import 'package:test/test.dart';
 
 void main() {

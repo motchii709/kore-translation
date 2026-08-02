@@ -1,6 +1,7 @@
 import 'package:dio/dio.dart';
 import 'package:kore_client/kore_client.dart';
 import 'package:kore_honyaku/app/providers/app_settings_provider.dart';
+import 'package:llm_clients/llm_clients.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 part 'translation_client_provider.g.dart';

@@ -1,4 +1,4 @@
-import 'package:kore_client/kore_client.dart';
+import 'package:llm_clients/llm_clients.dart';
 
 /// UI labels for the LLM backends. Kept out of kore_client, which only
 /// deals in stable identifiers.

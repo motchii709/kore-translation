@@ -1,5 +1,5 @@
 import 'package:freezed_annotation/freezed_annotation.dart';
-import 'package:kore_client/src/exceptions.dart';
+import 'package:llm_clients/src/exceptions.dart';
 
 part 'api_error.freezed.dart';
 part 'api_error.g.dart';
@@ -30,6 +30,6 @@ void throwIfApiError(Map<String, dynamic> json) {
   }
   final message = envelope.error?.message;
   if (message != null) {
-    throw KoreClientException(message);
+    throw LlmApiException(message);
   }
 }

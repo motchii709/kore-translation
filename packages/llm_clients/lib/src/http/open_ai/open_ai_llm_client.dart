@@ -2,12 +2,12 @@ import 'dart:convert';
 
 import 'package:dio/dio.dart';
 import 'package:json_annotation/json_annotation.dart';
-import 'package:kore_client/src/exceptions.dart';
-import 'package:kore_client/src/llm/http/api_error.dart';
-import 'package:kore_client/src/llm/http/open_ai/open_ai_stream_models.dart';
-import 'package:kore_client/src/llm/http/sse.dart';
-import 'package:kore_client/src/llm/llm_client_config.dart';
-import 'package:kore_client/src/safe_json.dart';
+import 'package:llm_clients/src/exceptions.dart';
+import 'package:llm_clients/src/http/api_error.dart';
+import 'package:llm_clients/src/http/open_ai/open_ai_stream_models.dart';
+import 'package:llm_clients/src/http/sse.dart';
+import 'package:llm_clients/src/llm_client_config.dart';
+import 'package:llm_clients/src/safe_json.dart';
 
 /// Thin wrapper over OpenAI-compatible Chat Completions APIs
 /// (OpenAI, Groq, Ollama, LM Studio, OpenRouter, ...).
@@ -18,9 +18,13 @@ final class OpenAiLlmClient {
   final Dio dio;
 
   /// Streams the chunks of one chat completion.
+  ///
+  /// [responseFormat] is passed through as the API's `response_format`
+  /// parameter (e.g. `{"type": "json_object"}`); null omits it.
   Stream<OpenAiChatChunk> streamChatCompletions({
     required String systemPrompt,
     required String userText,
+    Map<String, Object?>? responseFormat,
   }) async* {
     try {
       final response = await dio.post<ResponseBody>(
@@ -32,7 +36,7 @@ final class OpenAiLlmClient {
         data: {
           'model': config.model,
           'stream': true,
-          'response_format': {'type': 'json_object'},
+          'response_format': ?responseFormat,
           'messages': [
             {'role': 'system', 'content': systemPrompt},
             {'role': 'user', 'content': userText},
@@ -41,7 +45,7 @@ final class OpenAiLlmClient {
       );
       final body = response.data;
       if (body == null) {
-        throw const KoreClientException('Empty API response body');
+        throw const LlmApiException('Empty API response body');
       }
       await for (final event in sseDataEvents(body.stream)) {
         // Skip non-JSON lines such as "[DONE]".

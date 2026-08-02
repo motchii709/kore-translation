@@ -1,5 +1,5 @@
-/// Error thrown by kore_client for domain-level failures: API error events,
-/// unparsable replies, or replies without a result.
+/// Error thrown by kore_client for domain-level failures: unparsable
+/// replies, or replies without a result.
 ///
 /// Transport-level errors (e.g. `DioException`) are propagated as-is so
 /// callers can inspect the raw failure.

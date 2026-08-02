@@ -19,30 +19,33 @@ pub workspace によるモノレポ構成です。
 │       ├── router/          # go_router (typed routes)
 │       └── ui/              # テーマ・共通コンポーネント
 └── packages/
-    ├── kore_client/         # 純 Dart の LLM 翻訳クライアント (Flutter 非依存)
+    ├── kore_client/         # 翻訳クライアント (llm_clients の上の翻訳層、Flutter 非依存)
     ├── kore_cli/            # CLI / 対話 TUI
     ├── kore_lints/          # 共有 lint 設定 (yumemi_lints ベース)
+    ├── llm_clients/         # 各社 LLM API の薄い型付きストリーミングクライアント (kore 非依存)
     └── partial_json/        # 生成途中で切れた JSON を補完する汎用ユーティリティ
 ```
 
 ### アーキテクチャ
 
-`kore_client` は 2 層構成です。継承階層は持たず、共有処理は関数合成で行います。
+翻訳は 2 層 = 2 パッケージ構成です。継承階層は持たず、共有処理は関数合成で行います。
 
 ```
-TranslationClient (抽象)                  # UI (Flutter / CLI / TUI) が依存する唯一の抽象
+TranslationClient (抽象、kore_client)     # UI (Flutter / CLI / TUI) が依存する唯一の抽象
 ├── OpenAiTranslationClient               # 各社オブジェクト → thinking/text デルタ抽出
 ├── AnthropicTranslationClient            #   + assembleTranslationEvents (共通組み立て)
 └── GeminiTranslationClient               #   → TranslationEvent {thinking, result}
 
-LlmClient 群 (抽象なし・各社独立の薄いラッパー)
+LlmClient 群 (llm_clients、抽象なし・各社独立の薄いラッパー)
 ├── OpenAiLlmClient.streamChatCompletions()  → Stream<OpenAiChatChunk>
 ├── AnthropicLlmClient.streamMessages()      → Stream<AnthropicStreamEvent>
 └── GeminiLlmClient.streamGenerateContent()  → Stream<GeminiStreamChunk>
 ```
 
 - 薄いラッパーは各社 API の型付きオブジェクト (freezed / discriminated union)
-  をそのまま流します。翻訳の知識は持ちません
+  をそのまま流します。翻訳の知識は持たず、ユースケース側の決定
+  (`response_format` / `max_tokens` / レスポンス MIME) はパススルー引数で
+  翻訳層が渡します
 - `TranslationClient` 実装が各社オブジェクトから思考/本文デルタを取り出し、
   生成途中 JSON の補完 (`partial_json` パッケージ、未完文字列と閉じ括弧を
   閉じて再パース) による逐次スナップショット + ストリーム完了後の厳密パースで
@@ -64,7 +67,8 @@ LlmClient 群 (抽象なし・各社独立の薄いラッパー)
 mise install
 flutter pub get
 dart run build_runner build                            # アプリのコード生成
-(cd packages/kore_client && dart run build_runner build) # クライアントのコード生成
+(cd packages/kore_client && dart run build_runner build)  # 翻訳層のコード生成
+(cd packages/llm_clients && dart run build_runner build)  # LLMクライアントのコード生成
 ```
 
 > Windows デスクトップで実行する場合は、プラグインの symlink 作成のため
@@ -105,7 +109,8 @@ AI エージェント (Claude Code / Codex 等) 向けの運用手順は [AGENTS
 ```sh
 flutter analyze                          # 静的解析 (yumemi_lints)
 flutter test                             # アプリのウィジェットテスト
-(cd packages/kore_client && dart test)   # クライアントのユニットテスト
+(cd packages/kore_client && dart test)   # 翻訳層のユニットテスト
+(cd packages/llm_clients && dart test)   # LLMクライアントのユニットテスト
 (cd packages/partial_json && dart test)  # JSON 補完のユニットテスト
 ```
 

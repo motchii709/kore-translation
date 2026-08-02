@@ -4,6 +4,7 @@ import 'package:flutter/services.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:kore_client/kore_client.dart';
 import 'package:kore_honyaku/app/ui/components/app_section_header.dart';
+import 'package:llm_clients/llm_clients.dart';
 
 /// Renders the state of the latest translation request.
 class TranslationResultSection extends StatelessWidget {
@@ -191,6 +192,7 @@ class _ErrorCard extends StatelessWidget {
     final colorScheme = Theme.of(context).colorScheme;
     final message = switch (error) {
       final KoreClientException e => e.message,
+      final LlmApiException e => e.message,
       // DioException.toString() does not include the response body, which
       // carries the API's actual error message.
       final DioException e when e.response?.data != null => '$e\n${e.response?.data}',

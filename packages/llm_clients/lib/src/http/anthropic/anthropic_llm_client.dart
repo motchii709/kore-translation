@@ -2,31 +2,31 @@ import 'dart:convert';
 
 import 'package:dio/dio.dart';
 import 'package:json_annotation/json_annotation.dart';
-import 'package:kore_client/src/exceptions.dart';
-import 'package:kore_client/src/llm/http/anthropic/anthropic_stream_models.dart';
-import 'package:kore_client/src/llm/http/api_error.dart';
-import 'package:kore_client/src/llm/http/sse.dart';
-import 'package:kore_client/src/llm/llm_client_config.dart';
-import 'package:kore_client/src/safe_json.dart';
+import 'package:llm_clients/src/exceptions.dart';
+import 'package:llm_clients/src/http/anthropic/anthropic_stream_models.dart';
+import 'package:llm_clients/src/http/api_error.dart';
+import 'package:llm_clients/src/http/sse.dart';
+import 'package:llm_clients/src/llm_client_config.dart';
+import 'package:llm_clients/src/safe_json.dart';
 
 /// Thin wrapper over the Anthropic Messages API.
 final class AnthropicLlmClient {
   AnthropicLlmClient({required this.config, required this.dio});
 
   static const _apiVersion = '2023-06-01';
-  // Thinking tokens count toward max_tokens, so leave generous headroom.
-  static const _maxTokens = 16384;
 
   final AnthropicConfig config;
   final Dio dio;
 
   /// Streams the events of one message.
   ///
-  /// [thinking] is passed through as the API's `thinking` parameter
-  /// (e.g. `{"type": "adaptive", "display": "summarized"}`); null omits it.
+  /// [maxTokens] is mandatory on this API. [thinking] is passed through as
+  /// the API's `thinking` parameter (e.g. `{"type": "adaptive", "display":
+  /// "summarized"}`); null omits it.
   Stream<AnthropicStreamEvent> streamMessages({
     required String systemPrompt,
     required String userText,
+    required int maxTokens,
     Map<String, Object?>? thinking,
   }) async* {
     try {
@@ -41,7 +41,7 @@ final class AnthropicLlmClient {
         ),
         data: {
           'model': config.model,
-          'max_tokens': _maxTokens,
+          'max_tokens': maxTokens,
           'stream': true,
           'thinking': ?thinking,
           'system': systemPrompt,
@@ -52,7 +52,7 @@ final class AnthropicLlmClient {
       );
       final body = response.data;
       if (body == null) {
-        throw const KoreClientException('Empty API response body');
+        throw const LlmApiException('Empty API response body');
       }
       await for (final event in sseDataEvents(body.stream)) {
         final json = tryJsonDecode(event);

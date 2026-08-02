@@ -1,8 +1,7 @@
-import 'package:kore_client/src/llm/http/gemini/gemini_llm_client.dart';
-import 'package:kore_client/src/llm/http/gemini/gemini_stream_models.dart';
 import 'package:kore_client/src/translation/translation_client.dart';
 import 'package:kore_client/src/translation/translation_delta.dart';
 import 'package:kore_client/src/translation/translation_models.dart';
+import 'package:llm_clients/llm_clients.dart';
 
 /// [TranslationClient] backed by the Google AI (Gemini) API.
 final class GeminiTranslationClient implements TranslationClient {
@@ -19,6 +18,7 @@ final class GeminiTranslationClient implements TranslationClient {
     final chunks = llm.streamGenerateContent(
       systemPrompt: systemPrompt,
       userText: text,
+      responseMimeType: 'application/json',
       // Thoughts are only included in the response when explicitly requested.
       thinkingConfig: thinking ? const {'includeThoughts': true} : null,
     );
