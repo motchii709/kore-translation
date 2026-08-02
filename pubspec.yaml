@@ -1,7 +1,7 @@
 name: kore_translation
-description: kore translation (Kore翻訳) — LLM translation app built with Flutter. No backend, calls OpenAI-compatible APIs directly.
+description: kore translation (Kore翻訳) — LLM translation app built with Flutter. No backend, calls APIs directly.
 publish_to: none
-version: 0.1.0+1
+version: 0.1.1+2
 
 environment:
   sdk: ^3.12.2
@@ -15,7 +15,6 @@ workspace:
   - packages/partial_json
 
 dependencies:
-  cupertino_icons: ^1.0.9
   dio: ^5.11.0
   drift: ^2.34.3
   drift_flutter: ^0.3.1
@@ -28,7 +27,7 @@ dependencies:
   freezed_annotation: ^3.1.0
   go_router: ^17.3.0
   hooks_riverpod: ^3.3.2 # riverpod_annotation 4.0.3 pins riverpod 3.3.2
-  json_annotation: ^4.12.0
+  intl: ^0.20.2
   kore_client: ^0.1.0
   llm_clients: ^0.1.0
   path_provider: ^2.1.6
@@ -45,7 +44,7 @@ dev_dependencies:
     sdk: flutter
   freezed: ^3.2.5
   go_router_builder: ^4.4.0
-  json_serializable: ^6.14.1
+  json_annotation: ^4.12.0 # tests inspect CheckedFromJsonException from stored-data parses
   kore_lints: ^0.1.0
   riverpod_generator: ^4.0.4 # 4.0.6+ conflicts with freezed 3.2.x over analyzer requirements
 

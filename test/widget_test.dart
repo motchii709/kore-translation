@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:kore_translation/app/i18n/translations.g.dart';
+import 'package:kore_translation/app/providers/app_database_provider.dart';
 import 'package:kore_translation/app/providers/llm_config_provider.dart';
 import 'package:kore_translation/main.dart';
 import 'package:llm_clients/llm_clients.dart';
@@ -18,7 +19,12 @@ class _UnconfiguredStorage extends LlmConfigStorage {
 
 Widget _app(LlmConfigStorage Function() storage) => TranslationProvider(
   child: ProviderScope(
-    overrides: [llmConfigStorageProvider.overrideWith(storage)],
+    overrides: [
+      llmConfigStorageProvider.overrideWith(storage),
+      // Hermetic: no real sqlite database in widget tests; dependents
+      // surface the error and the pages under test don't need it.
+      appDatabaseProvider.overrideWith((ref) => throw StateError('no database in widget tests')),
+    ],
     child: const KoreApp(),
   ),
 );

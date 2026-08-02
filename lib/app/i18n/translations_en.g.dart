@@ -53,6 +53,7 @@ class _Translations$translate$en extends Translations$translate$ja {
 
 	// Translations
 	@override String get settingsTooltip => 'Settings';
+	@override String get sourceText => 'Source text';
 	@override String get inputHint => 'Enter text to translate';
 	@override String get language => 'Language';
 	@override late final _Translations$translate$style$en style = _Translations$translate$style$en._(_root);
@@ -72,6 +73,7 @@ class _Translations$history$en extends Translations$history$ja {
 	@override String get title => 'History';
 	@override String get empty => 'No history yet';
 	@override String get delete => 'Delete';
+	@override String loadFailed({required Object error}) => 'Failed to load history: ${error}';
 }
 
 // Path: tone
@@ -234,6 +236,7 @@ class _Translations$settings$advanced$en extends Translations$settings$advanced$
 	@override String get submitEnter => 'Enter to send';
 	@override String get submitShiftEnter => 'Shift+Enter to send';
 	@override String get dangerTitle => 'Delete data';
+	@override String get delete => 'Delete';
 	@override String get deleteDatabase => 'Delete the database';
 	@override String get deleteDatabaseConfirm => 'Delete the entire database (history and advanced settings)?';
 	@override String get deleteModel => 'Delete model settings';
@@ -251,6 +254,7 @@ extension on TranslationsEn {
 	dynamic _flatMapFunction(String path) {
 		return switch (path) {
 			'translate.settingsTooltip' => 'Settings',
+			'translate.sourceText' => 'Source text',
 			'translate.inputHint' => 'Enter text to translate',
 			'translate.language' => 'Language',
 			'translate.style.title' => 'Style',
@@ -273,6 +277,7 @@ extension on TranslationsEn {
 			'history.title' => 'History',
 			'history.empty' => 'No history yet',
 			'history.delete' => 'Delete',
+			'history.loadFailed' => ({required Object error}) => 'Failed to load history: ${error}',
 			'tone.polite' => '🥸 Polite',
 			'tone.casual' => '😎 Casual',
 			'tone.friendChat' => '💬 Chat with a friend',
@@ -325,6 +330,7 @@ extension on TranslationsEn {
 			'settings.advanced.submitEnter' => 'Enter to send',
 			'settings.advanced.submitShiftEnter' => 'Shift+Enter to send',
 			'settings.advanced.dangerTitle' => 'Delete data',
+			'settings.advanced.delete' => 'Delete',
 			'settings.advanced.deleteDatabase' => 'Delete the database',
 			'settings.advanced.deleteDatabaseConfirm' => 'Delete the entire database (history and advanced settings)?',
 			'settings.advanced.deleteModel' => 'Delete model settings',

@@ -4,7 +4,7 @@ abstract final class AppBreakpoints {
   static const twoPane = 840.0;
 
   /// Wide desktop windows: a persistent history sidebar joins the panes.
-  /// Narrower windows reach the history through its own page instead.
+  /// Narrower windows reach the history through the edge-swipe drawer.
   static const historySidebar = 1200.0;
 
   /// Fixed width of that sidebar.

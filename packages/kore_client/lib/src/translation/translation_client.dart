@@ -32,10 +32,10 @@ Respond with a JSON object only, using exactly this schema:
   "detected_language": "<name of the input language>",
   "target_language": "<name of the language translated into>",
   "translation": "<the best translation>",
+  "explanation": "<brief notes about nuance, word choice, and grammar>",
   "alternatives": [
     {"text": "<alternative translation>", "nuance": "<short nuance note>"}
-  ],
-  "explanation": "<brief notes about nuance, word choice, and grammar>"
+  ]
 }
 Provide 2 or 3 alternatives with meaningfully different nuances.
 ''';

@@ -3,8 +3,8 @@ import 'package:freezed_annotation/freezed_annotation.dart';
 
 part 'ui_settings.freezed.dart';
 
-/// Which hardware-keyboard chord submits the translate input. Plain Enter
-/// does the other action (a newline).
+/// Which hardware-keyboard chord submits the translate input. The unbound
+/// chord does the other action (a newline).
 enum SubmitShortcut { enter, shiftEnter }
 
 /// The app display language: follow the OS, or force a supported locale.

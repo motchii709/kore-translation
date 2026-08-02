@@ -57,6 +57,9 @@ class Translations$translate$ja {
 	/// ja: '設定'
 	String get settingsTooltip => '設定';
 
+	/// ja: '原文'
+	String get sourceText => '原文';
+
 	/// ja: '翻訳したいテキストを入力'
 	String get inputHint => '翻訳したいテキストを入力';
 
@@ -93,6 +96,9 @@ class Translations$history$ja {
 
 	/// ja: '削除'
 	String get delete => '削除';
+
+	/// ja: '履歴を読み込めませんでした: $error'
+	String loadFailed({required Object error}) => '履歴を読み込めませんでした: ${error}';
 }
 
 // Path: tone
@@ -390,6 +396,9 @@ class Translations$settings$advanced$ja {
 	/// ja: 'データ削除'
 	String get dangerTitle => 'データ削除';
 
+	/// ja: '削除'
+	String get delete => '削除';
+
 	/// ja: 'データベースを削除'
 	String get deleteDatabase => 'データベースを削除';
 
@@ -418,6 +427,7 @@ extension on Translations {
 	dynamic _flatMapFunction(String path) {
 		return switch (path) {
 			'translate.settingsTooltip' => '設定',
+			'translate.sourceText' => '原文',
 			'translate.inputHint' => '翻訳したいテキストを入力',
 			'translate.language' => '言語',
 			'translate.style.title' => '翻訳スタイル',
@@ -440,6 +450,7 @@ extension on Translations {
 			'history.title' => '履歴',
 			'history.empty' => '履歴はまだありません',
 			'history.delete' => '削除',
+			'history.loadFailed' => ({required Object error}) => '履歴を読み込めませんでした: ${error}',
 			'tone.polite' => '🥸 丁寧',
 			'tone.casual' => '😎 カジュアル',
 			'tone.friendChat' => '💬 友達とチャット',
@@ -492,6 +503,7 @@ extension on Translations {
 			'settings.advanced.submitEnter' => 'Enterで送信',
 			'settings.advanced.submitShiftEnter' => 'Shift+Enterで送信',
 			'settings.advanced.dangerTitle' => 'データ削除',
+			'settings.advanced.delete' => '削除',
 			'settings.advanced.deleteDatabase' => 'データベースを削除',
 			'settings.advanced.deleteDatabaseConfirm' => 'データベース (履歴と詳細設定) をすべて削除します。よろしいですか？',
 			'settings.advanced.deleteModel' => 'モデル設定を削除',

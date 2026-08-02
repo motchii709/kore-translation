@@ -115,12 +115,16 @@ class InteractiveSession {
         final target = parts.sublist(1).join(' ');
         onTarget(target);
         stdout.writeln(printer.dim('翻訳先を $target に変更しました'));
+        _warnIfCustomPrompt();
+      case ':to':
+        printer.printError(':to には言語を指定してください (例: :to 日本語)');
       case ':tone':
         final tone = parts.sublist(1).join(' ');
         onTone(tone);
         stdout.writeln(
           printer.dim(tone.isEmpty ? 'トーン指示を解除しました' : 'トーンを "$tone" に変更しました'),
         );
+        _warnIfCustomPrompt();
       case ':help':
         stdout.writeln('''
 :to <言語>     翻訳先の言語を変更 (例: :to 日本語)
@@ -131,5 +135,11 @@ class InteractiveSession {
         printer.printError('不明なコマンドです: $input (:help でヘルプ)');
     }
     return false;
+  }
+
+  void _warnIfCustomPrompt() {
+    if (customPrompt.isNotEmpty) {
+      stdout.writeln(printer.dim('注意: system_prompt が設定されているため、この変更はプロンプトに反映されません'));
+    }
   }
 }

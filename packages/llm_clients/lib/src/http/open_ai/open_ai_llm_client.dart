@@ -9,7 +9,7 @@ import 'package:llm_clients/src/http/sse.dart';
 import 'package:llm_clients/src/llm_client_config.dart';
 import 'package:llm_clients/src/safe_json.dart';
 
-/// Thin wrapper over OpenAI-compatible Chat Completions APIs
+/// Thin wrapper over the OpenAI Chat Completions API
 /// (OpenAI, Groq, Ollama, LM Studio, OpenRouter, ...).
 final class OpenAiLlmClient {
   OpenAiLlmClient({required this.config, required this.dio});

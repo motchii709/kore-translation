@@ -64,9 +64,6 @@ class AppDatabase extends $AppDatabase {
 
   Future<void> deleteEntry(int id) => (delete(historyEntries)..where((e) => e.id.equals(id))).go();
 
-  /// Wipes the whole history.
-  Future<void> deleteAllEntries() => delete(historyEntries).go();
-
   /// The stored UI preferences; the defaults when never saved.
   Future<UiSettings> loadUiSettings() async {
     final row = await (select(

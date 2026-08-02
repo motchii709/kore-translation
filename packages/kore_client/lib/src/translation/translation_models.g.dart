@@ -36,6 +36,7 @@ _TranslationResult _$TranslationResultFromJson(
         'target_language',
         (v) => v as String? ?? '',
       ),
+      explanation: $checkedConvert('explanation', (v) => v as String? ?? ''),
       alternatives: $checkedConvert(
         'alternatives',
         (v) =>
@@ -46,7 +47,6 @@ _TranslationResult _$TranslationResultFromJson(
                 .toList() ??
             const [],
       ),
-      explanation: $checkedConvert('explanation', (v) => v as String? ?? ''),
     );
     return val;
   },
@@ -60,6 +60,6 @@ Map<String, dynamic> _$TranslationResultToJson(_TranslationResult instance) => <
   'translation': instance.translation,
   'detected_language': instance.detectedLanguage,
   'target_language': instance.targetLanguage,
-  'alternatives': instance.alternatives,
   'explanation': instance.explanation,
+  'alternatives': instance.alternatives,
 };

@@ -48,6 +48,19 @@ void main() {
     );
   });
 
+  test('reset deletes the stored profile wholesale', () async {
+    final data = useStorage({'llm': '{"provider":"anthropic","api_key":"sk-ant"}'});
+    final scope = container();
+    final subscription = scope.listen(llmConfigStorageProvider, (_, _) {});
+    addTearDown(subscription.close);
+    await scope.read(llmConfigStorageProvider.future);
+
+    await scope.read(llmConfigStorageProvider.notifier).reset();
+
+    expect(data, isEmpty);
+    expect(scope.read(llmConfigStorageProvider).value, defaultLlmConfig);
+  });
+
   test('save round-trips thinking and system prompt inside the union JSON', () async {
     const config = LlmClientConfig.anthropic(
       apiKey: 'sk-ant',

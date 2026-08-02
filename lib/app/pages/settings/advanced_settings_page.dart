@@ -208,7 +208,7 @@ Future<bool> _confirm(BuildContext context, String message) async {
         ),
         FilledButton(
           onPressed: () => Navigator.of(context).pop(true),
-          child: Text(context.t.history.delete),
+          child: Text(context.t.settings.advanced.delete),
         ),
       ],
     ),

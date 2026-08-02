@@ -3,7 +3,7 @@ import 'package:kore_client/src/translation/translation_delta.dart';
 import 'package:kore_client/src/translation/translation_models.dart';
 import 'package:llm_clients/llm_clients.dart';
 
-/// [TranslationClient] backed by an OpenAI-compatible API.
+/// [TranslationClient] backed by the OpenAI API.
 final class OpenAiTranslationClient implements TranslationClient {
   OpenAiTranslationClient({required this.llm});
 

@@ -5,5 +5,4 @@ abstract final class AppRoutePaths {
   /// app is unconfigured.
   static const settings = '/settings';
   static const modelSettings = '/settings/model';
-  static const advancedSettings = '/settings/advanced';
 }

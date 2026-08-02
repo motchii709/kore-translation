@@ -22,12 +22,8 @@ Future<void> main(List<String> arguments) async {
   final printer = ResultPrinter();
 
   final ArgResults args;
-  final String configPath;
-  final CliConfig cliConfig;
   try {
     args = parser.parse(arguments);
-    configPath = args.option('config') ?? defaultCliConfigPath();
-    cliConfig = loadCliConfig(configPath);
   } on FormatException catch (e) {
     printer.printError(e.message);
     stderr.writeln(parser.usage);
@@ -57,6 +53,17 @@ llm のフィールドはプロバイダごとに api_key / base_url / model / c
     return;
   }
 
+  final configPath = args.option('config') ?? defaultCliConfigPath();
+  final CliConfig cliConfig;
+  try {
+    cliConfig = loadCliConfig(configPath);
+  } on FormatException catch (e) {
+    // A broken config file is a configuration error, not a usage error.
+    printer.printError(e.message);
+    exitCode = 78;
+    return;
+  }
+
   final llm = cliConfig.llm;
   if (llm == null) {
     printer.printError('設定ファイル ($configPath) に llm がありません。(kore -h で設定例)');
@@ -64,9 +71,9 @@ llm のフィールドはプロバイダごとに api_key / base_url / model / c
     return;
   }
   switch (llm) {
-    // ACP agents authenticate on their own; they need a launch command.
-    case AcpConfig(command: ''):
-      printer.printError('llm の command が空です。ACPエージェントの起動コマンドを設定してください。');
+    // Agent backends authenticate on their own; they need a launch command.
+    case AcpConfig(command: '') || CodexConfig(command: ''):
+      printer.printError('llm の command が空です。エージェントの起動コマンドを設定してください。');
       exitCode = 78;
       return;
     // Local OpenAI-compatible servers (Ollama, LM Studio) need no API key.
@@ -87,7 +94,10 @@ llm のフィールドはプロバイダごとに api_key / base_url / model / c
   // built-in translator instruction.
   final customPrompt = llm.systemPrompt;
 
-  Dio dio() => Dio(
+  // One Dio for the HTTP providers, closed in the finally below: without
+  // the close, keep-alive sockets hold the one-shot process open for the
+  // idle timeout (~15s) after the result has printed.
+  final dio = Dio(
     BaseOptions(
       connectTimeout: const Duration(seconds: 10),
       receiveTimeout: const Duration(seconds: 120),
@@ -98,23 +108,23 @@ llm のフィールドはプロバイダごとに api_key / base_url / model / c
   switch (llm) {
     case final OpenAiConfig config:
       client = OpenAiTranslationClient(
-        llm: OpenAiLlmClient(config: config, dio: dio()),
+        llm: OpenAiLlmClient(config: config, dio: dio),
       );
     case final OpenAiCompatibleConfig config:
       client = OpenAiCompatibleTranslationClient(
-        llm: OpenAiCompatibleLlmClient(config: config, dio: dio()),
+        llm: OpenAiCompatibleLlmClient(config: config, dio: dio),
       );
     case final AnthropicConfig config:
       client = AnthropicTranslationClient(
-        llm: AnthropicLlmClient(config: config, dio: dio()),
+        llm: AnthropicLlmClient(config: config, dio: dio),
       );
     case final GeminiConfig config:
       client = GeminiTranslationClient(
-        llm: GeminiLlmClient(config: config, dio: dio()),
+        llm: GeminiLlmClient(config: config, dio: dio),
       );
     case final DeepSeekConfig config:
       client = DeepSeekTranslationClient(
-        llm: DeepSeekLlmClient(config: config, dio: dio()),
+        llm: DeepSeekLlmClient(config: config, dio: dio),
       );
     case final AcpConfig config:
       agent = await StdioAgentProcess.start(config.command);
@@ -184,6 +194,7 @@ llm のフィールドはプロバイダごとに api_key / base_url / model / c
       exitCode = 1;
     }
   } finally {
+    dio.close(force: true);
     agent?.kill();
   }
 }

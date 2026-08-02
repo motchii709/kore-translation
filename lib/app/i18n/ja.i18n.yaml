@@ -1,5 +1,6 @@
 translate:
   settingsTooltip: "設定"
+  sourceText: "原文"
   inputHint: "翻訳したいテキストを入力"
   language: "言語"
   style:
@@ -25,6 +26,7 @@ history:
   title: "履歴"
   empty: "履歴はまだありません"
   delete: "削除"
+  loadFailed: "履歴を読み込めませんでした: $error"
 tone:
   polite: "🥸 丁寧"
   casual: "😎 カジュアル"
@@ -85,6 +87,7 @@ settings:
     submitEnter: "Enterで送信"
     submitShiftEnter: "Shift+Enterで送信"
     dangerTitle: "データ削除"
+    delete: "削除"
     deleteDatabase: "データベースを削除"
     deleteDatabaseConfirm: "データベース (履歴と詳細設定) をすべて削除します。よろしいですか？"
     deleteModel: "モデル設定を削除"

@@ -1,5 +1,6 @@
 translate:
   settingsTooltip: "Settings"
+  sourceText: "Source text"
   inputHint: "Enter text to translate"
   language: "Language"
   style:
@@ -25,6 +26,7 @@ history:
   title: "History"
   empty: "No history yet"
   delete: "Delete"
+  loadFailed: "Failed to load history: $error"
 tone:
   polite: "🥸 Polite"
   casual: "😎 Casual"
@@ -85,6 +87,7 @@ settings:
     submitEnter: "Enter to send"
     submitShiftEnter: "Shift+Enter to send"
     dangerTitle: "Delete data"
+    delete: "Delete"
     deleteDatabase: "Delete the database"
     deleteDatabaseConfirm: "Delete the entire database (history and advanced settings)?"
     deleteModel: "Delete model settings"

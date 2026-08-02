@@ -1,5 +1,5 @@
 name: llm_clients
-description: Thin typed streaming clients for LLM HTTP APIs (OpenAI-compatible, Anthropic, Google AI, DeepSeek).
+description: Thin typed streaming clients for LLM backends - HTTP APIs (OpenAI, OpenAI-compatible, Anthropic, Google AI, DeepSeek) and stdio agent protocols (ACP, Codex app-server).
 publish_to: none
 version: 0.1.0
 resolution: workspace

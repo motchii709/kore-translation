@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
@@ -76,6 +78,7 @@ class TranslateInputSection extends HookConsumerWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
+        AppSectionHeader(title: context.t.translate.sourceText),
         // The submit chord only exists on hardware keyboards; plain Enter
         // (or the unbound chord) inserts a newline, and soft keyboards
         // submit through the button.
@@ -84,7 +87,12 @@ class TranslateInputSection extends HookConsumerWidget {
             switch (submitShortcut) {
               SubmitShortcut.enter => const SingleActivator(LogicalKeyboardKey.enter),
               SubmitShortcut.shiftEnter => const SingleActivator(LogicalKeyboardKey.enter, shift: true),
-            }: submit,
+            }: () {
+              // Mirror the disabled button: no double-submit mid-stream.
+              if (!isLoading) {
+                unawaited(submit());
+              }
+            },
           },
           child: TextField(
             controller: controller,

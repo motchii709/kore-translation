@@ -1,4 +1,4 @@
-# Shared lint configuration for pure Dart packages (kore_client, kore_cli).
+# Shared lint configuration for pure Dart packages.
 # NOTE: latest definition available in yumemi_lints 4.4.0 (Dart 3.11).
 include: package:yumemi_lints/dart/3.11/recommended.yaml
 

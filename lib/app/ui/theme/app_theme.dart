@@ -9,7 +9,9 @@ ThemeData buildAppTheme(Brightness brightness) {
   );
   return ThemeData(
     colorScheme: colorScheme,
-    appBarTheme: const AppBarTheme(centerTitle: false),
+    // scrolledUnderElevation: 0 keeps the app bar the same color when
+    // content scrolls underneath (no M3 surface tint shift).
+    appBarTheme: const AppBarTheme(centerTitle: false, scrolledUnderElevation: 0),
     // The checkmark widens a selected chip and shifts the whole row;
     // selection is already conveyed by the chip's color.
     chipTheme: const ChipThemeData(showCheckmark: false),

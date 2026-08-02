@@ -23,9 +23,24 @@ class ResultPrinter {
       return;
     }
     if (result.detectedLanguage.isNotEmpty) {
-      stdout.writeln(dim('検出言語: ${result.detectedLanguage}'));
+      // The output language is the model's decision, so it is shown too
+      // (mirrors the app); empty means the model did not provide it.
+      stdout.writeln(
+        dim(
+          result.targetLanguage.isEmpty
+              ? '検出言語: ${result.detectedLanguage}'
+              : '${result.detectedLanguage} → ${result.targetLanguage}',
+        ),
+      );
     }
     stdout.writeln(bold(result.translation));
+    // The explanation belongs right under the result it explains (mirrors
+    // the app and the schema order).
+    if (result.explanation.isNotEmpty) {
+      stdout.writeln();
+      stdout.writeln(yellow('解説:'));
+      stdout.writeln(result.explanation);
+    }
     if (result.alternatives.isNotEmpty) {
       stdout.writeln();
       stdout.writeln(cyan('別の言い方:'));
@@ -35,11 +50,6 @@ class ResultPrinter {
           stdout.writeln(dim('    ${alt.nuance}'));
         }
       }
-    }
-    if (result.explanation.isNotEmpty) {
-      stdout.writeln();
-      stdout.writeln(yellow('解説:'));
-      stdout.writeln(result.explanation);
     }
   }
 

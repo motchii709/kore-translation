@@ -15,9 +15,22 @@ void main() {
       );
     });
 
-    test('ignores payloads without an error message', () {
+    test('ignores payloads without an error', () {
       expect(() => throwIfApiError({'choices': <Object>[]}), returnsNormally);
-      expect(() => throwIfApiError({'error': <String, Object>{}}), returnsNormally);
+      expect(() => throwIfApiError({'error': null}), returnsNormally);
+    });
+
+    test('carries a non-standard error payload raw', () {
+      expect(
+        () => throwIfApiError({
+          'error': {'code': 429, 'type': 'rate_limit'},
+        }),
+        throwsA(isA<LlmApiException>().having((e) => e.message, 'message', contains('rate_limit'))),
+      );
+      expect(
+        () => throwIfApiError({'error': 'boom'}),
+        throwsA(isA<LlmApiException>().having((e) => e.message, 'message', contains('boom'))),
+      );
     });
   });
 }

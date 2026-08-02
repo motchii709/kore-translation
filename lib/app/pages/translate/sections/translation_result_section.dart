@@ -178,6 +178,19 @@ class TranslationResultView extends StatelessWidget {
             ),
           ),
         ),
+        // The explanation belongs right under the result it explains; the
+        // alternatives come after. The schema requests the same order so
+        // streaming reveals the sections top to bottom.
+        if (translation.explanation.isNotEmpty) ...[
+          const SizedBox(height: 16),
+          AppSectionHeader(title: context.t.translate.result.explanation),
+          Card(
+            child: Padding(
+              padding: const EdgeInsets.all(16),
+              child: SelectableText(translation.explanation),
+            ),
+          ),
+        ],
         if (translation.alternatives.isNotEmpty) ...[
           const SizedBox(height: 16),
           AppSectionHeader(title: context.t.translate.result.alternatives),
@@ -188,16 +201,6 @@ class TranslationResultView extends StatelessWidget {
                 subtitle: alternative.nuance.isEmpty ? null : Text(alternative.nuance),
               ),
             ),
-        ],
-        if (translation.explanation.isNotEmpty) ...[
-          const SizedBox(height: 16),
-          AppSectionHeader(title: context.t.translate.result.explanation),
-          Card(
-            child: Padding(
-              padding: const EdgeInsets.all(16),
-              child: SelectableText(translation.explanation),
-            ),
-          ),
         ],
       ],
     );

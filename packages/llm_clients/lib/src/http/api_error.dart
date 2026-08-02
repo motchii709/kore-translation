@@ -40,4 +40,9 @@ void throwIfApiError(Map<String, dynamic> json) {
   if (message != null) {
     throw LlmApiException(message);
   }
+  if (envelope.error != null) {
+    // An error object without the standard message field is still a
+    // reported failure — carry it raw.
+    throw LlmApiException(jsonEncode(json['error']));
+  }
 }

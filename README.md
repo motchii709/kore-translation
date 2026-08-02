@@ -110,7 +110,7 @@ flutter run -d windows   # ほか: -d <android-device> / macos / linux
 (認証は `codex login`)。エージェント系はサブプロセスを起動するため、
 Android / iOS では選択肢に表示されません。
 システムプロンプトも同様にデフォルトの本文が入った状態から直接編集できます
-(`{{target}}` / `{{tone}}` が翻訳時に置換されます)。
+(`{{language}}` (選択言語)・`{{app}}` (アプリの言語)・`{{tone}}` が翻訳時に置換されます)。
 
 ### CLI
 
@@ -125,7 +125,7 @@ llm:
   provider: codex        # openai / openai-compatible / anthropic / google / deepseek / acp / codex
   # model: gpt-5.6-sol
   # thinking: false      # 対応プロバイダの思考のオン/オフ
-  # system_prompt: 関西弁に翻訳して   # 組み込みプロンプトの差し替え (応答フォーマット指示は自動で付加)
+  # system_prompt: 関西弁に翻訳して   # プロンプト全体の差し替え (応答フォーマット指示も自前で書く)
 to: English              # 翻訳オプションの既定 (tone も可)
 ```
 

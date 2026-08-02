@@ -41,8 +41,8 @@ abstract class TranslationResult with _$TranslationResult {
     /// The language the model translated into — its own decision whenever
     /// the request leaves the choice to it (language pairing).
     @JsonKey(name: 'target_language') @Default('') String targetLanguage,
-    @Default([]) List<TranslationCandidate> alternatives,
     @Default('') String explanation,
+    @Default([]) List<TranslationCandidate> alternatives,
   }) = _TranslationResult;
 
   factory TranslationResult.fromJson(Map<String, dynamic> json) => _$TranslationResultFromJson(json);

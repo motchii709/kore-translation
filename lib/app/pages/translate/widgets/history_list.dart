@@ -5,9 +5,9 @@ import 'package:kore_translation/app/providers/app_database_provider.dart';
 import 'package:kore_translation/app/providers/history_provider.dart';
 import 'package:silky_scroll/silky_scroll.dart';
 
-/// Translation history list, shared by the desktop sidebar and the phone
-/// history page. Tapping an entry makes it the selected one; [onSelected]
-/// runs afterwards (the phone page uses it to navigate back).
+/// Translation history list, shared by the desktop sidebar and the narrow
+/// layout's drawer. Tapping an entry makes it the selected one;
+/// [onSelected] runs afterwards (the drawer uses it to close itself).
 class HistoryList extends ConsumerWidget {
   const HistoryList({this.onSelected, super.key});
 
@@ -51,7 +51,7 @@ class HistoryList extends ConsumerWidget {
           );
         },
       ),
-      AsyncError(:final error) => Center(child: Text('$error')),
+      AsyncError(:final error) => Center(child: Text(context.t.history.loadFailed(error: '$error'))),
       _ => const Center(child: CircularProgressIndicator()),
     };
   }
