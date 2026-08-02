@@ -1,0 +1,17 @@
+# drift runs in modular mode: the generated code becomes a standalone
+# library (history_database.drift.dart) instead of a part file, which lets
+# riverpod_generator resolve drift row types in provider signatures — the
+# part-file setup fails there with an InvalidTypeException.
+targets:
+  $default:
+    builders:
+      drift_dev:
+        enabled: false
+      drift_dev:analyzer:
+        enabled: true
+      drift_dev:modular:
+        enabled: true
+global_options:
+  drift_dev:modular:
+    runs_before:
+      - riverpod_generator

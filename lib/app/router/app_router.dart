@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
-import 'package:kore_honyaku/app/pages/settings/settings_page.dart';
-import 'package:kore_honyaku/app/pages/translate/translate_page.dart';
-import 'package:kore_honyaku/app/router/app_route_paths.dart';
-import 'package:kore_honyaku/app/router/settings_route_guard.dart';
+import 'package:kore_translation/app/pages/settings/advanced_settings_page.dart';
+import 'package:kore_translation/app/pages/settings/model_settings_page.dart';
+import 'package:kore_translation/app/pages/translate/translate_page.dart';
+import 'package:kore_translation/app/router/app_route_paths.dart';
+import 'package:kore_translation/app/router/settings_route_guard.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 part 'app_router.g.dart';
@@ -26,7 +27,8 @@ GoRouter appRouter(Ref ref) {
 @TypedGoRoute<TranslateRoute>(
   path: AppRoutePaths.translate,
   routes: <TypedRoute<RouteData>>[
-    TypedGoRoute<SettingsRoute>(path: 'settings'),
+    TypedGoRoute<ModelSettingsRoute>(path: 'settings/model'),
+    TypedGoRoute<AdvancedSettingsRoute>(path: 'settings/advanced'),
   ],
 )
 class TranslateRoute extends GoRouteData with $TranslateRoute {
@@ -38,11 +40,20 @@ class TranslateRoute extends GoRouteData with $TranslateRoute {
   }
 }
 
-class SettingsRoute extends GoRouteData with $SettingsRoute {
-  const SettingsRoute();
+class ModelSettingsRoute extends GoRouteData with $ModelSettingsRoute {
+  const ModelSettingsRoute();
 
   @override
   Widget build(BuildContext context, GoRouterState state) {
-    return const SettingsPage();
+    return const ModelSettingsPage();
+  }
+}
+
+class AdvancedSettingsRoute extends GoRouteData with $AdvancedSettingsRoute {
+  const AdvancedSettingsRoute();
+
+  @override
+  Widget build(BuildContext context, GoRouterState state) {
+    return const AdvancedSettingsPage();
   }
 }

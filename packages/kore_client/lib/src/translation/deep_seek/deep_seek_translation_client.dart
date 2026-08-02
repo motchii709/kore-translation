@@ -14,7 +14,6 @@ final class DeepSeekTranslationClient implements TranslationClient {
   Stream<TranslationEvent> streamTranslation({
     required String systemPrompt,
     required String text,
-    bool thinking = true,
   }) {
     // No responseFormat: deepseek-reasoner rejects it; the prompt and the
     // fence-tolerant parser keep the reply usable.
@@ -26,7 +25,7 @@ final class DeepSeekTranslationClient implements TranslationClient {
       // DeepSeek has no request parameter for reasoning (it depends on the
       // model), so an unwanted reasoning stream is dropped here instead.
       chunks.expand(
-        (chunk) => _deltasOf(chunk, includeThinking: thinking),
+        (chunk) => _deltasOf(chunk, includeThinking: llm.config.thinking),
       ),
     );
   }

@@ -12,12 +12,11 @@ abstract interface class TranslationClient {
   ///
   /// [systemPrompt] is assembled by the frontend (and thus freely adjustable
   /// by the user); append [translationSchemaPrompt] to it so the reply stays
-  /// parsable. [thinking] is a neutral intent; each implementation maps it to
-  /// its provider's parameters (or ignores it when unsupported).
+  /// parsable. Whether thinking is requested is not a request parameter:
+  /// backends that can control it read it from their own config variant.
   Stream<TranslationEvent> streamTranslation({
     required String systemPrompt,
     required String text,
-    bool thinking = true,
   });
 }
 
@@ -30,6 +29,7 @@ const translationSchemaPrompt = '''
 Respond with a JSON object only, using exactly this schema:
 {
   "detected_language": "<name of the input language>",
+  "target_language": "<name of the language translated into>",
   "translation": "<the best translation>",
   "alternatives": [
     {"text": "<alternative translation>", "nuance": "<short nuance note>"}

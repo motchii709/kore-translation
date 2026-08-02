@@ -22,15 +22,8 @@ final translationClientProvider = TranslationClientProvider._();
 /// disposes the previous agent.
 
 final class TranslationClientProvider
-    extends
-        $FunctionalProvider<
-          AsyncValue<TranslationClient>,
-          TranslationClient,
-          FutureOr<TranslationClient>
-        >
-    with
-        $FutureModifier<TranslationClient>,
-        $FutureProvider<TranslationClient> {
+    extends $FunctionalProvider<AsyncValue<TranslationClient>, TranslationClient, FutureOr<TranslationClient>>
+    with $FutureModifier<TranslationClient>, $FutureProvider<TranslationClient> {
   /// The translation backend. Kept alive so the agent backends (ACP / Codex)
   /// hold one subprocess across translations instead of losing it to auto
   /// dispose mid-stream; a settings change rebuilds this provider, which
@@ -61,4 +54,4 @@ final class TranslationClientProvider
   }
 }
 
-String _$translationClientHash() => r'b8c1dc1b13712eb6f88cea9e0a7dc156a9d028ba';
+String _$translationClientHash() => r'050c1fa8a0a577ca5af57a21fb89befcfbe335ee';

@@ -13,12 +13,7 @@ part of 'secure_storage_provider.dart';
 final secureStorageProvider = SecureStorageProvider._();
 
 final class SecureStorageProvider
-    extends
-        $FunctionalProvider<
-          FlutterSecureStorage,
-          FlutterSecureStorage,
-          FlutterSecureStorage
-        >
+    extends $FunctionalProvider<FlutterSecureStorage, FlutterSecureStorage, FlutterSecureStorage>
     with $Provider<FlutterSecureStorage> {
   SecureStorageProvider._()
     : super(

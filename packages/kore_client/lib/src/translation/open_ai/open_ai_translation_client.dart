@@ -13,7 +13,6 @@ final class OpenAiTranslationClient implements TranslationClient {
   Stream<TranslationEvent> streamTranslation({
     required String systemPrompt,
     required String text,
-    bool thinking = true,
   }) {
     final chunks = llm.streamChatCompletions(
       systemPrompt: systemPrompt,

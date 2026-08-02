@@ -3,7 +3,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:kore_client/kore_client.dart';
-import 'package:kore_honyaku/app/ui/components/app_section_header.dart';
+import 'package:kore_translation/app/i18n/translations.g.dart';
+import 'package:kore_translation/app/ui/components/app_section_header.dart';
 import 'package:llm_clients/llm_clients.dart';
 
 /// Renders the state of the latest translation request.
@@ -36,7 +37,7 @@ class _EmptyHint extends StatelessWidget {
       padding: const EdgeInsets.symmetric(vertical: 32),
       child: Center(
         child: Text(
-          '翻訳結果がここに表示されます',
+          context.t.translate.result.placeholder,
           style: theme.textTheme.bodyMedium?.copyWith(
             color: theme.colorScheme.outline,
           ),
@@ -62,7 +63,7 @@ class _UpdateView extends StatelessWidget {
           const SizedBox(height: 16),
         ],
         if (result != null)
-          _ResultView(result)
+          TranslationResultView(result)
         else if (update.thinking.isEmpty)
           const Padding(
             padding: EdgeInsets.symmetric(vertical: 32),
@@ -85,7 +86,7 @@ class _ThinkingView extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
-        const AppSectionHeader(title: '思考'),
+        AppSectionHeader(title: context.t.translate.result.thinking),
         Card(
           child: Padding(
             padding: const EdgeInsets.all(16),
@@ -100,8 +101,10 @@ class _ThinkingView extends StatelessWidget {
   }
 }
 
-class _ResultView extends StatelessWidget {
-  const _ResultView(this.translation);
+/// A [TranslationResult], as shown for both live translations and stored
+/// history entries.
+class TranslationResultView extends StatelessWidget {
+  const TranslationResultView(this.translation, {super.key});
 
   final TranslationResult translation;
 
@@ -111,7 +114,7 @@ class _ResultView extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
-        const AppSectionHeader(title: '翻訳結果'),
+        AppSectionHeader(title: context.t.translate.result.title),
         Card(
           child: Padding(
             padding: const EdgeInsets.all(16),
@@ -120,7 +123,16 @@ class _ResultView extends StatelessWidget {
               children: [
                 if (translation.detectedLanguage.isNotEmpty) ...[
                   Text(
-                    '検出言語: ${translation.detectedLanguage}',
+                    // The output language is the model's decision (language
+                    // pairing), so it is shown too. History entries from
+                    // before target_language existed fall back to the
+                    // detected language alone.
+                    translation.targetLanguage.isEmpty
+                        ? context.t.translate.result.detectedLanguage(language: translation.detectedLanguage)
+                        : context.t.translate.result.languagePair(
+                            source: translation.detectedLanguage,
+                            target: translation.targetLanguage,
+                          ),
                     style: theme.textTheme.bodySmall?.copyWith(
                       color: theme.colorScheme.outline,
                     ),
@@ -137,7 +149,7 @@ class _ResultView extends StatelessWidget {
                       ),
                     ),
                     IconButton(
-                      tooltip: 'コピー',
+                      tooltip: context.t.translate.result.copy,
                       icon: const Icon(Icons.copy_outlined, size: 20),
                       onPressed: () async {
                         await Clipboard.setData(
@@ -145,7 +157,7 @@ class _ResultView extends StatelessWidget {
                         );
                         if (context.mounted) {
                           ScaffoldMessenger.of(context).showSnackBar(
-                            const SnackBar(content: Text('コピーしました')),
+                            SnackBar(content: Text(context.t.translate.result.copied)),
                           );
                         }
                       },
@@ -158,7 +170,7 @@ class _ResultView extends StatelessWidget {
         ),
         if (translation.alternatives.isNotEmpty) ...[
           const SizedBox(height: 16),
-          const AppSectionHeader(title: '別の言い方'),
+          AppSectionHeader(title: context.t.translate.result.alternatives),
           for (final alternative in translation.alternatives)
             Card(
               child: ListTile(
@@ -169,7 +181,7 @@ class _ResultView extends StatelessWidget {
         ],
         if (translation.explanation.isNotEmpty) ...[
           const SizedBox(height: 16),
-          const AppSectionHeader(title: '解説'),
+          AppSectionHeader(title: context.t.translate.result.explanation),
           Card(
             child: Padding(
               padding: const EdgeInsets.all(16),
@@ -202,17 +214,17 @@ class _ErrorCard extends StatelessWidget {
       color: colorScheme.errorContainer,
       child: ListTile(
         leading: Icon(Icons.error_outline, color: colorScheme.error),
-        title: const Text('翻訳に失敗しました'),
+        title: Text(context.t.translate.result.failed),
         subtitle: SelectableText(message),
         trailing: IconButton(
-          tooltip: 'エラーをコピー',
+          tooltip: context.t.translate.result.copyError,
           icon: const Icon(Icons.copy_outlined, size: 20),
           onPressed: () async {
             await Clipboard.setData(ClipboardData(text: message));
             if (context.mounted) {
               ScaffoldMessenger.of(
                 context,
-              ).showSnackBar(const SnackBar(content: Text('コピーしました')));
+              ).showSnackBar(SnackBar(content: Text(context.t.translate.result.copied)));
             }
           },
         ),

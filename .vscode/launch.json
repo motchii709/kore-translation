@@ -2,14 +2,14 @@
   "version": "0.2.0",
   "configurations": [
     {
-      "name": "kore_honyaku (Windows)",
+      "name": "kore_translation (Windows)",
       "request": "launch",
       "type": "dart",
       "program": "lib/main.dart",
       "deviceId": "windows"
     },
     {
-      "name": "kore_honyaku (Android)",
+      "name": "kore_translation (Android)",
       "request": "launch",
       "type": "dart",
       "program": "lib/main.dart",

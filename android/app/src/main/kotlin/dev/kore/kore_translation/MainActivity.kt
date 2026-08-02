@@ -1,4 +1,4 @@
-package dev.kore.kore_honyaku
+package dev.kore.kore_translation
 
 import io.flutter.embedding.android.FlutterActivity
 

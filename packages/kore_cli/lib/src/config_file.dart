@@ -9,13 +9,11 @@ import 'package:yaml/yaml.dart';
 /// The CLI configuration: the LLM backend as the [LlmClientConfig] union
 /// under `llm`, plus per-user defaults for the translation options.
 final class CliConfig {
-  const CliConfig({this.llm, this.to, this.tone, this.thinking, this.prompt});
+  const CliConfig({this.llm, this.to, this.tone});
 
   final LlmClientConfig? llm;
   final String? to;
   final String? tone;
-  final bool? thinking;
-  final String? prompt;
 }
 
 /// The default config file location: `~/.kore/config.yaml`.
@@ -51,7 +49,7 @@ CliConfig loadCliConfig(String path) {
   // Yaml nodes are json-encodable, so a JSON round-trip converts the nested
   // YamlMap/YamlList structure into plain maps and lists.
   final map = jsonDecode(jsonEncode(document)) as Map<String, dynamic>;
-  const allowedKeys = {'llm', 'to', 'tone', 'thinking', 'prompt'};
+  const allowedKeys = {'llm', 'to', 'tone'};
   for (final key in map.keys) {
     if (!allowedKeys.contains(key)) {
       throw FormatException('Unknown key "$key" in $path (allowed: ${allowedKeys.join(' / ')})');
@@ -65,12 +63,6 @@ CliConfig loadCliConfig(String path) {
     },
     to: _stringOf(map, 'to', path),
     tone: _stringOf(map, 'tone', path),
-    thinking: switch (map['thinking']) {
-      null => null,
-      final bool value => value,
-      _ => throw FormatException('"thinking" in $path must be a boolean'),
-    },
-    prompt: _stringOf(map, 'prompt', path),
   );
 }
 

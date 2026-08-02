@@ -41,7 +41,7 @@ final class AcpLlmClient {
       // Capabilities omitted here are unsupported: no file system access,
       // no terminal.
       'clientCapabilities': <String, Object?>{},
-      'clientInfo': {'name': 'kore', 'version': '0.1.0'},
+      'clientInfo': {'name': 'kore translation', 'version': '0.1.0'},
     });
   }
 
@@ -60,14 +60,12 @@ final class AcpLlmClient {
 
   /// Streams the session updates of one prompt turn.
   ///
-  /// ACP has no system-prompt slot, so [systemPrompt] is prepended to
-  /// [userText] inside the turn's single text block. The turn ends when the
-  /// agent reports a stop reason; anything but `end_turn` becomes an
-  /// [LlmApiException]. Cancelling the subscription cancels the turn.
-  Stream<AcpSessionUpdate> streamPrompt({
-    required String systemPrompt,
-    required String userText,
-  }) async* {
+  /// [text] becomes the turn's single text block, sent verbatim — ACP has no
+  /// further prompt structure, so any composition is the caller's business.
+  /// The turn ends when the agent reports a stop reason; anything but
+  /// `end_turn` becomes an [LlmApiException]. Cancelling the subscription
+  /// cancels the turn.
+  Stream<AcpSessionUpdate> streamPrompt({required String text}) async* {
     await _initialized;
     final session = await _request('session/new', {
       // A session requires a working directory even though translation
@@ -85,7 +83,7 @@ final class AcpLlmClient {
       _request('session/prompt', {
             'sessionId': sessionId,
             'prompt': [
-              {'type': 'text', 'text': '$systemPrompt\n\n$userText'},
+              {'type': 'text', 'text': text},
             ],
           })
           .then(

@@ -1,4 +1,4 @@
-# Kore!? (kore_honyaku)
+# kore translation (Kore翻訳)
 
 LLM を使った翻訳アプリのテンプレート。[Nani翻訳](https://nani.now) 風の
 「翻訳 + 別の言い方 + ニュアンス解説」をバックエンド無しで実現します。
@@ -57,7 +57,7 @@ LlmClient 群 (llm_clients、抽象なし・各社独立の薄いラッパー)
   生成途中 JSON の補完 (`partial_json` パッケージ、未完文字列と閉じ括弧を
   閉じて再パース) による逐次スナップショット + ストリーム完了後の厳密パースで
   `TranslationEvent {thinking, result}` を流します
-- システムプロンプトはフロントエンド (アプリ設定 / CLI オプション) が組み立て、
+- システムプロンプトはフロントエンド (llm 設定の `system_prompt`) が組み立て、
   ユーザーが自由に調整できます。kore_client が持つプロンプト知識は、パーサーと
   対になるレスポンススキーマ指示 (`translationSchemaPrompt`) のみです
 - 設定は sealed な `LlmClientConfig` (プロバイダ毎のバリアント、実デフォルト
@@ -124,7 +124,9 @@ union の定義どおりエラーになります):
 llm:
   provider: codex        # openai / openai-compatible / anthropic / google / deepseek / acp / codex
   # model: gpt-5.6-sol
-to: English              # 翻訳オプションの既定 (tone / thinking / prompt も可)
+  # thinking: false      # 対応プロバイダの思考のオン/オフ
+  # system_prompt: 関西弁に翻訳して   # 組み込みプロンプトの差し替え (応答フォーマット指示は自動で付加)
+to: English              # 翻訳オプションの既定 (tone も可)
 ```
 
 プロバイダごとの `llm` の例:
@@ -144,7 +146,6 @@ dart run bin/kore.dart "こんにちは"
 dart run bin/kore.dart -i                # 対話 (TUI) モード
 dart run bin/kore.dart "Hello" -t 日本語
 dart run bin/kore.dart "了解です" --tone "フランクな口調で"   # トーンは自由記述
-dart run bin/kore.dart "Hi" --prompt "関西弁に翻訳して"       # プロンプト差し替え
 ```
 
 ## 開発

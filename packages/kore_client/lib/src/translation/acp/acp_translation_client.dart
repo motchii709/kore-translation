@@ -9,15 +9,18 @@ final class AcpTranslationClient implements TranslationClient {
 
   final AcpLlmClient llm;
 
+  // ACP has no thinking switch — agents reason at their own discretion, and
+  // thought chunks stream whenever the agent emits them. Accordingly,
+  // `AcpConfig` carries no thinking field.
   @override
   Stream<TranslationEvent> streamTranslation({
     required String systemPrompt,
     required String text,
-    // ACP has no thinking switch — agents reason at their own discretion,
-    // and thought chunks stream whenever the agent emits them.
-    bool thinking = true,
   }) {
-    final updates = llm.streamPrompt(systemPrompt: systemPrompt, userText: text);
+    // ACP has no system-prompt slot either: the prompt is prepended to the
+    // turn's text block here, where that translation-specific composition
+    // belongs.
+    final updates = llm.streamPrompt(text: '$systemPrompt\n\n$text');
     return assembleTranslationEvents(updates.expand(_deltasOf));
   }
 

@@ -8,15 +8,14 @@ part of 'settings_route_guard.dart';
 
 // GENERATED CODE - DO NOT MODIFY BY HAND
 // ignore_for_file: type=lint, type=warning
-/// Redirects to the settings page until an API key is configured.
+/// Redirects to the settings page until a usable LLM profile is configured.
 
 @ProviderFor(SettingsRouteGuard)
 final settingsRouteGuardProvider = SettingsRouteGuardProvider._();
 
-/// Redirects to the settings page until an API key is configured.
-final class SettingsRouteGuardProvider
-    extends $NotifierProvider<SettingsRouteGuard, SettingsRouteState> {
-  /// Redirects to the settings page until an API key is configured.
+/// Redirects to the settings page until a usable LLM profile is configured.
+final class SettingsRouteGuardProvider extends $NotifierProvider<SettingsRouteGuard, SettingsRouteState> {
+  /// Redirects to the settings page until a usable LLM profile is configured.
   SettingsRouteGuardProvider._()
     : super(
         from: null,
@@ -44,10 +43,9 @@ final class SettingsRouteGuardProvider
   }
 }
 
-String _$settingsRouteGuardHash() =>
-    r'6894733eb71c022481fba134dc70bd1f357692a8';
+String _$settingsRouteGuardHash() => r'3d588f2c5c715f3c44e5cc1d8f1cebd559540789';
 
-/// Redirects to the settings page until an API key is configured.
+/// Redirects to the settings page until a usable LLM profile is configured.
 
 abstract class _$SettingsRouteGuard extends $Notifier<SettingsRouteState> {
   SettingsRouteState build();

@@ -1,5 +1,5 @@
 name: kore_client
-description: Pure Dart translation client for Kore!?, layered on llm_clients.
+description: Pure Dart translation client for kore translation, layered on llm_clients.
 publish_to: none
 version: 0.1.0
 resolution: workspace

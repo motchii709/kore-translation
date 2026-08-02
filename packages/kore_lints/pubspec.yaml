@@ -1,5 +1,5 @@
 name: kore_lints
-description: Shared lint rules for the Kore!? workspace.
+description: Shared lint rules for the kore translation workspace.
 publish_to: none
 version: 0.1.0
 resolution: workspace

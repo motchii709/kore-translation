@@ -42,29 +42,32 @@ void main() {
   test('streams thought and message chunks of one prompt turn', () async {
     final transport = StreamChannelController<String>();
     Map<String, dynamic>? promptParams;
-    _fakeAgent(transport, onPrompt: (agent, params) async {
-      promptParams = params;
-      _sendUpdate(agent, {
-        'sessionUpdate': 'agent_thought_chunk',
-        'content': {'type': 'text', 'text': 'considering'},
-      });
-      _sendUpdate(agent, {'sessionUpdate': 'usage_update', 'used': 1, 'size': 2});
-      _sendUpdate(agent, _messageChunk('{"translation":'));
-      _sendUpdate(agent, {
-        'sessionUpdate': 'agent_message_chunk',
-        'content': {'type': 'image', 'data': '...', 'mimeType': 'image/png'},
-      });
-      _sendUpdate(agent, _messageChunk(' "Hi"}'));
-      return {'stopReason': 'end_turn'};
-    });
+    _fakeAgent(
+      transport,
+      onPrompt: (agent, params) async {
+        promptParams = params;
+        _sendUpdate(agent, {
+          'sessionUpdate': 'agent_thought_chunk',
+          'content': {'type': 'text', 'text': 'considering'},
+        });
+        _sendUpdate(agent, {'sessionUpdate': 'usage_update', 'used': 1, 'size': 2});
+        _sendUpdate(agent, _messageChunk('{"translation":'));
+        _sendUpdate(agent, {
+          'sessionUpdate': 'agent_message_chunk',
+          'content': {'type': 'image', 'data': '...', 'mimeType': 'image/png'},
+        });
+        _sendUpdate(agent, _messageChunk(' "Hi"}'));
+        return {'stopReason': 'end_turn'};
+      },
+    );
 
     final client = AcpLlmClient(channel: transport.local);
-    final updates = await client.streamPrompt(systemPrompt: 'Translate.', userText: 'こんにちは').toList();
+    final updates = await client.streamPrompt(text: 'こんにちは').toList();
 
     expect(promptParams, {
       'sessionId': 'sess-1',
       'prompt': [
-        {'type': 'text', 'text': 'Translate.\n\nこんにちは'},
+        {'type': 'text', 'text': 'こんにちは'},
       ],
     });
     expect(updates, const [
@@ -80,28 +83,31 @@ void main() {
     final transport = StreamChannelController<String>();
     Object? rejectOutcome;
     Object? cancelOutcome;
-    _fakeAgent(transport, onPrompt: (agent, params) async {
-      rejectOutcome = await agent.sendRequest('session/request_permission', {
-        'sessionId': 'sess-1',
-        'toolCall': {'toolCallId': 'call-1', 'title': 'Read a file'},
-        'options': [
-          {'optionId': 'allow', 'name': 'Allow', 'kind': 'allow_once'},
-          {'optionId': 'reject', 'name': 'Reject', 'kind': 'reject_once'},
-        ],
-      });
-      cancelOutcome = await agent.sendRequest('session/request_permission', {
-        'sessionId': 'sess-1',
-        'toolCall': {'toolCallId': 'call-2', 'title': 'Read a file'},
-        'options': [
-          {'optionId': 'allow', 'name': 'Allow', 'kind': 'allow_once'},
-        ],
-      });
-      _sendUpdate(agent, _messageChunk('done'));
-      return {'stopReason': 'end_turn'};
-    });
+    _fakeAgent(
+      transport,
+      onPrompt: (agent, params) async {
+        rejectOutcome = await agent.sendRequest('session/request_permission', {
+          'sessionId': 'sess-1',
+          'toolCall': {'toolCallId': 'call-1', 'title': 'Read a file'},
+          'options': [
+            {'optionId': 'allow', 'name': 'Allow', 'kind': 'allow_once'},
+            {'optionId': 'reject', 'name': 'Reject', 'kind': 'reject_once'},
+          ],
+        });
+        cancelOutcome = await agent.sendRequest('session/request_permission', {
+          'sessionId': 'sess-1',
+          'toolCall': {'toolCallId': 'call-2', 'title': 'Read a file'},
+          'options': [
+            {'optionId': 'allow', 'name': 'Allow', 'kind': 'allow_once'},
+          ],
+        });
+        _sendUpdate(agent, _messageChunk('done'));
+        return {'stopReason': 'end_turn'};
+      },
+    );
 
     final client = AcpLlmClient(channel: transport.local);
-    await client.streamPrompt(systemPrompt: 's', userText: 'u').drain<void>();
+    await client.streamPrompt(text: 'u').drain<void>();
 
     expect(rejectOutcome, {
       'outcome': {'outcome': 'selected', 'optionId': 'reject'},
@@ -117,7 +123,7 @@ void main() {
 
     final client = AcpLlmClient(channel: transport.local);
     await expectLater(
-      client.streamPrompt(systemPrompt: 's', userText: 'u').drain<void>(),
+      client.streamPrompt(text: 'u').drain<void>(),
       throwsA(
         isA<LlmApiException>().having((e) => e.message, 'message', contains('refusal')),
       ),
@@ -133,7 +139,7 @@ void main() {
 
     final client = AcpLlmClient(channel: transport.local);
     await expectLater(
-      client.streamPrompt(systemPrompt: 's', userText: 'u').drain<void>(),
+      client.streamPrompt(text: 'u').drain<void>(),
       throwsA(
         isA<RpcException>().having((e) => e.message, 'message', 'Authentication required'),
       ),
@@ -144,11 +150,14 @@ void main() {
     final transport = StreamChannelController<String>();
     final cancelParams = Completer<Map<String, dynamic>>();
     late final Peer agent;
-    agent = _fakeAgent(transport, onPrompt: (_, promptParams) async {
-      _sendUpdate(agent, _messageChunk('partial'));
-      expect(await cancelParams.future, {'sessionId': 'sess-1'});
-      return {'stopReason': 'cancelled'};
-    });
+    agent = _fakeAgent(
+      transport,
+      onPrompt: (_, promptParams) async {
+        _sendUpdate(agent, _messageChunk('partial'));
+        expect(await cancelParams.future, {'sessionId': 'sess-1'});
+        return {'stopReason': 'cancelled'};
+      },
+    );
     agent.registerMethod(
       'session/cancel',
       (Parameters params) => cancelParams.complete(params.value as Map<String, dynamic>),
@@ -157,7 +166,7 @@ void main() {
     final client = AcpLlmClient(channel: transport.local);
     final firstUpdate = Completer<AcpSessionUpdate>();
     late final StreamSubscription<AcpSessionUpdate> subscription;
-    subscription = client.streamPrompt(systemPrompt: 's', userText: 'u').listen((update) {
+    subscription = client.streamPrompt(text: 'u').listen((update) {
       firstUpdate.complete(update);
       unawaited(subscription.cancel());
     });

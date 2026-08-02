@@ -1,23 +1,21 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
-import 'package:kore_honyaku/app/models/app_settings.dart';
-import 'package:kore_honyaku/app/providers/app_settings_provider.dart';
-import 'package:kore_honyaku/app/providers/translation_client_provider.dart';
+import 'package:kore_translation/app/providers/llm_config_provider.dart';
+import 'package:kore_translation/app/providers/translation_client_provider.dart';
 import 'package:llm_clients/llm_clients.dart';
 
-/// Serves fixed settings pointing the Codex backend at the fake app-server
+/// Serves a fixed profile pointing the Codex backend at the fake app-server
 /// fixture, without touching secure storage.
-final class _FakeAppSettingsStorage extends AppSettingsStorage {
+final class _FakeLlmConfigStorage extends LlmConfigStorage {
   @override
-  Future<AppSettings> build() async => const AppSettings(
-    llm: LlmClientConfig.codex(command: 'dart test/fixtures/fake_codex_app_server.dart'),
-  );
+  Future<LlmClientConfig> build() async =>
+      const LlmClientConfig.codex(command: 'dart test/fixtures/fake_codex_app_server.dart');
 }
 
 void main() {
   ProviderContainer container() {
     final container = ProviderContainer(
-      overrides: [appSettingsStorageProvider.overrideWith(_FakeAppSettingsStorage.new)],
+      overrides: [llmConfigStorageProvider.overrideWith(_FakeLlmConfigStorage.new)],
     );
     addTearDown(container.dispose);
     return container;

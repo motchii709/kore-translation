@@ -64,7 +64,7 @@ final class CodexLlmClient {
 
   Future<void> _initialize() async {
     await _request('initialize', {
-      'clientInfo': {'name': 'kore', 'version': '0.1.0'},
+      'clientInfo': {'name': 'kore translation', 'version': '0.1.0'},
     });
     _peer.sendNotification('initialized');
   }

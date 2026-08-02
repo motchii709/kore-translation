@@ -13,14 +13,13 @@ final class GeminiTranslationClient implements TranslationClient {
   Stream<TranslationEvent> streamTranslation({
     required String systemPrompt,
     required String text,
-    bool thinking = true,
   }) {
     final chunks = llm.streamGenerateContent(
       systemPrompt: systemPrompt,
       userText: text,
       responseMimeType: 'application/json',
       // Thoughts are only included in the response when explicitly requested.
-      thinkingConfig: thinking ? const {'includeThoughts': true} : null,
+      thinkingConfig: llm.config.thinking ? const {'includeThoughts': true} : null,
     );
     return assembleTranslationEvents(chunks.expand(_deltasOf));
   }

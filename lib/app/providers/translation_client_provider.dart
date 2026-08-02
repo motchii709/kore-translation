@@ -1,6 +1,6 @@
 import 'package:dio/dio.dart';
 import 'package:kore_client/kore_client.dart';
-import 'package:kore_honyaku/app/providers/app_settings_provider.dart';
+import 'package:kore_translation/app/providers/llm_config_provider.dart';
 import 'package:llm_clients/llm_clients.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
@@ -12,7 +12,7 @@ part 'translation_client_provider.g.dart';
 /// disposes the previous agent.
 @Riverpod(keepAlive: true)
 Future<TranslationClient> translationClient(Ref ref) async {
-  final settings = await ref.watch(appSettingsStorageProvider.future);
+  final llmConfig = await ref.watch(llmConfigStorageProvider.future);
   Dio dio() => Dio(
     BaseOptions(
       connectTimeout: const Duration(seconds: 10),
@@ -32,7 +32,7 @@ Future<TranslationClient> translationClient(Ref ref) async {
     return agent;
   }
 
-  switch (settings.llm) {
+  switch (llmConfig) {
     case final OpenAiConfig config:
       return OpenAiTranslationClient(
         llm: OpenAiLlmClient(config: config, dio: dio()),

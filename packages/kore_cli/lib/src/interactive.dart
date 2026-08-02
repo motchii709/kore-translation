@@ -15,8 +15,7 @@ class InteractiveSession {
     required this.printer,
     this.initialTarget = 'English',
     this.initialTone = '',
-    this.customPrompt,
-    this.thinking = true,
+    this.customPrompt = '',
   });
 
   final TranslationClient client;
@@ -24,16 +23,15 @@ class InteractiveSession {
   final String initialTarget;
   final String initialTone;
 
-  /// Replaces the built-in instruction when set; `:to` and `:tone` then no
-  /// longer affect the prompt.
-  final String? customPrompt;
-  final bool thinking;
+  /// The llm block's `system_prompt`. When non-empty it replaces the
+  /// built-in instruction, and `:to` and `:tone` no longer affect the prompt.
+  final String customPrompt;
 
   Future<void> run() async {
     var target = initialTarget;
     var tone = initialTone;
 
-    stdout.writeln(printer.bold('Kore!? 対話モード'));
+    stdout.writeln(printer.bold('Kore翻訳 対話モード'));
     stdout.writeln(
       printer.dim('テキストを入力すると翻訳します。:help でコマンド一覧、:q で終了。'),
     );
@@ -76,7 +74,6 @@ class InteractiveSession {
                 customPrompt: customPrompt,
               ),
               text: input,
-              thinking: thinking,
             )
             .last;
         final result = event.result;

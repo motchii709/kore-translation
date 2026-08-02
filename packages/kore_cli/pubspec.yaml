@@ -1,5 +1,5 @@
 name: kore_cli
-description: Command line and interactive TUI frontend for Kore!? translation.
+description: Command line and interactive TUI frontend for kore translation.
 publish_to: none
 version: 0.1.0
 resolution: workspace

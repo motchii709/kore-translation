@@ -90,12 +90,12 @@ BEGIN
         BLOCK "040904e4"
         BEGIN
             VALUE "CompanyName", "dev.kore" "\0"
-            VALUE "FileDescription", "kore_honyaku" "\0"
+            VALUE "FileDescription", "kore_translation" "\0"
             VALUE "FileVersion", VERSION_AS_STRING "\0"
-            VALUE "InternalName", "kore_honyaku" "\0"
+            VALUE "InternalName", "kore_translation" "\0"
             VALUE "LegalCopyright", "Copyright (C) 2026 dev.kore. All rights reserved." "\0"
-            VALUE "OriginalFilename", "kore_honyaku.exe" "\0"
-            VALUE "ProductName", "kore_honyaku" "\0"
+            VALUE "OriginalFilename", "kore_translation.exe" "\0"
+            VALUE "ProductName", "kore_translation" "\0"
             VALUE "ProductVersion", VERSION_AS_STRING "\0"
         END
     END

@@ -11,7 +11,7 @@ part of 'translation_controller.dart';
 /// Holds the latest translation progress. `null` means nothing has been
 /// translated yet. While streaming, the model's thinking and progressively
 /// richer results are reflected into [state]; the last event carries the
-/// validated final result.
+/// validated final result, which is also appended to the history.
 
 @ProviderFor(TranslationController)
 final translationControllerProvider = TranslationControllerProvider._();
@@ -19,13 +19,12 @@ final translationControllerProvider = TranslationControllerProvider._();
 /// Holds the latest translation progress. `null` means nothing has been
 /// translated yet. While streaming, the model's thinking and progressively
 /// richer results are reflected into [state]; the last event carries the
-/// validated final result.
-final class TranslationControllerProvider
-    extends $AsyncNotifierProvider<TranslationController, TranslationEvent?> {
+/// validated final result, which is also appended to the history.
+final class TranslationControllerProvider extends $AsyncNotifierProvider<TranslationController, TranslationEvent?> {
   /// Holds the latest translation progress. `null` means nothing has been
   /// translated yet. While streaming, the model's thinking and progressively
   /// richer results are reflected into [state]; the last event carries the
-  /// validated final result.
+  /// validated final result, which is also appended to the history.
   TranslationControllerProvider._()
     : super(
         from: null,
@@ -45,22 +44,19 @@ final class TranslationControllerProvider
   TranslationController create() => TranslationController();
 }
 
-String _$translationControllerHash() =>
-    r'409178b21aa259c5b2f51fd0798584ec53a6bcae';
+String _$translationControllerHash() => r'05692aa1ba329d93c2aae057cdddb0e161ea2b9a';
 
 /// Holds the latest translation progress. `null` means nothing has been
 /// translated yet. While streaming, the model's thinking and progressively
 /// richer results are reflected into [state]; the last event carries the
-/// validated final result.
+/// validated final result, which is also appended to the history.
 
-abstract class _$TranslationController
-    extends $AsyncNotifier<TranslationEvent?> {
+abstract class _$TranslationController extends $AsyncNotifier<TranslationEvent?> {
   FutureOr<TranslationEvent?> build();
   @$mustCallSuper
   @override
   WhenComplete runBuild() {
-    final ref =
-        this.ref as $Ref<AsyncValue<TranslationEvent?>, TranslationEvent?>;
+    final ref = this.ref as $Ref<AsyncValue<TranslationEvent?>, TranslationEvent?>;
     final element =
         ref.element
             as $ClassProviderElement<

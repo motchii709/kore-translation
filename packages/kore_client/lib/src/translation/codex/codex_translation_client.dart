@@ -13,14 +13,13 @@ final class CodexTranslationClient implements TranslationClient {
   Stream<TranslationEvent> streamTranslation({
     required String systemPrompt,
     required String text,
-    bool thinking = true,
   }) {
     final events = llm.streamTurn(
       systemPrompt: systemPrompt,
       userText: text,
       // Codex models always reason; the summary setting only controls
       // whether the reasoning streams back as text.
-      reasoningSummary: thinking ? 'auto' : 'none',
+      reasoningSummary: llm.config.thinking ? 'auto' : 'none',
     );
     return assembleTranslationEvents(events.expand(_deltasOf));
   }

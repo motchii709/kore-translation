@@ -36,9 +36,7 @@ _OpenAiCompatibleChunkChoice _$OpenAiCompatibleChunkChoiceFromJson(
   final val = _OpenAiCompatibleChunkChoice(
     delta: $checkedConvert(
       'delta',
-      (v) => v == null
-          ? null
-          : OpenAiCompatibleChunkDelta.fromJson(v as Map<String, dynamic>),
+      (v) => v == null ? null : OpenAiCompatibleChunkDelta.fromJson(v as Map<String, dynamic>),
     ),
   );
   return val;

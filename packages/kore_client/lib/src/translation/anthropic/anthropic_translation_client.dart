@@ -13,7 +13,6 @@ final class AnthropicTranslationClient implements TranslationClient {
   Stream<TranslationEvent> streamTranslation({
     required String systemPrompt,
     required String text,
-    bool thinking = true,
   }) {
     final events = llm.streamMessages(
       systemPrompt: systemPrompt,
@@ -23,7 +22,7 @@ final class AnthropicTranslationClient implements TranslationClient {
       // Claude 5 models only accept adaptive thinking, and their `display`
       // defaults to "omitted" (empty thinking blocks) — "summarized" opts in
       // to receiving the thinking text.
-      thinking: thinking ? const {'type': 'adaptive', 'display': 'summarized'} : const {'type': 'disabled'},
+      thinking: llm.config.thinking ? const {'type': 'adaptive', 'display': 'summarized'} : const {'type': 'disabled'},
     );
     return assembleTranslationEvents(events.expand(_deltasOf));
   }

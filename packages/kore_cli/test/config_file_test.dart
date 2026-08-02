@@ -29,17 +29,18 @@ void main() {
 llm:
   provider: anthropic
   api_key: sk-ant-test
+  thinking: false
+  system_prompt: 関西弁に翻訳して
 to: 日本語
 tone: フランクに
-thinking: false
-prompt: 関西弁に翻訳して
 '''),
       );
-      expect(config.llm, const LlmClientConfig.anthropic(apiKey: 'sk-ant-test'));
+      expect(
+        config.llm,
+        const LlmClientConfig.anthropic(apiKey: 'sk-ant-test', thinking: false, systemPrompt: '関西弁に翻訳して'),
+      );
       expect(config.to, '日本語');
       expect(config.tone, 'フランクに');
-      expect(config.thinking, isFalse);
-      expect(config.prompt, '関西弁に翻訳して');
     });
 
     test('omitted llm fields fall back to the variant defaults', () {
@@ -69,11 +70,21 @@ prompt: 関西弁に翻訳して
         () => loadCliConfig(write('llms:\n  provider: codex')),
         throwsA(isA<FormatException>().having((e) => e.message, 'message', contains('llms'))),
       );
+      // Keys that moved into the llm block (`thinking`, `prompt` — now
+      // `system_prompt`) must fail loudly as leftovers rather than being
+      // silently ignored.
+      expect(
+        () => loadCliConfig(write('thinking: false')),
+        throwsA(isA<FormatException>().having((e) => e.message, 'message', contains('thinking'))),
+      );
+      expect(
+        () => loadCliConfig(write('prompt: 関西弁に翻訳して')),
+        throwsA(isA<FormatException>().having((e) => e.message, 'message', contains('prompt'))),
+      );
     });
 
     test('rejects wrongly typed values', () {
       expect(() => loadCliConfig(write('llm: codex')), throwsFormatException);
-      expect(() => loadCliConfig(write('thinking: maybe')), throwsFormatException);
       expect(() => loadCliConfig(write('to:\n  - a')), throwsFormatException);
     });
 

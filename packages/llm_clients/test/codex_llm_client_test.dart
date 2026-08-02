@@ -35,7 +35,10 @@ final class _FakeAppServer {
     final params = message['params'] as Map<String, dynamic>?;
     switch (method) {
       case 'initialize':
-        send({'id': message['id'], 'result': {'userAgent': 'fake/1.0'}});
+        send({
+          'id': message['id'],
+          'result': {'userAgent': 'fake/1.0'},
+        });
       case 'thread/start':
         threadStartParams = params;
         send({
@@ -71,33 +74,38 @@ final class _FakeAppServer {
 void main() {
   test('streams reasoning and message deltas of one turn', () async {
     final transport = StreamChannelController<String>();
-    final server = _FakeAppServer(transport, onTurn: (server, params) {
-      expect(params['input'], [
-        {'type': 'text', 'text': 'こんにちは'},
-      ]);
-      expect(params['summary'], 'auto');
-      server.notify('thread/started', {'thread': {'id': 'thread-1'}});
-      server.notify('item/reasoning/summaryTextDelta', {
-        'threadId': 'thread-1',
-        'turnId': 'turn-1',
-        'itemId': 'r-1',
-        'summaryIndex': 0,
-        'delta': 'considering',
-      });
-      server.notify('item/agentMessage/delta', {
-        'threadId': 'thread-1',
-        'turnId': 'turn-1',
-        'itemId': 'm-1',
-        'delta': '{"translation":',
-      });
-      server.notify('item/agentMessage/delta', {
-        'threadId': 'thread-1',
-        'turnId': 'turn-1',
-        'itemId': 'm-1',
-        'delta': ' "Hi"}',
-      });
-      server.completeTurn();
-    });
+    final server = _FakeAppServer(
+      transport,
+      onTurn: (server, params) {
+        expect(params['input'], [
+          {'type': 'text', 'text': 'こんにちは'},
+        ]);
+        expect(params['summary'], 'auto');
+        server.notify('thread/started', {
+          'thread': {'id': 'thread-1'},
+        });
+        server.notify('item/reasoning/summaryTextDelta', {
+          'threadId': 'thread-1',
+          'turnId': 'turn-1',
+          'itemId': 'r-1',
+          'summaryIndex': 0,
+          'delta': 'considering',
+        });
+        server.notify('item/agentMessage/delta', {
+          'threadId': 'thread-1',
+          'turnId': 'turn-1',
+          'itemId': 'm-1',
+          'delta': '{"translation":',
+        });
+        server.notify('item/agentMessage/delta', {
+          'threadId': 'thread-1',
+          'turnId': 'turn-1',
+          'itemId': 'm-1',
+          'delta': ' "Hi"}',
+        });
+        server.completeTurn();
+      },
+    );
 
     final client = CodexLlmClient(
       config: const CodexConfig(model: 'gpt-test-mini'),
@@ -121,9 +129,12 @@ void main() {
 
   test('a failed turn surfaces the turn error as LlmApiException', () async {
     final transport = StreamChannelController<String>();
-    _FakeAppServer(transport, onTurn: (server, params) {
-      server.completeTurn(status: 'failed', error: {'message': 'Usage limit exceeded'});
-    });
+    _FakeAppServer(
+      transport,
+      onTurn: (server, params) {
+        server.completeTurn(status: 'failed', error: {'message': 'Usage limit exceeded'});
+      },
+    );
 
     final client = CodexLlmClient(config: const CodexConfig(), channel: transport.local);
     await expectLater(
@@ -137,14 +148,17 @@ void main() {
   test('cancelling the subscription interrupts the turn', () async {
     final transport = StreamChannelController<String>();
     final firstDelta = Completer<CodexTurnEvent>();
-    final server = _FakeAppServer(transport, onTurn: (server, params) {
-      server.notify('item/agentMessage/delta', {
-        'threadId': 'thread-1',
-        'turnId': 'turn-1',
-        'itemId': 'm-1',
-        'delta': 'partial',
-      });
-    });
+    final server = _FakeAppServer(
+      transport,
+      onTurn: (server, params) {
+        server.notify('item/agentMessage/delta', {
+          'threadId': 'thread-1',
+          'turnId': 'turn-1',
+          'itemId': 'm-1',
+          'delta': 'partial',
+        });
+      },
+    );
 
     final client = CodexLlmClient(config: const CodexConfig(), channel: transport.local);
     late final StreamSubscription<CodexTurnEvent> subscription;

@@ -67,8 +67,12 @@ TranslationClient _client(LlmClientConfig config, _FakeAdapter adapter) {
 }
 
 /// Pairs an [AcpTranslationClient] with a minimal in-memory ACP agent that
-/// answers one prompt turn with [updates].
-TranslationClient _acpClient(List<Map<String, Object?>> updates) {
+/// answers one prompt turn with [updates]. [onPromptText] receives the
+/// turn's single text block.
+TranslationClient _acpClient(
+  List<Map<String, Object?>> updates, {
+  void Function(String text)? onPromptText,
+}) {
   final transport = StreamChannelController<String>();
   final agent = Peer(transport.foreign);
   agent.registerMethod(
@@ -81,6 +85,8 @@ TranslationClient _acpClient(List<Map<String, Object?>> updates) {
   );
   agent.registerMethod('session/new', (Parameters params) => {'sessionId': 'sess-1'});
   agent.registerMethod('session/prompt', (Parameters params) {
+    final blocks = (params.value as Map<String, dynamic>)['prompt'] as List<dynamic>;
+    onPromptText?.call((blocks.single as Map<String, dynamic>)['text'] as String);
     for (final update in updates) {
       agent.sendNotification('session/update', {'sessionId': 'sess-1', 'update': update});
     }
@@ -100,7 +106,10 @@ TranslationClient _codexClient(List<(String, String)> deltaNotifications) {
     final message = jsonDecode(line) as Map<String, dynamic>;
     switch (message['method']) {
       case 'initialize':
-        send({'id': message['id'], 'result': {'userAgent': 'fake/1.0'}});
+        send({
+          'id': message['id'],
+          'result': {'userAgent': 'fake/1.0'},
+        });
       case 'thread/start':
         send({
           'id': message['id'],
@@ -240,24 +249,29 @@ void main() {
     expect(adapter.lastRequest?.uri.path, '/v1/messages');
   });
 
-  test('AnthropicTranslationClient maps the thinking flag to the API parameter', () async {
+  test('AnthropicTranslationClient maps the config thinking flag to the API parameter', () async {
     final adapter = _FakeAdapter(
       _sse([
         _anthropicDelta({'type': 'text_delta', 'text': '{"translation": "Hello"}'}),
       ]),
     );
-    final client = _client(const LlmClientConfig.anthropic(apiKey: 'test-key'), adapter);
 
-    await client.streamTranslation(systemPrompt: prompt, text: 'こんにちは').last;
+    await _client(
+      const LlmClientConfig.anthropic(apiKey: 'test-key'),
+      adapter,
+    ).streamTranslation(systemPrompt: prompt, text: 'こんにちは').last;
     var data = adapter.lastRequest?.data as Map<String, Object?>;
     expect(data['thinking'], {'type': 'adaptive', 'display': 'summarized'});
 
-    await client.streamTranslation(systemPrompt: prompt, text: 'こんにちは', thinking: false).last;
+    await _client(
+      const LlmClientConfig.anthropic(apiKey: 'test-key', thinking: false),
+      adapter,
+    ).streamTranslation(systemPrompt: prompt, text: 'こんにちは').last;
     data = adapter.lastRequest?.data as Map<String, Object?>;
     expect(data['thinking'], {'type': 'disabled'});
   });
 
-  test('DeepSeekTranslationClient drops reasoning when thinking is off', () async {
+  test('DeepSeekTranslationClient drops reasoning when the config disables thinking', () async {
     final adapter = _FakeAdapter(
       _sse([
         _openAiDelta({'reasoning_content': '挨拶の翻訳を考える'}),
@@ -266,9 +280,9 @@ void main() {
       ]),
     );
     final events = await _client(
-      const LlmClientConfig.deepSeek(apiKey: 'test-key'),
+      const LlmClientConfig.deepSeek(apiKey: 'test-key', thinking: false),
       adapter,
-    ).streamTranslation(systemPrompt: prompt, text: 'こんにちは', thinking: false).toList();
+    ).streamTranslation(systemPrompt: prompt, text: 'こんにちは').toList();
 
     expect(events.map((e) => e.thinking), everyElement(isEmpty));
     expect(events.last.result?.translation, 'Hello');
@@ -296,23 +310,30 @@ void main() {
   });
 
   test('AcpTranslationClient streams thought chunks as thinking', () async {
-    final client = _acpClient([
-      {
-        'sessionUpdate': 'agent_thought_chunk',
-        'content': {'type': 'text', 'text': '考え中'},
-      },
-      {
-        'sessionUpdate': 'agent_message_chunk',
-        'content': {'type': 'text', 'text': '{"translation": "He'},
-      },
-      {'sessionUpdate': 'usage_update', 'used': 1, 'size': 2},
-      {
-        'sessionUpdate': 'agent_message_chunk',
-        'content': {'type': 'text', 'text': 'llo"}'},
-      },
-    ]);
+    String? sentText;
+    final client = _acpClient(
+      [
+        {
+          'sessionUpdate': 'agent_thought_chunk',
+          'content': {'type': 'text', 'text': '考え中'},
+        },
+        {
+          'sessionUpdate': 'agent_message_chunk',
+          'content': {'type': 'text', 'text': '{"translation": "He'},
+        },
+        {'sessionUpdate': 'usage_update', 'used': 1, 'size': 2},
+        {
+          'sessionUpdate': 'agent_message_chunk',
+          'content': {'type': 'text', 'text': 'llo"}'},
+        },
+      ],
+      onPromptText: (text) => sentText = text,
+    );
     final events = await client.streamTranslation(systemPrompt: prompt, text: 'こんにちは').toList();
 
+    // ACP has no system-prompt slot, so the instruction must arrive inside
+    // the turn's text block.
+    expect(sentText, '$prompt\n\nこんにちは');
     expect(events.first.thinking, '考え中');
     expect(events.first.result, isNull);
     expect(events.last.result?.translation, 'Hello');

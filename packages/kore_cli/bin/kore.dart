@@ -14,8 +14,6 @@ Future<void> main(List<String> arguments) async {
   final parser = ArgParser()
     ..addOption('to', abbr: 't', help: '翻訳先の言語 (既定: English)')
     ..addOption('tone', help: '翻訳のトーン (自由記述、例: "フランクな口調で")')
-    ..addOption('prompt', help: 'システムプロンプトを差し替える (応答フォーマットの指示は自動で付加)')
-    ..addFlag('thinking', defaultsTo: true, help: '対応モデルの思考を有効にする')
     ..addOption('config', help: '設定ファイルのパス (既定: ~/.kore/config.yaml)')
     ..addFlag('interactive', abbr: 'i', negatable: false, help: '対話(TUI)モード')
     ..addFlag('json', negatable: false, help: '結果をJSONで出力')
@@ -38,7 +36,7 @@ Future<void> main(List<String> arguments) async {
   }
 
   if (args.flag('help')) {
-    stdout.writeln('Kore!? — LLM翻訳CLI');
+    stdout.writeln('Kore翻訳 — LLM翻訳CLI');
     stdout.writeln();
     stdout.writeln('使い方: kore [オプション] <翻訳したいテキスト>');
     stdout.writeln('        kore -i   (対話モード)');
@@ -51,9 +49,11 @@ Future<void> main(List<String> arguments) async {
   llm:
     provider: codex   # openai / openai-compatible / anthropic / google / deepseek / acp / codex
     # model: gpt-5.6-sol
-  to: English         # 翻訳オプションの既定 (tone / thinking / prompt も可)
+    # thinking: false # 対応プロバイダの思考のオン/オフ
+    # system_prompt: 関西弁に翻訳して   # 組み込みプロンプトの差し替え (応答フォーマット指示は自動で付加)
+  to: English         # 翻訳オプションの既定 (tone も可)
 
-llm のフィールドはプロバイダごとに api_key / base_url / model / command です。''');
+llm のフィールドはプロバイダごとに api_key / base_url / model / command / thinking / system_prompt です。''');
     return;
   }
 
@@ -83,8 +83,9 @@ llm のフィールドはプロバイダごとに api_key / base_url / model / c
 
   final target = args.option('to') ?? cliConfig.to ?? 'English';
   final tone = args.option('tone') ?? cliConfig.tone ?? '';
-  final customPrompt = args.option('prompt') ?? cliConfig.prompt;
-  final thinking = args.wasParsed('thinking') ? args.flag('thinking') : cliConfig.thinking ?? true;
+  // The prompt template is part of the provider profile; empty means the
+  // built-in translator instruction.
+  final customPrompt = llm.systemPrompt;
 
   Dio dio() => Dio(
     BaseOptions(
@@ -133,7 +134,6 @@ llm のフィールドはプロバイダごとに api_key / base_url / model / c
         initialTarget: target,
         initialTone: tone,
         customPrompt: customPrompt,
-        thinking: thinking,
       ).run();
       return;
     }
@@ -154,7 +154,6 @@ llm のフィールドはプロバイダごとに api_key / base_url / model / c
               customPrompt: customPrompt,
             ),
             text: text,
-            thinking: thinking,
           )
           .last;
       final result = event.result;

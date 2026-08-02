@@ -10,6 +10,9 @@ ThemeData buildAppTheme(Brightness brightness) {
   return ThemeData(
     colorScheme: colorScheme,
     appBarTheme: const AppBarTheme(centerTitle: false),
+    // The checkmark widens a selected chip and shifts the whole row;
+    // selection is already conveyed by the chip's color.
+    chipTheme: const ChipThemeData(showCheckmark: false),
     inputDecorationTheme: const InputDecorationTheme(
       border: OutlineInputBorder(),
     ),

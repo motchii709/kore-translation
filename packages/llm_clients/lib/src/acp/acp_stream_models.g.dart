@@ -54,8 +54,9 @@ AcpUnknownUpdate _$AcpUnknownUpdateFromJson(Map<String, dynamic> json) =>
       return val;
     }, fieldKeyMap: const {r'$type': 'sessionUpdate'});
 
-Map<String, dynamic> _$AcpUnknownUpdateToJson(AcpUnknownUpdate instance) =>
-    <String, dynamic>{'sessionUpdate': instance.$type};
+Map<String, dynamic> _$AcpUnknownUpdateToJson(AcpUnknownUpdate instance) => <String, dynamic>{
+  'sessionUpdate': instance.$type,
+};
 
 AcpTextContent _$AcpTextContentFromJson(Map<String, dynamic> json) =>
     $checkedCreate('AcpTextContent', json, ($checkedConvert) {
@@ -66,8 +67,10 @@ AcpTextContent _$AcpTextContentFromJson(Map<String, dynamic> json) =>
       return val;
     }, fieldKeyMap: const {r'$type': 'type'});
 
-Map<String, dynamic> _$AcpTextContentToJson(AcpTextContent instance) =>
-    <String, dynamic>{'text': instance.text, 'type': instance.$type};
+Map<String, dynamic> _$AcpTextContentToJson(AcpTextContent instance) => <String, dynamic>{
+  'text': instance.text,
+  'type': instance.$type,
+};
 
 AcpUnknownContent _$AcpUnknownContentFromJson(Map<String, dynamic> json) =>
     $checkedCreate('AcpUnknownContent', json, ($checkedConvert) {
@@ -77,5 +80,4 @@ AcpUnknownContent _$AcpUnknownContentFromJson(Map<String, dynamic> json) =>
       return val;
     }, fieldKeyMap: const {r'$type': 'type'});
 
-Map<String, dynamic> _$AcpUnknownContentToJson(AcpUnknownContent instance) =>
-    <String, dynamic>{'type': instance.$type};
+Map<String, dynamic> _$AcpUnknownContentToJson(AcpUnknownContent instance) => <String, dynamic>{'type': instance.$type};

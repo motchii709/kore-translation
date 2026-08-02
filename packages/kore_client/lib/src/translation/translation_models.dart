@@ -37,6 +37,10 @@ abstract class TranslationResult with _$TranslationResult {
   const factory TranslationResult({
     required String translation,
     @JsonKey(name: 'detected_language') @Default('') String detectedLanguage,
+
+    /// The language the model translated into — its own decision whenever
+    /// the request leaves the choice to it (language pairing).
+    @JsonKey(name: 'target_language') @Default('') String targetLanguage,
     @Default([]) List<TranslationCandidate> alternatives,
     @Default('') String explanation,
   }) = _TranslationResult;

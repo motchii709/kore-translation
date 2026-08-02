@@ -1,0 +1,7 @@
+base_locale: ja
+input_directory: lib/app/i18n
+input_file_pattern: .i18n.yaml
+output_directory: lib/app/i18n
+output_file_name: translations.g.dart
+translate_var: t
+fallback_strategy: base_locale

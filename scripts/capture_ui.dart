@@ -5,15 +5,21 @@ import 'dart:io';
 
 import 'package:flutter/widgets.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
-import 'package:kore_honyaku/main.dart';
+import 'package:kore_translation/app/i18n/translations.g.dart';
+import 'package:kore_translation/main.dart';
 
 import 'ui_capture.dart';
 
-final _boundaryKey = GlobalKey();
+final GlobalKey _boundaryKey = GlobalKey();
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  runApp(RepaintBoundary(key: _boundaryKey, child: const ProviderScope(child: KoreApp())));
+  runApp(
+    RepaintBoundary(
+      key: _boundaryKey,
+      child: TranslationProvider(child: const ProviderScope(child: KoreApp())),
+    ),
+  );
 
   // Let the first frames render and async providers resolve.
   await Future<void>.delayed(const Duration(seconds: 3));

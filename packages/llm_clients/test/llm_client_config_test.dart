@@ -6,7 +6,12 @@ void main() {
   group('LlmClientConfig', () {
     test('variants carry real defaults', () {
       const config = LlmClientConfig.openAi(apiKey: 'sk-test');
-      expect(config, isA<OpenAiConfig>().having((c) => c.baseUrl, 'baseUrl', 'https://api.openai.com/v1').having((c) => c.model, 'model', 'gpt-5-mini'));
+      expect(
+        config,
+        isA<OpenAiConfig>()
+            .having((c) => c.baseUrl, 'baseUrl', 'https://api.openai.com/v1')
+            .having((c) => c.model, 'model', 'gpt-5-mini'),
+      );
     });
 
     test('the agent variants carry real defaults too', () {
@@ -30,6 +35,7 @@ void main() {
         'api_key': 'sk-test',
         'base_url': 'https://api.openai.com/v1',
         'model': 'gpt-5-mini',
+        'system_prompt': '',
       });
       expect(LlmClientConfig.fromJson(config.toJson()), config);
     });
@@ -50,5 +56,4 @@ void main() {
       expect(() => LlmClientConfig.fromJson({'provider': 'openai'}), throwsA(isA<CheckedFromJsonException>()));
     });
   });
-
 }
