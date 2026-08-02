@@ -14,7 +14,7 @@ T _$identity<T>(T value) => value;
 /// @nodoc
 mixin _$AppSettings {
 
- LlmProvider get provider; String get baseUrl; String get apiKey; String get model; bool get thinking; String get systemPrompt;
+ LlmProvider get provider; String get baseUrl; String get apiKey; String get model; String get acpCommand; String get codexCommand; bool get thinking; String get systemPrompt;
 /// Create a copy of AppSettings
 /// with the given fields replaced by the non-null parameter values.
 @JsonKey(includeFromJson: false, includeToJson: false)
@@ -25,16 +25,16 @@ $AppSettingsCopyWith<AppSettings> get copyWith => _$AppSettingsCopyWithImpl<AppS
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is AppSettings&&(identical(other.provider, provider) || other.provider == provider)&&(identical(other.baseUrl, baseUrl) || other.baseUrl == baseUrl)&&(identical(other.apiKey, apiKey) || other.apiKey == apiKey)&&(identical(other.model, model) || other.model == model)&&(identical(other.thinking, thinking) || other.thinking == thinking)&&(identical(other.systemPrompt, systemPrompt) || other.systemPrompt == systemPrompt));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is AppSettings&&(identical(other.provider, provider) || other.provider == provider)&&(identical(other.baseUrl, baseUrl) || other.baseUrl == baseUrl)&&(identical(other.apiKey, apiKey) || other.apiKey == apiKey)&&(identical(other.model, model) || other.model == model)&&(identical(other.acpCommand, acpCommand) || other.acpCommand == acpCommand)&&(identical(other.codexCommand, codexCommand) || other.codexCommand == codexCommand)&&(identical(other.thinking, thinking) || other.thinking == thinking)&&(identical(other.systemPrompt, systemPrompt) || other.systemPrompt == systemPrompt));
 }
 
 
 @override
-int get hashCode => Object.hash(runtimeType,provider,baseUrl,apiKey,model,thinking,systemPrompt);
+int get hashCode => Object.hash(runtimeType,provider,baseUrl,apiKey,model,acpCommand,codexCommand,thinking,systemPrompt);
 
 @override
 String toString() {
-  return 'AppSettings(provider: $provider, baseUrl: $baseUrl, apiKey: $apiKey, model: $model, thinking: $thinking, systemPrompt: $systemPrompt)';
+  return 'AppSettings(provider: $provider, baseUrl: $baseUrl, apiKey: $apiKey, model: $model, acpCommand: $acpCommand, codexCommand: $codexCommand, thinking: $thinking, systemPrompt: $systemPrompt)';
 }
 
 
@@ -45,7 +45,7 @@ abstract mixin class $AppSettingsCopyWith<$Res>  {
   factory $AppSettingsCopyWith(AppSettings value, $Res Function(AppSettings) _then) = _$AppSettingsCopyWithImpl;
 @useResult
 $Res call({
- LlmProvider provider, String baseUrl, String apiKey, String model, bool thinking, String systemPrompt
+ LlmProvider provider, String baseUrl, String apiKey, String model, String acpCommand, String codexCommand, bool thinking, String systemPrompt
 });
 
 
@@ -62,12 +62,14 @@ class _$AppSettingsCopyWithImpl<$Res>
 
 /// Create a copy of AppSettings
 /// with the given fields replaced by the non-null parameter values.
-@pragma('vm:prefer-inline') @override $Res call({Object? provider = null,Object? baseUrl = null,Object? apiKey = null,Object? model = null,Object? thinking = null,Object? systemPrompt = null,}) {
+@pragma('vm:prefer-inline') @override $Res call({Object? provider = null,Object? baseUrl = null,Object? apiKey = null,Object? model = null,Object? acpCommand = null,Object? codexCommand = null,Object? thinking = null,Object? systemPrompt = null,}) {
   return _then(_self.copyWith(
 provider: null == provider ? _self.provider : provider // ignore: cast_nullable_to_non_nullable
 as LlmProvider,baseUrl: null == baseUrl ? _self.baseUrl : baseUrl // ignore: cast_nullable_to_non_nullable
 as String,apiKey: null == apiKey ? _self.apiKey : apiKey // ignore: cast_nullable_to_non_nullable
 as String,model: null == model ? _self.model : model // ignore: cast_nullable_to_non_nullable
+as String,acpCommand: null == acpCommand ? _self.acpCommand : acpCommand // ignore: cast_nullable_to_non_nullable
+as String,codexCommand: null == codexCommand ? _self.codexCommand : codexCommand // ignore: cast_nullable_to_non_nullable
 as String,thinking: null == thinking ? _self.thinking : thinking // ignore: cast_nullable_to_non_nullable
 as bool,systemPrompt: null == systemPrompt ? _self.systemPrompt : systemPrompt // ignore: cast_nullable_to_non_nullable
 as String,
@@ -155,10 +157,10 @@ return $default(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( LlmProvider provider,  String baseUrl,  String apiKey,  String model,  bool thinking,  String systemPrompt)?  $default,{required TResult orElse(),}) {final _that = this;
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( LlmProvider provider,  String baseUrl,  String apiKey,  String model,  String acpCommand,  String codexCommand,  bool thinking,  String systemPrompt)?  $default,{required TResult orElse(),}) {final _that = this;
 switch (_that) {
 case _AppSettings() when $default != null:
-return $default(_that.provider,_that.baseUrl,_that.apiKey,_that.model,_that.thinking,_that.systemPrompt);case _:
+return $default(_that.provider,_that.baseUrl,_that.apiKey,_that.model,_that.acpCommand,_that.codexCommand,_that.thinking,_that.systemPrompt);case _:
   return orElse();
 
 }
@@ -176,10 +178,10 @@ return $default(_that.provider,_that.baseUrl,_that.apiKey,_that.model,_that.thin
 /// }
 /// ```
 
-@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( LlmProvider provider,  String baseUrl,  String apiKey,  String model,  bool thinking,  String systemPrompt)  $default,) {final _that = this;
+@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( LlmProvider provider,  String baseUrl,  String apiKey,  String model,  String acpCommand,  String codexCommand,  bool thinking,  String systemPrompt)  $default,) {final _that = this;
 switch (_that) {
 case _AppSettings():
-return $default(_that.provider,_that.baseUrl,_that.apiKey,_that.model,_that.thinking,_that.systemPrompt);case _:
+return $default(_that.provider,_that.baseUrl,_that.apiKey,_that.model,_that.acpCommand,_that.codexCommand,_that.thinking,_that.systemPrompt);case _:
   throw StateError('Unexpected subclass');
 
 }
@@ -196,10 +198,10 @@ return $default(_that.provider,_that.baseUrl,_that.apiKey,_that.model,_that.thin
 /// }
 /// ```
 
-@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( LlmProvider provider,  String baseUrl,  String apiKey,  String model,  bool thinking,  String systemPrompt)?  $default,) {final _that = this;
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( LlmProvider provider,  String baseUrl,  String apiKey,  String model,  String acpCommand,  String codexCommand,  bool thinking,  String systemPrompt)?  $default,) {final _that = this;
 switch (_that) {
 case _AppSettings() when $default != null:
-return $default(_that.provider,_that.baseUrl,_that.apiKey,_that.model,_that.thinking,_that.systemPrompt);case _:
+return $default(_that.provider,_that.baseUrl,_that.apiKey,_that.model,_that.acpCommand,_that.codexCommand,_that.thinking,_that.systemPrompt);case _:
   return null;
 
 }
@@ -211,13 +213,15 @@ return $default(_that.provider,_that.baseUrl,_that.apiKey,_that.model,_that.thin
 
 
 class _AppSettings extends AppSettings {
-  const _AppSettings({this.provider = LlmProvider.openAi, this.baseUrl = '', this.apiKey = '', this.model = '', this.thinking = true, this.systemPrompt = ''}): super._();
+  const _AppSettings({this.provider = LlmProvider.openAi, this.baseUrl = '', this.apiKey = '', this.model = '', this.acpCommand = '', this.codexCommand = '', this.thinking = true, this.systemPrompt = ''}): super._();
   
 
 @override@JsonKey() final  LlmProvider provider;
 @override@JsonKey() final  String baseUrl;
 @override@JsonKey() final  String apiKey;
 @override@JsonKey() final  String model;
+@override@JsonKey() final  String acpCommand;
+@override@JsonKey() final  String codexCommand;
 @override@JsonKey() final  bool thinking;
 @override@JsonKey() final  String systemPrompt;
 
@@ -231,16 +235,16 @@ _$AppSettingsCopyWith<_AppSettings> get copyWith => __$AppSettingsCopyWithImpl<_
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is _AppSettings&&(identical(other.provider, provider) || other.provider == provider)&&(identical(other.baseUrl, baseUrl) || other.baseUrl == baseUrl)&&(identical(other.apiKey, apiKey) || other.apiKey == apiKey)&&(identical(other.model, model) || other.model == model)&&(identical(other.thinking, thinking) || other.thinking == thinking)&&(identical(other.systemPrompt, systemPrompt) || other.systemPrompt == systemPrompt));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is _AppSettings&&(identical(other.provider, provider) || other.provider == provider)&&(identical(other.baseUrl, baseUrl) || other.baseUrl == baseUrl)&&(identical(other.apiKey, apiKey) || other.apiKey == apiKey)&&(identical(other.model, model) || other.model == model)&&(identical(other.acpCommand, acpCommand) || other.acpCommand == acpCommand)&&(identical(other.codexCommand, codexCommand) || other.codexCommand == codexCommand)&&(identical(other.thinking, thinking) || other.thinking == thinking)&&(identical(other.systemPrompt, systemPrompt) || other.systemPrompt == systemPrompt));
 }
 
 
 @override
-int get hashCode => Object.hash(runtimeType,provider,baseUrl,apiKey,model,thinking,systemPrompt);
+int get hashCode => Object.hash(runtimeType,provider,baseUrl,apiKey,model,acpCommand,codexCommand,thinking,systemPrompt);
 
 @override
 String toString() {
-  return 'AppSettings(provider: $provider, baseUrl: $baseUrl, apiKey: $apiKey, model: $model, thinking: $thinking, systemPrompt: $systemPrompt)';
+  return 'AppSettings(provider: $provider, baseUrl: $baseUrl, apiKey: $apiKey, model: $model, acpCommand: $acpCommand, codexCommand: $codexCommand, thinking: $thinking, systemPrompt: $systemPrompt)';
 }
 
 
@@ -251,7 +255,7 @@ abstract mixin class _$AppSettingsCopyWith<$Res> implements $AppSettingsCopyWith
   factory _$AppSettingsCopyWith(_AppSettings value, $Res Function(_AppSettings) _then) = __$AppSettingsCopyWithImpl;
 @override @useResult
 $Res call({
- LlmProvider provider, String baseUrl, String apiKey, String model, bool thinking, String systemPrompt
+ LlmProvider provider, String baseUrl, String apiKey, String model, String acpCommand, String codexCommand, bool thinking, String systemPrompt
 });
 
 
@@ -268,12 +272,14 @@ class __$AppSettingsCopyWithImpl<$Res>
 
 /// Create a copy of AppSettings
 /// with the given fields replaced by the non-null parameter values.
-@override @pragma('vm:prefer-inline') $Res call({Object? provider = null,Object? baseUrl = null,Object? apiKey = null,Object? model = null,Object? thinking = null,Object? systemPrompt = null,}) {
+@override @pragma('vm:prefer-inline') $Res call({Object? provider = null,Object? baseUrl = null,Object? apiKey = null,Object? model = null,Object? acpCommand = null,Object? codexCommand = null,Object? thinking = null,Object? systemPrompt = null,}) {
   return _then(_AppSettings(
 provider: null == provider ? _self.provider : provider // ignore: cast_nullable_to_non_nullable
 as LlmProvider,baseUrl: null == baseUrl ? _self.baseUrl : baseUrl // ignore: cast_nullable_to_non_nullable
 as String,apiKey: null == apiKey ? _self.apiKey : apiKey // ignore: cast_nullable_to_non_nullable
 as String,model: null == model ? _self.model : model // ignore: cast_nullable_to_non_nullable
+as String,acpCommand: null == acpCommand ? _self.acpCommand : acpCommand // ignore: cast_nullable_to_non_nullable
+as String,codexCommand: null == codexCommand ? _self.codexCommand : codexCommand // ignore: cast_nullable_to_non_nullable
 as String,thinking: null == thinking ? _self.thinking : thinking // ignore: cast_nullable_to_non_nullable
 as bool,systemPrompt: null == systemPrompt ? _self.systemPrompt : systemPrompt // ignore: cast_nullable_to_non_nullable
 as String,

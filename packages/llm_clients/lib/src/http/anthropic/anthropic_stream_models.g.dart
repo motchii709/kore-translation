@@ -45,10 +45,8 @@ AnthropicTextDelta _$AnthropicTextDeltaFromJson(Map<String, dynamic> json) =>
       return val;
     }, fieldKeyMap: const {r'$type': 'type'});
 
-Map<String, dynamic> _$AnthropicTextDeltaToJson(AnthropicTextDelta instance) => <String, dynamic>{
-  'text': instance.text,
-  'type': instance.$type,
-};
+Map<String, dynamic> _$AnthropicTextDeltaToJson(AnthropicTextDelta instance) =>
+    <String, dynamic>{'text': instance.text, 'type': instance.$type};
 
 AnthropicThinkingDelta _$AnthropicThinkingDeltaFromJson(
   Map<String, dynamic> json,

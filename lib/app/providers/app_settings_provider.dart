@@ -9,6 +9,8 @@ const _providerStorageKey = 'provider';
 const _baseUrlStorageKey = 'base_url';
 const _apiKeyStorageKey = 'api_key';
 const _modelStorageKey = 'model';
+const _acpCommandStorageKey = 'acp_command';
+const _codexCommandStorageKey = 'codex_command';
 const _thinkingStorageKey = 'thinking';
 const _systemPromptStorageKey = 'system_prompt';
 
@@ -27,6 +29,8 @@ class AppSettingsStorage extends _$AppSettingsStorage {
       baseUrl: await storage.read(key: _baseUrlStorageKey) ?? defaults.baseUrl,
       apiKey: await storage.read(key: _apiKeyStorageKey) ?? defaults.apiKey,
       model: await storage.read(key: _modelStorageKey) ?? defaults.model,
+      acpCommand: await storage.read(key: _acpCommandStorageKey) ?? defaults.acpCommand,
+      codexCommand: await storage.read(key: _codexCommandStorageKey) ?? defaults.codexCommand,
       thinking: switch (await storage.read(key: _thinkingStorageKey)) {
         'true' => true,
         'false' => false,
@@ -46,6 +50,14 @@ class AppSettingsStorage extends _$AppSettingsStorage {
       await storage.write(key: _baseUrlStorageKey, value: settings.baseUrl);
       await storage.write(key: _apiKeyStorageKey, value: settings.apiKey);
       await storage.write(key: _modelStorageKey, value: settings.model);
+      await storage.write(
+        key: _acpCommandStorageKey,
+        value: settings.acpCommand,
+      );
+      await storage.write(
+        key: _codexCommandStorageKey,
+        value: settings.codexCommand,
+      );
       await storage.write(
         key: _thinkingStorageKey,
         value: '${settings.thinking}',

@@ -1,6 +1,7 @@
 import 'dart:io';
 
 import 'package:dio/dio.dart';
+import 'package:json_rpc_2/json_rpc_2.dart';
 import 'package:kore_cli/src/output.dart';
 import 'package:kore_cli/src/prompt.dart';
 import 'package:kore_client/kore_client.dart';
@@ -90,6 +91,10 @@ class InteractiveSession {
         printer.printError(e.message);
       } on DioException catch (e) {
         printer.printError('$e\n${e.response?.data ?? ''}');
+      } on RpcException catch (e) {
+        // ACP failures (authentication, refused sessions, ...) arrive as
+        // raw JSON-RPC errors, mirroring how DioException stays raw.
+        printer.printError(e.message);
       }
       stdout.writeln();
     }

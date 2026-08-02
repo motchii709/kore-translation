@@ -12,7 +12,8 @@ part of 'app_settings_provider.dart';
 @ProviderFor(AppSettingsStorage)
 final appSettingsStorageProvider = AppSettingsStorageProvider._();
 
-final class AppSettingsStorageProvider extends $AsyncNotifierProvider<AppSettingsStorage, AppSettings> {
+final class AppSettingsStorageProvider
+    extends $AsyncNotifierProvider<AppSettingsStorage, AppSettings> {
   AppSettingsStorageProvider._()
     : super(
         from: null,
@@ -32,7 +33,8 @@ final class AppSettingsStorageProvider extends $AsyncNotifierProvider<AppSetting
   AppSettingsStorage create() => AppSettingsStorage();
 }
 
-String _$appSettingsStorageHash() => r'f29d8af66781e1f8886359077c717d9f8c0a436a';
+String _$appSettingsStorageHash() =>
+    r'76e00a9743bab9bf7852e5c25013302e909d5f88';
 
 abstract class _$AppSettingsStorage extends $AsyncNotifier<AppSettings> {
   FutureOr<AppSettings> build();

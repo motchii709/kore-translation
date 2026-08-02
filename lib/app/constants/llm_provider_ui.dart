@@ -9,5 +9,7 @@ extension LlmProviderUi on LlmProvider {
     LlmProvider.anthropic => 'Anthropic',
     LlmProvider.google => 'Google AI',
     LlmProvider.deepSeek => 'DeepSeek',
+    LlmProvider.acp => 'ACPエージェント',
+    LlmProvider.codex => 'Codex',
   };
 }

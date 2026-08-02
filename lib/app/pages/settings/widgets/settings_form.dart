@@ -21,10 +21,22 @@ class SettingsForm extends HookConsumerWidget {
     final baseUrlController = useTextEditingController(text: initialSettings.baseUrl);
     final apiKeyController = useTextEditingController(text: initialSettings.apiKey);
     final modelController = useTextEditingController(text: initialSettings.model);
+    final acpCommandController = useTextEditingController(text: initialSettings.acpCommand);
+    final codexCommandController = useTextEditingController(text: initialSettings.codexCommand);
     final obscureApiKey = useState(true);
     final thinking = useState(initialSettings.thinking);
     final systemPromptController = useTextEditingController(text: initialSettings.systemPrompt);
-    final defaults = LlmClientConfig.forProvider(provider.value, apiKey: '');
+    // Hints show the provider's real defaults. The agent providers render
+    // their own fields instead of the API fields, so their tuple stays
+    // unused.
+    final (defaultBaseUrl, defaultModel) = switch (LlmClientConfig.forProvider(provider.value)) {
+      final OpenAiConfig config => (config.baseUrl, config.model),
+      final OpenAiCompatibleConfig config => (config.baseUrl, config.model),
+      final AnthropicConfig config => (config.baseUrl, config.model),
+      final GeminiConfig config => (config.baseUrl, config.model),
+      final DeepSeekConfig config => (config.baseUrl, config.model),
+      AcpConfig() || CodexConfig() => ('', ''),
+    };
     // Generic OpenAI-compatible endpoints have no universal defaults, so the
     // endpoint and model must be filled in; local servers need no API key.
     final isCompatible = provider.value == LlmProvider.openAiCompatible;
@@ -41,6 +53,8 @@ class SettingsForm extends HookConsumerWidget {
               baseUrl: baseUrlController.text.trim(),
               apiKey: apiKeyController.text.trim(),
               model: modelController.text.trim(),
+              acpCommand: acpCommandController.text.trim(),
+              codexCommand: codexCommandController.text.trim(),
               thinking: thinking.value,
               systemPrompt: systemPromptController.text.trim(),
             ),
@@ -67,41 +81,75 @@ class SettingsForm extends HookConsumerWidget {
           },
         ),
         const SizedBox(height: 24),
-        const AppSectionHeader(title: 'API設定'),
-        TextField(
-          controller: baseUrlController,
-          keyboardType: TextInputType.url,
-          decoration: InputDecoration(
-            labelText: 'ベースURL',
-            hintText: isCompatible ? 'http://localhost:11434/v1' : defaults.baseUrl,
-            helperText: isCompatible ? '必須' : '空欄の場合はプロバイダのデフォルトを使用します',
-          ),
-        ),
-        const SizedBox(height: 16),
-        TextField(
-          controller: apiKeyController,
-          obscureText: obscureApiKey.value,
-          decoration: InputDecoration(
-            labelText: 'APIキー',
-            helperText: isCompatible ? 'ローカルサーバの場合は空欄可。端末のセキュアストレージにのみ保存されます' : 'APIキーは端末のセキュアストレージにのみ保存されます',
-            suffixIcon: IconButton(
-              tooltip: obscureApiKey.value ? '表示' : '隠す',
-              icon: Icon(
-                obscureApiKey.value ? Icons.visibility_outlined : Icons.visibility_off_outlined,
-              ),
-              onPressed: () => obscureApiKey.value = !obscureApiKey.value,
+        if (provider.value == LlmProvider.acp) ...[
+          const AppSectionHeader(title: 'エージェント設定'),
+          TextField(
+            controller: acpCommandController,
+            decoration: const InputDecoration(
+              labelText: 'ACPコマンド',
+              hintText: 'npx -y @agentclientprotocol/claude-agent-acp',
+              helperText:
+                  '必須。ACPエージェントを起動するコマンドです。\n'
+                  '認証とモデルはエージェント側の設定に従います',
+              helperMaxLines: 2,
             ),
           ),
-        ),
-        const SizedBox(height: 16),
-        TextField(
-          controller: modelController,
-          decoration: InputDecoration(
-            labelText: 'モデル',
-            hintText: isCompatible ? 'llama3' : defaults.model,
-            helperText: isCompatible ? '必須' : '空欄の場合はプロバイダのデフォルトを使用します',
+        ] else if (provider.value == LlmProvider.codex) ...[
+          const AppSectionHeader(title: 'エージェント設定'),
+          TextField(
+            controller: codexCommandController,
+            decoration: const InputDecoration(
+              labelText: 'Codexコマンド',
+              hintText: 'codex app-server',
+              helperText: '空欄の場合は "codex app-server" を使用します。認証は codex login に従います',
+            ),
           ),
-        ),
+          const SizedBox(height: 16),
+          TextField(
+            controller: modelController,
+            decoration: const InputDecoration(
+              labelText: 'モデル',
+              hintText: 'gpt-5.6-sol',
+              helperText: '空欄の場合は Codex の設定に従います',
+            ),
+          ),
+        ] else ...[
+          const AppSectionHeader(title: 'API設定'),
+          TextField(
+            controller: baseUrlController,
+            keyboardType: TextInputType.url,
+            decoration: InputDecoration(
+              labelText: 'ベースURL',
+              hintText: isCompatible ? 'http://localhost:11434/v1' : defaultBaseUrl,
+              helperText: isCompatible ? '必須' : '空欄の場合はプロバイダのデフォルトを使用します',
+            ),
+          ),
+          const SizedBox(height: 16),
+          TextField(
+            controller: apiKeyController,
+            obscureText: obscureApiKey.value,
+            decoration: InputDecoration(
+              labelText: 'APIキー',
+              helperText: isCompatible ? 'ローカルサーバの場合は空欄可。端末のセキュアストレージにのみ保存されます' : 'APIキーは端末のセキュアストレージにのみ保存されます',
+              suffixIcon: IconButton(
+                tooltip: obscureApiKey.value ? '表示' : '隠す',
+                icon: Icon(
+                  obscureApiKey.value ? Icons.visibility_outlined : Icons.visibility_off_outlined,
+                ),
+                onPressed: () => obscureApiKey.value = !obscureApiKey.value,
+              ),
+            ),
+          ),
+          const SizedBox(height: 16),
+          TextField(
+            controller: modelController,
+            decoration: InputDecoration(
+              labelText: 'モデル',
+              hintText: isCompatible ? 'llama3' : defaultModel,
+              helperText: isCompatible ? '必須' : '空欄の場合はプロバイダのデフォルトを使用します',
+            ),
+          ),
+        ],
         const SizedBox(height: 24),
         const AppSectionHeader(title: '翻訳オプション'),
         SwitchListTile(

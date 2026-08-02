@@ -1,30 +1,20 @@
-import 'dart:io';
-
 import 'package:llm_clients/llm_clients.dart';
 
-/// Conventional API key environment variables per backend — a CLI concern,
-/// kept out of kore_client.
-const Map<LlmProvider, String> apiKeyEnvNames = {
-  LlmProvider.openAi: 'OPENAI_API_KEY',
-  LlmProvider.anthropic: 'ANTHROPIC_API_KEY',
-  LlmProvider.google: 'GEMINI_API_KEY',
-  LlmProvider.deepSeek: 'DEEPSEEK_API_KEY',
-};
-
-/// Resolves a [LlmClientConfig] from command line options and environment
-/// variables.
+/// Resolves a [LlmClientConfig] from command line options and the config
+/// file.
 ///
-/// Priority: command line option > `KORE_*` variable > provider-conventional
-/// variable ([apiKeyEnvNames]) > provider default.
+/// Priority: command line option > [fileConfig] (keyed by option name, see
+/// `loadCliConfigFile`) > provider default.
 LlmClientConfig resolveCliConfig({
   String? providerId,
   String? baseUrl,
   String? apiKey,
   String? model,
-  Map<String, String>? environment,
+  String? acpCommand,
+  String? codexCommand,
+  Map<String, String> fileConfig = const {},
 }) {
-  final env = environment ?? Platform.environment;
-  final rawProviderId = providerId ?? env['KORE_PROVIDER'];
+  final rawProviderId = providerId ?? fileConfig['provider'];
   final provider = rawProviderId == null
       ? LlmProvider.openAi
       : LlmProvider.fromId(rawProviderId) ??
@@ -34,8 +24,13 @@ LlmClientConfig resolveCliConfig({
             ));
   return LlmClientConfig.forProvider(
     provider,
-    apiKey: apiKey ?? env['KORE_API_KEY'] ?? env[apiKeyEnvNames[provider]] ?? '',
-    baseUrl: baseUrl ?? env['KORE_BASE_URL'] ?? '',
-    model: model ?? env['KORE_MODEL'] ?? '',
+    apiKey: apiKey ?? fileConfig['api-key'] ?? '',
+    baseUrl: baseUrl ?? fileConfig['base-url'] ?? '',
+    model: model ?? fileConfig['model'] ?? '',
+    command: switch (provider) {
+      LlmProvider.acp => acpCommand ?? fileConfig['acp-command'] ?? '',
+      LlmProvider.codex => codexCommand ?? fileConfig['codex-command'] ?? '',
+      _ => '',
+    },
   );
 }

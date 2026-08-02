@@ -1,3 +1,7 @@
+export 'src/acp/acp_llm_client.dart';
+export 'src/acp/acp_stream_models.dart';
+export 'src/codex/codex_llm_client.dart';
+export 'src/codex/codex_stream_models.dart';
 export 'src/exceptions.dart';
 export 'src/http/anthropic/anthropic_llm_client.dart';
 export 'src/http/anthropic/anthropic_stream_models.dart';
@@ -11,3 +15,4 @@ export 'src/http/open_ai_compatible/open_ai_compatible_llm_client.dart';
 export 'src/http/open_ai_compatible/open_ai_compatible_stream_models.dart';
 export 'src/llm_client_config.dart';
 export 'src/llm_provider.dart';
+export 'src/stdio/stdio_agent_process.dart';

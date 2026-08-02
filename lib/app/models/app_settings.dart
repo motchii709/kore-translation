@@ -14,6 +14,8 @@ abstract class AppSettings with _$AppSettings {
     @Default('') String baseUrl,
     @Default('') String apiKey,
     @Default('') String model,
+    @Default('') String acpCommand,
+    @Default('') String codexCommand,
     @Default(true) bool thinking,
     @Default('') String systemPrompt,
   }) = _AppSettings;
@@ -23,9 +25,13 @@ abstract class AppSettings with _$AppSettings {
   /// Whether translation can be attempted with these settings.
   ///
   /// OpenAI-compatible endpoints may be local servers without authentication,
-  /// so they require an endpoint and model instead of an API key.
+  /// so they require an endpoint and model instead of an API key. Agent
+  /// backends hold their own credentials; ACP needs a launch command while
+  /// Codex has a real default.
   bool get isConfigured => switch (provider) {
     LlmProvider.openAiCompatible => baseUrl.isNotEmpty && model.isNotEmpty,
+    LlmProvider.acp => acpCommand.isNotEmpty,
+    LlmProvider.codex => true,
     _ => apiKey.isNotEmpty,
   };
 
@@ -34,5 +40,10 @@ abstract class AppSettings with _$AppSettings {
     apiKey: apiKey,
     baseUrl: baseUrl,
     model: model,
+    command: switch (provider) {
+      LlmProvider.acp => acpCommand,
+      LlmProvider.codex => codexCommand,
+      _ => '',
+    },
   );
 }

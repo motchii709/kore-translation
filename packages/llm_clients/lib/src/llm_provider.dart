@@ -6,7 +6,9 @@ enum LlmProvider {
   openAiCompatible('openai-compatible'),
   anthropic('anthropic'),
   google('google'),
-  deepSeek('deepseek');
+  deepSeek('deepseek'),
+  acp('acp'),
+  codex('codex');
 
   const LlmProvider(this.id);
 

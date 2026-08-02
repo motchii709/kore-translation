@@ -45,6 +45,22 @@ sealed class LlmClientConfig with _$LlmClientConfig {
     @Default('deepseek-chat') String model,
   }) = DeepSeekConfig;
 
+  /// An Agent Client Protocol agent (https://agentclientprotocol.com) such
+  /// as Claude Code or Gemini CLI. [command] is the command line that starts
+  /// the agent on stdio; no universal default exists. Credentials and model
+  /// belong to the agent itself.
+  const factory LlmClientConfig.acp({
+    @Default('') String command,
+  }) = AcpConfig;
+
+  /// The Codex app-server (Codex's own stdio JSON-RPC protocol, spoken by
+  /// the official IDE extensions). Credentials come from `codex login`;
+  /// an empty [model] uses the Codex configuration's default.
+  const factory LlmClientConfig.codex({
+    @Default('codex app-server') String command,
+    @Default('') String model,
+  }) = CodexConfig;
+
   const LlmClientConfig._();
 
   /// Builds the variant matching [provider] — the bridge from persisted
@@ -52,9 +68,10 @@ sealed class LlmClientConfig with _$LlmClientConfig {
   /// to a typed config.
   factory LlmClientConfig.forProvider(
     LlmProvider provider, {
-    required String apiKey,
+    String apiKey = '',
     String baseUrl = '',
     String model = '',
+    String command = '',
   }) {
     final defaults = switch (provider) {
       LlmProvider.openAi => LlmClientConfig.openAi(apiKey: apiKey),
@@ -62,12 +79,41 @@ sealed class LlmClientConfig with _$LlmClientConfig {
       LlmProvider.anthropic => LlmClientConfig.anthropic(apiKey: apiKey),
       LlmProvider.google => LlmClientConfig.google(apiKey: apiKey),
       LlmProvider.deepSeek => LlmClientConfig.deepSeek(apiKey: apiKey),
+      LlmProvider.acp => LlmClientConfig.acp(command: command),
+      LlmProvider.codex => const LlmClientConfig.codex(),
     };
-    return defaults.copyWith(
-      baseUrl: baseUrl.isNotEmpty ? baseUrl : defaults.baseUrl,
-      model: model.isNotEmpty ? model : defaults.model,
-    );
+    // The agent variants share no endpoint fields with the API variants, so
+    // the "empty means default" merge is spelled out per variant.
+    return switch (defaults) {
+      final AcpConfig config => config,
+      final CodexConfig config => config.copyWith(
+        command: _nonEmpty(command, config.command),
+        model: _nonEmpty(model, config.model),
+      ),
+      final OpenAiConfig config => config.copyWith(
+        baseUrl: _nonEmpty(baseUrl, config.baseUrl),
+        model: _nonEmpty(model, config.model),
+      ),
+      final OpenAiCompatibleConfig config => config.copyWith(
+        baseUrl: _nonEmpty(baseUrl, config.baseUrl),
+        model: _nonEmpty(model, config.model),
+      ),
+      final AnthropicConfig config => config.copyWith(
+        baseUrl: _nonEmpty(baseUrl, config.baseUrl),
+        model: _nonEmpty(model, config.model),
+      ),
+      final GeminiConfig config => config.copyWith(
+        baseUrl: _nonEmpty(baseUrl, config.baseUrl),
+        model: _nonEmpty(model, config.model),
+      ),
+      final DeepSeekConfig config => config.copyWith(
+        baseUrl: _nonEmpty(baseUrl, config.baseUrl),
+        model: _nonEmpty(model, config.model),
+      ),
+    };
   }
+
+  static String _nonEmpty(String value, String fallback) => value.isNotEmpty ? value : fallback;
 
   LlmProvider get provider => switch (this) {
     OpenAiConfig() => LlmProvider.openAi,
@@ -75,5 +121,7 @@ sealed class LlmClientConfig with _$LlmClientConfig {
     AnthropicConfig() => LlmProvider.anthropic,
     GeminiConfig() => LlmProvider.google,
     DeepSeekConfig() => LlmProvider.deepSeek,
+    AcpConfig() => LlmProvider.acp,
+    CodexConfig() => LlmProvider.codex,
   };
 }

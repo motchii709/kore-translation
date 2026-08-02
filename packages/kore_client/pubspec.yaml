@@ -17,6 +17,8 @@ dev_dependencies:
   build_runner: ^2.13.1
   dio: ^5.11.0 # tests stub the HTTP adapter
   freezed: ^3.2.5
+  json_rpc_2: ^4.1.0
   json_serializable: ^6.14.1
   kore_lints: ^0.1.0
+  stream_channel: ^2.1.4
   test: ^1.26.2 # resolves to a version compatible with the test_api pinned by flutter_test

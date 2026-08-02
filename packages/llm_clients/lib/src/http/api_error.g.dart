@@ -11,13 +11,16 @@ _ApiErrorEnvelope _$ApiErrorEnvelopeFromJson(Map<String, dynamic> json) =>
       final val = _ApiErrorEnvelope(
         error: $checkedConvert(
           'error',
-          (v) => v == null ? null : ApiErrorDetail.fromJson(v as Map<String, dynamic>),
+          (v) => v == null
+              ? null
+              : ApiErrorDetail.fromJson(v as Map<String, dynamic>),
         ),
       );
       return val;
     });
 
-Map<String, dynamic> _$ApiErrorEnvelopeToJson(_ApiErrorEnvelope instance) => <String, dynamic>{'error': instance.error};
+Map<String, dynamic> _$ApiErrorEnvelopeToJson(_ApiErrorEnvelope instance) =>
+    <String, dynamic>{'error': instance.error};
 
 _ApiErrorDetail _$ApiErrorDetailFromJson(Map<String, dynamic> json) =>
     $checkedCreate('_ApiErrorDetail', json, ($checkedConvert) {
@@ -27,4 +30,5 @@ _ApiErrorDetail _$ApiErrorDetailFromJson(Map<String, dynamic> json) =>
       return val;
     });
 
-Map<String, dynamic> _$ApiErrorDetailToJson(_ApiErrorDetail instance) => <String, dynamic>{'message': instance.message};
+Map<String, dynamic> _$ApiErrorDetailToJson(_ApiErrorDetail instance) =>
+    <String, dynamic>{'message': instance.message};
