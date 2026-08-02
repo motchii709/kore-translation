@@ -42,6 +42,6 @@ void main() {
     await tester.pumpAndSettle();
 
     expect(find.text('設定'), findsOneWidget);
-    expect(find.text('保存'), findsOneWidget);
+    expect(find.text('LLMプロバイダ'), findsOneWidget);
   });
 }

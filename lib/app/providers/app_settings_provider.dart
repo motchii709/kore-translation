@@ -9,6 +9,7 @@ const _providerStorageKey = 'provider';
 const _baseUrlStorageKey = 'base_url';
 const _apiKeyStorageKey = 'api_key';
 const _modelStorageKey = 'model';
+const _thinkingStorageKey = 'thinking';
 
 @riverpod
 class AppSettingsStorage extends _$AppSettingsStorage {
@@ -17,13 +18,19 @@ class AppSettingsStorage extends _$AppSettingsStorage {
     final storage = ref.watch(secureStorageProvider);
     const defaults = AppSettings();
     return AppSettings(
-      provider: LlmProvider.fromId(
+      provider:
+          LlmProvider.fromId(
             await storage.read(key: _providerStorageKey),
           ) ??
           defaults.provider,
       baseUrl: await storage.read(key: _baseUrlStorageKey) ?? defaults.baseUrl,
       apiKey: await storage.read(key: _apiKeyStorageKey) ?? defaults.apiKey,
       model: await storage.read(key: _modelStorageKey) ?? defaults.model,
+      thinking: switch (await storage.read(key: _thinkingStorageKey)) {
+        'true' => true,
+        'false' => false,
+        _ => defaults.thinking,
+      },
     );
   }
 
@@ -37,6 +44,10 @@ class AppSettingsStorage extends _$AppSettingsStorage {
       await storage.write(key: _baseUrlStorageKey, value: settings.baseUrl);
       await storage.write(key: _apiKeyStorageKey, value: settings.apiKey);
       await storage.write(key: _modelStorageKey, value: settings.model);
+      await storage.write(
+        key: _thinkingStorageKey,
+        value: '${settings.thinking}',
+      );
       return settings;
     });
   }

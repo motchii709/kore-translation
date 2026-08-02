@@ -1,5 +1,6 @@
 import 'dart:io';
 
+import 'package:dio/dio.dart';
 import 'package:kore_cli/src/output.dart';
 import 'package:kore_client/kore_client.dart';
 
@@ -7,12 +8,12 @@ import 'package:kore_client/kore_client.dart';
 /// change settings.
 class InteractiveSession {
   InteractiveSession({
-    required this.translator,
+    required this.client,
     required this.printer,
     this.initialTarget = 'English',
   });
 
-  final Translator translator;
+  final TranslationClient client;
   final ResultPrinter printer;
   final String initialTarget;
 
@@ -37,11 +38,15 @@ class InteractiveSession {
       }
 
       if (input.startsWith(':')) {
-        final shouldExit = _handleCommand(input, onTarget: (value) {
-          target = value;
-        }, onTone: (value) {
-          tone = value;
-        });
+        final shouldExit = _handleCommand(
+          input,
+          onTarget: (value) {
+            target = value;
+          },
+          onTone: (value) {
+            tone = value;
+          },
+        );
         if (shouldExit) {
           return;
         }
@@ -50,16 +55,25 @@ class InteractiveSession {
 
       stdout.writeln(printer.dim('翻訳中...'));
       try {
-        final result = await translator.translate(
-          TranslationRequest(
-            text: input,
-            targetLanguage: target,
-            tone: tone,
-          ),
-        );
-        printer.printResult(result);
+        final event = await client
+            .streamTranslation(
+              TranslationRequest(
+                text: input,
+                targetLanguage: target,
+                tone: tone,
+              ),
+            )
+            .last;
+        final result = event.result;
+        if (result == null) {
+          printer.printError('翻訳結果を取得できませんでした');
+        } else {
+          printer.printResult(result);
+        }
       } on KoreClientException catch (e) {
         printer.printError(e.message);
+      } on DioException catch (e) {
+        printer.printError('$e\n${e.response?.data ?? ''}');
       }
       stdout.writeln();
     }

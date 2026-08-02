@@ -1,5 +1,5 @@
 import 'package:kore_client/kore_client.dart';
-import 'package:kore_client/src/parsing/translation_response_parser.dart';
+import 'package:kore_client/src/translation/translation_response_parser.dart';
 import 'package:test/test.dart';
 
 void main() {

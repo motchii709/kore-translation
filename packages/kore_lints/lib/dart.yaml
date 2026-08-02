@@ -1,3 +1,11 @@
-# Flutter に依存しない Dart パッケージ (kore_client, kore_cli) 用の共有 lint 設定
-# NOTE: yumemi_lints 4.4.0 時点の最新定義 (Dart 3.11)。
+# Shared lint configuration for pure Dart packages (kore_client, kore_cli).
+# NOTE: latest definition available in yumemi_lints 4.4.0 (Dart 3.11).
 include: package:yumemi_lints/dart/3.11/recommended.yaml
+
+formatter:
+  page_width: 120
+
+linter:
+  rules:
+    # The formatter is configured with page_width 120.
+    lines_longer_than_80_chars: false

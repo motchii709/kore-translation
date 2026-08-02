@@ -1,9 +1,14 @@
-# Flutter パッケージ用の共有 lint 設定
-# NOTE: yumemi_lints 4.4.0 時点の最新定義 (Flutter 3.41)。更新時は
-#       `dart run yumemi_lints update` 相当でバージョンを見直すこと。
+# Shared lint configuration for Flutter packages.
+# NOTE: latest definition available in yumemi_lints 4.4.0 (Flutter 3.41).
+#       Revisit the version when upgrading, cf. `dart run yumemi_lints update`.
 include: package:yumemi_lints/flutter/3.41/recommended.yaml
+
+formatter:
+  page_width: 120
 
 linter:
   rules:
-    # フレームワーク・ライブラリ作者向けのルールで、アプリでは過剰なため無効化
+    # Aimed at framework and library authors; too noisy for app code.
     diagnostic_describe_all_properties: false
+    # The formatter is configured with page_width 120.
+    lines_longer_than_80_chars: false

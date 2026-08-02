@@ -7,6 +7,7 @@ import 'package:kore_client/kore_client.dart';
 import 'package:kore_honyaku/app/constants/translation_presets.dart';
 import 'package:kore_honyaku/app/pages/translate/sections/translate_input_section.dart';
 import 'package:kore_honyaku/app/pages/translate/sections/translation_result_section.dart';
+import 'package:kore_honyaku/app/providers/app_settings_provider.dart';
 import 'package:kore_honyaku/app/providers/translation_controller.dart';
 import 'package:kore_honyaku/app/router/app_router.dart';
 import 'package:kore_honyaku/app/ui/layout/app_breakpoints.dart';
@@ -20,6 +21,7 @@ class TranslatePage extends HookConsumerWidget {
     final targetLanguage = useState(TranslationPresets.targetLanguages.first);
     final tone = useState(ToneStyle.auto);
     final result = ref.watch(translationControllerProvider);
+    final settings = ref.watch(appSettingsStorageProvider).value;
 
     void submit() {
       final text = inputController.text.trim();
@@ -28,11 +30,14 @@ class TranslatePage extends HookConsumerWidget {
       }
       FocusScope.of(context).unfocus();
       unawaited(
-        ref.read(translationControllerProvider.notifier).translate(
+        ref
+            .read(translationControllerProvider.notifier)
+            .translate(
               TranslationRequest(
                 text: text,
                 targetLanguage: targetLanguage.value,
                 tone: tone.value,
+                thinking: settings?.thinking ?? true,
               ),
             ),
       );
@@ -47,7 +52,7 @@ class TranslatePage extends HookConsumerWidget {
       isLoading: result.isLoading,
       onSubmit: submit,
     );
-    final resultSection = TranslationResultSection(result: result);
+    final resultSection = TranslationResultSection(update: result);
 
     return Scaffold(
       appBar: AppBar(
@@ -91,8 +96,7 @@ class _TwoPaneLayout extends StatelessWidget {
   Widget build(BuildContext context) {
     return Center(
       child: ConstrainedBox(
-        constraints:
-            const BoxConstraints(maxWidth: AppBreakpoints.maxContentWidth),
+        constraints: const BoxConstraints(maxWidth: AppBreakpoints.maxContentWidth),
         child: Row(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
@@ -127,8 +131,7 @@ class _SingleColumnLayout extends StatelessWidget {
   Widget build(BuildContext context) {
     return Center(
       child: ConstrainedBox(
-        constraints:
-            const BoxConstraints(maxWidth: AppBreakpoints.maxSingleColumnWidth),
+        constraints: const BoxConstraints(maxWidth: AppBreakpoints.maxSingleColumnWidth),
         child: ListView(
           padding: const EdgeInsets.all(16),
           children: [

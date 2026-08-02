@@ -3,5 +3,6 @@ targets:
     builders:
       json_serializable:
         options:
-          # スキーマ不一致を TypeError ではなく CheckedFromJsonException にする
+          # Schema mismatches surface as CheckedFromJsonException instead of
+          # TypeError.
           checked: true

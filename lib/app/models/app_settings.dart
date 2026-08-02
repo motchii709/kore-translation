@@ -13,14 +13,24 @@ abstract class AppSettings with _$AppSettings {
     @Default('') String baseUrl,
     @Default('') String apiKey,
     @Default('') String model,
+    @Default(true) bool thinking,
   }) = _AppSettings;
 
   const AppSettings._();
 
-  TranslatorConfig toTranslatorConfig() => TranslatorConfig(
-        provider: provider,
-        apiKey: apiKey,
-        baseUrl: baseUrl,
-        model: model,
-      );
+  /// Whether translation can be attempted with these settings.
+  ///
+  /// OpenAI-compatible endpoints may be local servers without authentication,
+  /// so they require an endpoint and model instead of an API key.
+  bool get isConfigured => switch (provider) {
+    LlmProvider.openAiCompatible => baseUrl.isNotEmpty && model.isNotEmpty,
+    _ => apiKey.isNotEmpty,
+  };
+
+  LlmClientConfig toLlmClientConfig() => LlmClientConfig.forProvider(
+    provider,
+    apiKey: apiKey,
+    baseUrl: baseUrl,
+    model: model,
+  );
 }

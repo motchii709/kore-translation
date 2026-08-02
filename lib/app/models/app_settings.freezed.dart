@@ -14,7 +14,7 @@ T _$identity<T>(T value) => value;
 /// @nodoc
 mixin _$AppSettings {
 
- LlmProvider get provider; String get baseUrl; String get apiKey; String get model;
+ LlmProvider get provider; String get baseUrl; String get apiKey; String get model; bool get thinking;
 /// Create a copy of AppSettings
 /// with the given fields replaced by the non-null parameter values.
 @JsonKey(includeFromJson: false, includeToJson: false)
@@ -25,16 +25,16 @@ $AppSettingsCopyWith<AppSettings> get copyWith => _$AppSettingsCopyWithImpl<AppS
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is AppSettings&&(identical(other.provider, provider) || other.provider == provider)&&(identical(other.baseUrl, baseUrl) || other.baseUrl == baseUrl)&&(identical(other.apiKey, apiKey) || other.apiKey == apiKey)&&(identical(other.model, model) || other.model == model));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is AppSettings&&(identical(other.provider, provider) || other.provider == provider)&&(identical(other.baseUrl, baseUrl) || other.baseUrl == baseUrl)&&(identical(other.apiKey, apiKey) || other.apiKey == apiKey)&&(identical(other.model, model) || other.model == model)&&(identical(other.thinking, thinking) || other.thinking == thinking));
 }
 
 
 @override
-int get hashCode => Object.hash(runtimeType,provider,baseUrl,apiKey,model);
+int get hashCode => Object.hash(runtimeType,provider,baseUrl,apiKey,model,thinking);
 
 @override
 String toString() {
-  return 'AppSettings(provider: $provider, baseUrl: $baseUrl, apiKey: $apiKey, model: $model)';
+  return 'AppSettings(provider: $provider, baseUrl: $baseUrl, apiKey: $apiKey, model: $model, thinking: $thinking)';
 }
 
 
@@ -45,7 +45,7 @@ abstract mixin class $AppSettingsCopyWith<$Res>  {
   factory $AppSettingsCopyWith(AppSettings value, $Res Function(AppSettings) _then) = _$AppSettingsCopyWithImpl;
 @useResult
 $Res call({
- LlmProvider provider, String baseUrl, String apiKey, String model
+ LlmProvider provider, String baseUrl, String apiKey, String model, bool thinking
 });
 
 
@@ -62,13 +62,14 @@ class _$AppSettingsCopyWithImpl<$Res>
 
 /// Create a copy of AppSettings
 /// with the given fields replaced by the non-null parameter values.
-@pragma('vm:prefer-inline') @override $Res call({Object? provider = null,Object? baseUrl = null,Object? apiKey = null,Object? model = null,}) {
+@pragma('vm:prefer-inline') @override $Res call({Object? provider = null,Object? baseUrl = null,Object? apiKey = null,Object? model = null,Object? thinking = null,}) {
   return _then(_self.copyWith(
 provider: null == provider ? _self.provider : provider // ignore: cast_nullable_to_non_nullable
 as LlmProvider,baseUrl: null == baseUrl ? _self.baseUrl : baseUrl // ignore: cast_nullable_to_non_nullable
 as String,apiKey: null == apiKey ? _self.apiKey : apiKey // ignore: cast_nullable_to_non_nullable
 as String,model: null == model ? _self.model : model // ignore: cast_nullable_to_non_nullable
-as String,
+as String,thinking: null == thinking ? _self.thinking : thinking // ignore: cast_nullable_to_non_nullable
+as bool,
   ));
 }
 
@@ -153,10 +154,10 @@ return $default(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( LlmProvider provider,  String baseUrl,  String apiKey,  String model)?  $default,{required TResult orElse(),}) {final _that = this;
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( LlmProvider provider,  String baseUrl,  String apiKey,  String model,  bool thinking)?  $default,{required TResult orElse(),}) {final _that = this;
 switch (_that) {
 case _AppSettings() when $default != null:
-return $default(_that.provider,_that.baseUrl,_that.apiKey,_that.model);case _:
+return $default(_that.provider,_that.baseUrl,_that.apiKey,_that.model,_that.thinking);case _:
   return orElse();
 
 }
@@ -174,10 +175,10 @@ return $default(_that.provider,_that.baseUrl,_that.apiKey,_that.model);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( LlmProvider provider,  String baseUrl,  String apiKey,  String model)  $default,) {final _that = this;
+@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( LlmProvider provider,  String baseUrl,  String apiKey,  String model,  bool thinking)  $default,) {final _that = this;
 switch (_that) {
 case _AppSettings():
-return $default(_that.provider,_that.baseUrl,_that.apiKey,_that.model);case _:
+return $default(_that.provider,_that.baseUrl,_that.apiKey,_that.model,_that.thinking);case _:
   throw StateError('Unexpected subclass');
 
 }
@@ -194,10 +195,10 @@ return $default(_that.provider,_that.baseUrl,_that.apiKey,_that.model);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( LlmProvider provider,  String baseUrl,  String apiKey,  String model)?  $default,) {final _that = this;
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( LlmProvider provider,  String baseUrl,  String apiKey,  String model,  bool thinking)?  $default,) {final _that = this;
 switch (_that) {
 case _AppSettings() when $default != null:
-return $default(_that.provider,_that.baseUrl,_that.apiKey,_that.model);case _:
+return $default(_that.provider,_that.baseUrl,_that.apiKey,_that.model,_that.thinking);case _:
   return null;
 
 }
@@ -209,13 +210,14 @@ return $default(_that.provider,_that.baseUrl,_that.apiKey,_that.model);case _:
 
 
 class _AppSettings extends AppSettings {
-  const _AppSettings({this.provider = LlmProvider.openAi, this.baseUrl = '', this.apiKey = '', this.model = ''}): super._();
+  const _AppSettings({this.provider = LlmProvider.openAi, this.baseUrl = '', this.apiKey = '', this.model = '', this.thinking = true}): super._();
   
 
 @override@JsonKey() final  LlmProvider provider;
 @override@JsonKey() final  String baseUrl;
 @override@JsonKey() final  String apiKey;
 @override@JsonKey() final  String model;
+@override@JsonKey() final  bool thinking;
 
 /// Create a copy of AppSettings
 /// with the given fields replaced by the non-null parameter values.
@@ -227,16 +229,16 @@ _$AppSettingsCopyWith<_AppSettings> get copyWith => __$AppSettingsCopyWithImpl<_
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is _AppSettings&&(identical(other.provider, provider) || other.provider == provider)&&(identical(other.baseUrl, baseUrl) || other.baseUrl == baseUrl)&&(identical(other.apiKey, apiKey) || other.apiKey == apiKey)&&(identical(other.model, model) || other.model == model));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is _AppSettings&&(identical(other.provider, provider) || other.provider == provider)&&(identical(other.baseUrl, baseUrl) || other.baseUrl == baseUrl)&&(identical(other.apiKey, apiKey) || other.apiKey == apiKey)&&(identical(other.model, model) || other.model == model)&&(identical(other.thinking, thinking) || other.thinking == thinking));
 }
 
 
 @override
-int get hashCode => Object.hash(runtimeType,provider,baseUrl,apiKey,model);
+int get hashCode => Object.hash(runtimeType,provider,baseUrl,apiKey,model,thinking);
 
 @override
 String toString() {
-  return 'AppSettings(provider: $provider, baseUrl: $baseUrl, apiKey: $apiKey, model: $model)';
+  return 'AppSettings(provider: $provider, baseUrl: $baseUrl, apiKey: $apiKey, model: $model, thinking: $thinking)';
 }
 
 
@@ -247,7 +249,7 @@ abstract mixin class _$AppSettingsCopyWith<$Res> implements $AppSettingsCopyWith
   factory _$AppSettingsCopyWith(_AppSettings value, $Res Function(_AppSettings) _then) = __$AppSettingsCopyWithImpl;
 @override @useResult
 $Res call({
- LlmProvider provider, String baseUrl, String apiKey, String model
+ LlmProvider provider, String baseUrl, String apiKey, String model, bool thinking
 });
 
 
@@ -264,13 +266,14 @@ class __$AppSettingsCopyWithImpl<$Res>
 
 /// Create a copy of AppSettings
 /// with the given fields replaced by the non-null parameter values.
-@override @pragma('vm:prefer-inline') $Res call({Object? provider = null,Object? baseUrl = null,Object? apiKey = null,Object? model = null,}) {
+@override @pragma('vm:prefer-inline') $Res call({Object? provider = null,Object? baseUrl = null,Object? apiKey = null,Object? model = null,Object? thinking = null,}) {
   return _then(_AppSettings(
 provider: null == provider ? _self.provider : provider // ignore: cast_nullable_to_non_nullable
 as LlmProvider,baseUrl: null == baseUrl ? _self.baseUrl : baseUrl // ignore: cast_nullable_to_non_nullable
 as String,apiKey: null == apiKey ? _self.apiKey : apiKey // ignore: cast_nullable_to_non_nullable
 as String,model: null == model ? _self.model : model // ignore: cast_nullable_to_non_nullable
-as String,
+as String,thinking: null == thinking ? _self.thinking : thinking // ignore: cast_nullable_to_non_nullable
+as bool,
   ));
 }
 

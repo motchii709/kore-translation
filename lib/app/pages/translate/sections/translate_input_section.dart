@@ -62,8 +62,7 @@ class TranslateInputSection extends StatelessWidget {
         const AppSectionHeader(title: 'トーン'),
         SegmentedButton<ToneStyle>(
           segments: [
-            for (final style in ToneStyle.values)
-              ButtonSegment(value: style, label: Text(style.label)),
+            for (final style in ToneStyle.values) ButtonSegment(value: style, label: Text(style.label)),
           ],
           selected: {tone},
           onSelectionChanged: (selection) => onToneChanged(selection.first),

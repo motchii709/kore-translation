@@ -12,6 +12,7 @@ executables:
 
 dependencies:
   args: ^2.7.0
+  dio: ^5.11.0
   kore_client: ^0.1.0
 
 dev_dependencies:

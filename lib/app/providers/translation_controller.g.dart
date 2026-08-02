@@ -8,18 +8,23 @@ part of 'translation_controller.dart';
 
 // GENERATED CODE - DO NOT MODIFY BY HAND
 // ignore_for_file: type=lint, type=warning
-/// Holds the latest translation result. `null` means nothing has been
-/// translated yet.
+/// Holds the latest translation progress. `null` means nothing has been
+/// translated yet. While streaming, the model's thinking and progressively
+/// richer results are reflected into [state]; the last event carries the
+/// validated final result.
 
 @ProviderFor(TranslationController)
 final translationControllerProvider = TranslationControllerProvider._();
 
-/// Holds the latest translation result. `null` means nothing has been
-/// translated yet.
-final class TranslationControllerProvider
-    extends $AsyncNotifierProvider<TranslationController, TranslationResult?> {
-  /// Holds the latest translation result. `null` means nothing has been
-  /// translated yet.
+/// Holds the latest translation progress. `null` means nothing has been
+/// translated yet. While streaming, the model's thinking and progressively
+/// richer results are reflected into [state]; the last event carries the
+/// validated final result.
+final class TranslationControllerProvider extends $AsyncNotifierProvider<TranslationController, TranslationEvent?> {
+  /// Holds the latest translation progress. `null` means nothing has been
+  /// translated yet. While streaming, the model's thinking and progressively
+  /// richer results are reflected into [state]; the last event carries the
+  /// validated final result.
   TranslationControllerProvider._()
     : super(
         from: null,
@@ -39,25 +44,24 @@ final class TranslationControllerProvider
   TranslationController create() => TranslationController();
 }
 
-String _$translationControllerHash() =>
-    r'0158426b7fe86ae5d8fdbb3821daa36955be6dbd';
+String _$translationControllerHash() => r'c1dbe4cb13aa72e3337c03374e0a929fbf636be2';
 
-/// Holds the latest translation result. `null` means nothing has been
-/// translated yet.
+/// Holds the latest translation progress. `null` means nothing has been
+/// translated yet. While streaming, the model's thinking and progressively
+/// richer results are reflected into [state]; the last event carries the
+/// validated final result.
 
-abstract class _$TranslationController
-    extends $AsyncNotifier<TranslationResult?> {
-  FutureOr<TranslationResult?> build();
+abstract class _$TranslationController extends $AsyncNotifier<TranslationEvent?> {
+  FutureOr<TranslationEvent?> build();
   @$mustCallSuper
   @override
   WhenComplete runBuild() {
-    final ref =
-        this.ref as $Ref<AsyncValue<TranslationResult?>, TranslationResult?>;
+    final ref = this.ref as $Ref<AsyncValue<TranslationEvent?>, TranslationEvent?>;
     final element =
         ref.element
             as $ClassProviderElement<
-              AnyNotifier<AsyncValue<TranslationResult?>, TranslationResult?>,
-              AsyncValue<TranslationResult?>,
+              AnyNotifier<AsyncValue<TranslationEvent?>, TranslationEvent?>,
+              AsyncValue<TranslationEvent?>,
               Object?,
               Object?
             >;

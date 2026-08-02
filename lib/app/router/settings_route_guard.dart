@@ -17,9 +17,7 @@ SettingsRouteState settingsRouteStateFromSettings(
   return switch (settings) {
     AsyncLoading() => SettingsRouteState.loading,
     AsyncError() => SettingsRouteState.unconfigured,
-    AsyncData(:final value) => value.apiKey.isEmpty
-        ? SettingsRouteState.unconfigured
-        : SettingsRouteState.configured,
+    AsyncData(:final value) => value.isConfigured ? SettingsRouteState.configured : SettingsRouteState.unconfigured,
   };
 }
 
@@ -29,8 +27,7 @@ String? redirectLocationForSettingsState(
 ) {
   return switch (state) {
     SettingsRouteState.loading => null,
-    SettingsRouteState.unconfigured =>
-      location == AppRoutePaths.settings ? null : AppRoutePaths.settings,
+    SettingsRouteState.unconfigured => location == AppRoutePaths.settings ? null : AppRoutePaths.settings,
     SettingsRouteState.configured => null,
   };
 }

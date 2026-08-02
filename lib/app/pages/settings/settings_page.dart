@@ -15,12 +15,10 @@ class SettingsPage extends ConsumerWidget {
       body: SafeArea(
         child: Center(
           child: ConstrainedBox(
-            constraints:
-                const BoxConstraints(maxWidth: AppBreakpoints.maxFormWidth),
+            constraints: const BoxConstraints(maxWidth: AppBreakpoints.maxFormWidth),
             child: switch (settings) {
               AsyncData(:final value) => SettingsForm(initialSettings: value),
-              AsyncError(:final error) =>
-                Center(child: Text('設定を読み込めませんでした: $error')),
+              AsyncError(:final error) => Center(child: Text('設定を読み込めませんでした: $error')),
               _ => const Center(child: CircularProgressIndicator()),
             },
           ),

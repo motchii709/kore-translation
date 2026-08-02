@@ -26,19 +26,31 @@ pub workspace によるモノレポ構成です。
 
 ### アーキテクチャ
 
-UI (Flutter / CLI / TUI) は `kore_client` の `Translator` 抽象にのみ依存し、
-LLM バックエンドは `TranslatorConfig` で自由に切り替えられます。
+`kore_client` は 2 層構成です。継承階層は持たず、共有処理は関数合成で行います。
 
 ```
-Translator (抽象)
-├── OpenAiTranslator     # OpenAI / Groq / Ollama / LM Studio / OpenRouter ...
-├── AnthropicTranslator  # Anthropic Messages API
-└── GeminiTranslator     # Google AI generateContent
+TranslationClient (抽象)                  # UI (Flutter / CLI / TUI) が依存する唯一の抽象
+├── OpenAiTranslationClient               # 各社オブジェクト → thinking/text デルタ抽出
+├── AnthropicTranslationClient            #   + assembleTranslationEvents (共通組み立て)
+└── GeminiTranslationClient               #   → TranslationEvent {thinking, result}
+
+LlmClient 群 (抽象なし・各社独立の薄いラッパー)
+├── OpenAiLlmClient.streamChatCompletions()  → Stream<OpenAiChatChunk>
+├── AnthropicLlmClient.streamMessages()      → Stream<AnthropicStreamEvent>
+└── GeminiLlmClient.streamGenerateContent()  → Stream<GeminiStreamChunk>
 ```
 
-プロンプト構築 (`TranslationPromptBuilder`) と応答パース
-(`parseTranslationResponse`) は全バックエンド共通で、各バックエンドは
-「1 回の API 呼び出し」だけを実装します (`DioTranslator` のテンプレートメソッド)。
+- 薄いラッパーは各社 API の型付きオブジェクト (freezed / discriminated union)
+  をそのまま流します。翻訳の知識は持ちません
+- `TranslationClient` 実装が各社オブジェクトから思考/本文デルタを取り出し、
+  [llm_json_stream](https://pub.dev/packages/llm_json_stream) による
+  逐次パース + ストリーム完了後の厳密パースで
+  `TranslationEvent {thinking, result}` を流します
+- 設定は sealed な `LlmClientConfig` (プロバイダ毎のバリアント、実デフォルト
+  値付き)。クライアントの構築 (DI) は composition root — アプリの provider と
+  CLI の main — が config バリアントの switch で行います
+- トランスポートエラー (`DioException`) は変換せず生のまま UI へ届きます
+  (ストリーミングのエラーボディのみ読み取って例外に残します)
 
 ## セットアップ
 
@@ -80,6 +92,8 @@ dart run bin/kore.dart -p anthropic "Hello" -t 日本語
 `ANTHROPIC_API_KEY` / `GEMINI_API_KEY` も利用可)。
 
 ## 開発
+
+AI エージェント (Claude Code / Codex 等) 向けの運用手順は [AGENTS.md](AGENTS.md) を参照。
 
 ```sh
 flutter analyze                          # 静的解析 (yumemi_lints)

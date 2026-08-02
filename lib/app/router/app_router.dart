@@ -13,9 +13,7 @@ GoRouter appRouter(Ref ref) {
   final goRouter = GoRouter(
     initialLocation: AppRoutePaths.translate,
     routes: $appRoutes,
-    redirect: (_, state) => ref
-        .read(settingsRouteGuardProvider.notifier)
-        .redirectForLocation(state.matchedLocation),
+    redirect: (_, state) => ref.read(settingsRouteGuardProvider.notifier).redirectForLocation(state.matchedLocation),
   );
 
   ref.listen(

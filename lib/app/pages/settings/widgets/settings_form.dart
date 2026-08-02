@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:kore_client/kore_client.dart';
+import 'package:kore_honyaku/app/constants/llm_provider_ui.dart';
 import 'package:kore_honyaku/app/models/app_settings.dart';
 import 'package:kore_honyaku/app/providers/app_settings_provider.dart';
 import 'package:kore_honyaku/app/ui/components/app_section_header.dart';
@@ -16,27 +17,33 @@ class SettingsForm extends HookConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final provider = useState(initialSettings.provider);
-    final baseUrlController =
-        useTextEditingController(text: initialSettings.baseUrl);
-    final apiKeyController =
-        useTextEditingController(text: initialSettings.apiKey);
-    final modelController =
-        useTextEditingController(text: initialSettings.model);
+    final baseUrlController = useTextEditingController(text: initialSettings.baseUrl);
+    final apiKeyController = useTextEditingController(text: initialSettings.apiKey);
+    final modelController = useTextEditingController(text: initialSettings.model);
     final obscureApiKey = useState(true);
+    final thinking = useState(initialSettings.thinking);
+    final defaults = LlmClientConfig.forProvider(provider.value, apiKey: '');
+    // Generic OpenAI-compatible endpoints have no universal defaults, so the
+    // endpoint and model must be filled in; local servers need no API key.
+    final isCompatible = provider.value == LlmProvider.openAiCompatible;
 
     Future<void> save() async {
       FocusScope.of(context).unfocus();
-      await ref.read(appSettingsStorageProvider.notifier).save(
+      // Trim clipboard artifacts (trailing whitespace and newlines) that
+      // cause hard-to-diagnose authentication failures.
+      await ref
+          .read(appSettingsStorageProvider.notifier)
+          .save(
             AppSettings(
               provider: provider.value,
               baseUrl: baseUrlController.text.trim(),
               apiKey: apiKeyController.text.trim(),
               model: modelController.text.trim(),
+              thinking: thinking.value,
             ),
           );
       if (context.mounted) {
-        ScaffoldMessenger.of(context)
-            .showSnackBar(const SnackBar(content: Text('設定を保存しました')));
+        ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('設定を保存しました')));
       }
     }
 
@@ -44,13 +51,17 @@ class SettingsForm extends HookConsumerWidget {
       padding: const EdgeInsets.all(16),
       children: [
         const AppSectionHeader(title: 'LLMプロバイダ'),
-        SegmentedButton<LlmProvider>(
-          segments: [
-            for (final value in LlmProvider.values)
-              ButtonSegment(value: value, label: Text(value.label)),
+        DropdownMenu<LlmProvider>(
+          initialSelection: provider.value,
+          expandedInsets: EdgeInsets.zero,
+          dropdownMenuEntries: [
+            for (final value in LlmProvider.values) DropdownMenuEntry(value: value, label: value.label),
           ],
-          selected: {provider.value},
-          onSelectionChanged: (selection) => provider.value = selection.first,
+          onSelected: (value) {
+            if (value != null) {
+              provider.value = value;
+            }
+          },
         ),
         const SizedBox(height: 24),
         const AppSectionHeader(title: 'API設定'),
@@ -59,8 +70,8 @@ class SettingsForm extends HookConsumerWidget {
           keyboardType: TextInputType.url,
           decoration: InputDecoration(
             labelText: 'ベースURL',
-            hintText: provider.value.defaultBaseUrl,
-            helperText: '空欄の場合はプロバイダのデフォルトを使用します',
+            hintText: isCompatible ? 'http://localhost:11434/v1' : defaults.baseUrl,
+            helperText: isCompatible ? '必須' : '空欄の場合はプロバイダのデフォルトを使用します',
           ),
         ),
         const SizedBox(height: 16),
@@ -69,13 +80,11 @@ class SettingsForm extends HookConsumerWidget {
           obscureText: obscureApiKey.value,
           decoration: InputDecoration(
             labelText: 'APIキー',
-            helperText: 'APIキーは端末のセキュアストレージにのみ保存されます',
+            helperText: isCompatible ? 'ローカルサーバの場合は空欄可。端末のセキュアストレージにのみ保存されます' : 'APIキーは端末のセキュアストレージにのみ保存されます',
             suffixIcon: IconButton(
               tooltip: obscureApiKey.value ? '表示' : '隠す',
               icon: Icon(
-                obscureApiKey.value
-                    ? Icons.visibility_outlined
-                    : Icons.visibility_off_outlined,
+                obscureApiKey.value ? Icons.visibility_outlined : Icons.visibility_off_outlined,
               ),
               onPressed: () => obscureApiKey.value = !obscureApiKey.value,
             ),
@@ -86,9 +95,18 @@ class SettingsForm extends HookConsumerWidget {
           controller: modelController,
           decoration: InputDecoration(
             labelText: 'モデル',
-            hintText: provider.value.defaultModel,
-            helperText: '空欄の場合はプロバイダのデフォルトを使用します',
+            hintText: isCompatible ? 'llama3' : defaults.model,
+            helperText: isCompatible ? '必須' : '空欄の場合はプロバイダのデフォルトを使用します',
           ),
+        ),
+        const SizedBox(height: 24),
+        const AppSectionHeader(title: '翻訳オプション'),
+        SwitchListTile(
+          contentPadding: EdgeInsets.zero,
+          title: const Text('思考 (thinking)'),
+          subtitle: const Text('対応モデルの思考を有効にし、ストリーミング表示します'),
+          value: thinking.value,
+          onChanged: (value) => thinking.value = value,
         ),
         const SizedBox(height: 24),
         FilledButton.icon(

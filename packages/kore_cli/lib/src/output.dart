@@ -9,8 +9,7 @@ class ResultPrinter {
 
   final bool _ansi;
 
-  String _style(String text, String code) =>
-      _ansi ? '\x1B[${code}m$text\x1B[0m' : text;
+  String _style(String text, String code) => _ansi ? '\x1B[${code}m$text\x1B[0m' : text;
 
   String bold(String text) => _style(text, '1');
   String dim(String text) => _style(text, '2');

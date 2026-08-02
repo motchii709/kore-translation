@@ -1,23 +1,43 @@
+import 'dart:async';
+
 import 'package:kore_client/kore_client.dart';
-import 'package:kore_honyaku/app/providers/translator_provider.dart';
+import 'package:kore_honyaku/app/providers/translation_client_provider.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 part 'translation_controller.g.dart';
 
-/// Holds the latest translation result. `null` means nothing has been
-/// translated yet.
+/// Holds the latest translation progress. `null` means nothing has been
+/// translated yet. While streaming, the model's thinking and progressively
+/// richer results are reflected into [state]; the last event carries the
+/// validated final result.
 @riverpod
 class TranslationController extends _$TranslationController {
+  StreamSubscription<TranslationEvent>? _subscription;
+
   @override
-  Future<TranslationResult?> build() async {
+  Future<TranslationEvent?> build() async {
+    ref.onDispose(() => unawaited(_subscription?.cancel()));
     return null;
   }
 
+  /// Cancels the previous request (if any) and starts a new streaming
+  /// translation.
   Future<void> translate(TranslationRequest request) async {
+    await _subscription?.cancel();
     state = const AsyncLoading();
-    state = await AsyncValue.guard(() async {
-      final translator = await ref.read(translatorProvider.future);
-      return translator.translate(request);
-    });
+    final TranslationClient client;
+    try {
+      client = await ref.read(translationClientProvider.future);
+    } on Exception catch (error, stackTrace) {
+      state = AsyncError(error, stackTrace);
+      return;
+    }
+    _subscription = client
+        .streamTranslation(request)
+        .listen(
+          (event) => state = AsyncData(event),
+          onError: (Object error, StackTrace stackTrace) => state = AsyncError(error, stackTrace),
+          cancelOnError: true,
+        );
   }
 }

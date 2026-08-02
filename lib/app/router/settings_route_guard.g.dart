@@ -14,8 +14,7 @@ part of 'settings_route_guard.dart';
 final settingsRouteGuardProvider = SettingsRouteGuardProvider._();
 
 /// Redirects to the settings page until an API key is configured.
-final class SettingsRouteGuardProvider
-    extends $NotifierProvider<SettingsRouteGuard, SettingsRouteState> {
+final class SettingsRouteGuardProvider extends $NotifierProvider<SettingsRouteGuard, SettingsRouteState> {
   /// Redirects to the settings page until an API key is configured.
   SettingsRouteGuardProvider._()
     : super(
@@ -44,8 +43,7 @@ final class SettingsRouteGuardProvider
   }
 }
 
-String _$settingsRouteGuardHash() =>
-    r'6894733eb71c022481fba134dc70bd1f357692a8';
+String _$settingsRouteGuardHash() => r'6894733eb71c022481fba134dc70bd1f357692a8';
 
 /// Redirects to the settings page until an API key is configured.
 
