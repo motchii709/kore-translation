@@ -5,6 +5,7 @@ import 'package:dio/dio.dart';
 import 'package:kore_cli/src/cli_config.dart';
 import 'package:kore_cli/src/interactive.dart';
 import 'package:kore_cli/src/output.dart';
+import 'package:kore_cli/src/prompt.dart';
 import 'package:kore_client/kore_client.dart';
 
 Future<void> main(List<String> arguments) async {
@@ -16,12 +17,8 @@ Future<void> main(List<String> arguments) async {
       help: 'LLMプロバイダ (既定: KORE_PROVIDER または openai)',
     )
     ..addOption('to', abbr: 't', defaultsTo: 'English', help: '翻訳先の言語')
-    ..addOption(
-      'tone',
-      defaultsTo: ToneStyle.auto.name,
-      allowed: ToneStyle.values.map((t) => t.name),
-      help: '翻訳のトーン',
-    )
+    ..addOption('tone', defaultsTo: '', help: '翻訳のトーン (自由記述、例: "フランクな口調で")')
+    ..addOption('prompt', help: 'システムプロンプトを差し替える (応答フォーマットの指示は自動で付加)')
     ..addOption('model', abbr: 'm', help: '使用するモデル (既定: KORE_MODEL)')
     ..addOption('base-url', help: 'APIのベースURL (既定: KORE_BASE_URL)')
     ..addOption('api-key', help: 'APIキー (既定: KORE_API_KEY など)')
@@ -106,6 +103,9 @@ Future<void> main(List<String> arguments) async {
       client: client,
       printer: printer,
       initialTarget: args.option('to')!,
+      initialTone: args.option('tone')!,
+      customPrompt: args.option('prompt'),
+      thinking: args.flag('thinking'),
     ).run();
     return;
   }
@@ -120,12 +120,13 @@ Future<void> main(List<String> arguments) async {
   try {
     final event = await client
         .streamTranslation(
-          TranslationRequest(
-            text: text,
+          systemPrompt: buildCliSystemPrompt(
             targetLanguage: args.option('to')!,
-            tone: ToneStyle.values.byName(args.option('tone')!),
-            thinking: args.flag('thinking'),
+            toneInstruction: args.option('tone')!,
+            customPrompt: args.option('prompt'),
           ),
+          text: text,
+          thinking: args.flag('thinking'),
         )
         .last;
     final result = event.result;

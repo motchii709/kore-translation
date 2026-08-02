@@ -3,8 +3,8 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
-import 'package:kore_client/kore_client.dart';
 import 'package:kore_honyaku/app/constants/translation_presets.dart';
+import 'package:kore_honyaku/app/constants/translation_prompt.dart';
 import 'package:kore_honyaku/app/pages/translate/sections/translate_input_section.dart';
 import 'package:kore_honyaku/app/pages/translate/sections/translation_result_section.dart';
 import 'package:kore_honyaku/app/providers/app_settings_provider.dart';
@@ -19,7 +19,7 @@ class TranslatePage extends HookConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final inputController = useTextEditingController();
     final targetLanguage = useState(TranslationPresets.targetLanguages.first);
-    final tone = useState(ToneStyle.auto);
+    final tones = useState(const <TonePreset>{});
     final result = ref.watch(translationControllerProvider);
     final settings = ref.watch(appSettingsStorageProvider).value;
 
@@ -29,16 +29,25 @@ class TranslatePage extends HookConsumerWidget {
         return;
       }
       FocusScope.of(context).unfocus();
+      final template = switch (settings?.systemPrompt) {
+        null || '' => defaultTranslationPromptTemplate,
+        final custom => custom,
+      };
       unawaited(
         ref
             .read(translationControllerProvider.notifier)
             .translate(
-              TranslationRequest(
-                text: text,
+              systemPrompt: buildTranslationSystemPrompt(
+                template: template,
                 targetLanguage: targetLanguage.value,
-                tone: tone.value,
-                thinking: settings?.thinking ?? true,
+                // Join in declaration order so the prompt is deterministic.
+                toneInstruction: [
+                  for (final preset in TranslationPresets.tones)
+                    if (tones.value.contains(preset)) preset.instruction,
+                ].join('\n'),
               ),
+              text: text,
+              thinking: settings?.thinking ?? true,
             ),
       );
     }
@@ -47,8 +56,8 @@ class TranslatePage extends HookConsumerWidget {
       controller: inputController,
       targetLanguage: targetLanguage.value,
       onTargetLanguageChanged: (value) => targetLanguage.value = value,
-      tone: tone.value,
-      onToneChanged: (value) => tone.value = value,
+      tones: tones.value,
+      onTonesChanged: (value) => tones.value = value,
       isLoading: result.isLoading,
       onSubmit: submit,
     );

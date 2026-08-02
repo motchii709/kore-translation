@@ -1,7 +1,7 @@
-import 'dart:async';
-
+import 'package:kore_client/src/exceptions.dart';
 import 'package:kore_client/src/translation/translation_models.dart';
-import 'package:kore_client/src/translation/translation_snapshot_stream.dart';
+import 'package:kore_client/src/translation/translation_response_parser.dart';
+import 'package:partial_json/partial_json.dart';
 
 /// A neutral delta extracted from provider-specific stream objects by the
 /// `TranslationClient` implementations.
@@ -22,64 +22,39 @@ final class TranslationTextDelta extends TranslationDelta {
 }
 
 /// Accumulates [deltas] into [TranslationEvent] snapshots: thinking text is
-/// concatenated, reply text is assembled via [translationResultStream].
+/// concatenated, and the reply is decoded leniently on every delta into a
+/// provisional result, then parsed strictly once [deltas] completes.
 ///
-/// The shared core of every `TranslationClient` implementation, composed
-/// rather than inherited so the implementations stay flat.
+/// Each event carries the full accumulated state. The shared core of every
+/// `TranslationClient` implementation, composed rather than inherited so the
+/// implementations stay flat.
 Stream<TranslationEvent> assembleTranslationEvents(
   Stream<TranslationDelta> deltas,
-) {
-  final output = StreamController<TranslationEvent>();
+) async* {
   final thinking = StringBuffer();
-  TranslationResult? lastResult;
-
-  void emit() {
-    if (!output.isClosed) {
-      output.add(
-        TranslationEvent(thinking: thinking.toString(), result: lastResult),
-      );
+  final reply = StringBuffer();
+  final partial = PartialJsonDecoder();
+  TranslationResult? result;
+  await for (final delta in deltas) {
+    switch (delta) {
+      case TranslationThinkingDelta(:final delta):
+        thinking.write(delta);
+      case TranslationTextDelta(:final delta):
+        reply.write(delta);
+        partial.add(delta);
+        final snapshot = tryPartialTranslationResult(partial.decode());
+        if (snapshot == null || snapshot == result) {
+          continue; // This cut point renders nothing new.
+        }
+        result = snapshot;
     }
+    yield TranslationEvent(thinking: thinking.toString(), result: result);
   }
-
-  final jsonDeltas = StreamController<String>();
-  final resultSubscription = translationResultStream(jsonDeltas.stream).listen(
-    (result) {
-      lastResult = result;
-      emit();
-    },
-    onError: output.addError,
-    // The result stream completing means the final result has been emitted,
-    // so the output can close here.
-    onDone: () => unawaited(output.close()),
-    cancelOnError: false,
+  if (reply.isEmpty) {
+    throw const KoreClientException('The API reply contains no translation');
+  }
+  yield TranslationEvent(
+    thinking: thinking.toString(),
+    result: parseTranslationResponse(reply.toString()),
   );
-
-  late final StreamSubscription<TranslationDelta> deltaSubscription;
-  deltaSubscription = deltas.listen(
-    (delta) {
-      switch (delta) {
-        case TranslationThinkingDelta(:final delta):
-          thinking.write(delta);
-          emit();
-        case TranslationTextDelta(:final delta):
-          jsonDeltas.add(delta);
-      }
-    },
-    onError: (Object error, StackTrace stackTrace) async {
-      output.addError(error, stackTrace);
-      await resultSubscription.cancel();
-      await output.close();
-    },
-    onDone: () => unawaited(jsonDeltas.close()),
-    cancelOnError: true,
-  );
-
-  output.onCancel = () async {
-    await deltaSubscription.cancel();
-    await resultSubscription.cancel();
-    if (!jsonDeltas.isClosed) {
-      await jsonDeltas.close();
-    }
-  };
-  return output.stream;
 }

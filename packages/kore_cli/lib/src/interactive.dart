@@ -2,6 +2,7 @@ import 'dart:io';
 
 import 'package:dio/dio.dart';
 import 'package:kore_cli/src/output.dart';
+import 'package:kore_cli/src/prompt.dart';
 import 'package:kore_client/kore_client.dart';
 
 /// Simple interactive TUI: type text to translate, use `:` commands to
@@ -11,15 +12,24 @@ class InteractiveSession {
     required this.client,
     required this.printer,
     this.initialTarget = 'English',
+    this.initialTone = '',
+    this.customPrompt,
+    this.thinking = true,
   });
 
   final TranslationClient client;
   final ResultPrinter printer;
   final String initialTarget;
+  final String initialTone;
+
+  /// Replaces the built-in instruction when set; `:to` and `:tone` then no
+  /// longer affect the prompt.
+  final String? customPrompt;
+  final bool thinking;
 
   Future<void> run() async {
     var target = initialTarget;
-    var tone = ToneStyle.auto;
+    var tone = initialTone;
 
     stdout.writeln(printer.bold('Kore!? 対話モード'));
     stdout.writeln(
@@ -27,7 +37,8 @@ class InteractiveSession {
     );
 
     while (true) {
-      stdout.write(printer.cyan('kore($target/${tone.name})> '));
+      final label = tone.isEmpty ? target : '$target/$tone';
+      stdout.write(printer.cyan('kore($label)> '));
       final line = stdin.readLineSync();
       if (line == null) {
         return;
@@ -57,11 +68,13 @@ class InteractiveSession {
       try {
         final event = await client
             .streamTranslation(
-              TranslationRequest(
-                text: input,
+              systemPrompt: buildCliSystemPrompt(
                 targetLanguage: target,
-                tone: tone,
+                toneInstruction: tone,
+                customPrompt: customPrompt,
               ),
+              text: input,
+              thinking: thinking,
             )
             .last;
         final result = event.result;
@@ -83,7 +96,7 @@ class InteractiveSession {
   bool _handleCommand(
     String input, {
     required void Function(String) onTarget,
-    required void Function(ToneStyle) onTone,
+    required void Function(String) onTone,
   }) {
     final parts = input.split(RegExp(r'\s+'));
     switch (parts.first) {
@@ -93,20 +106,16 @@ class InteractiveSession {
         final target = parts.sublist(1).join(' ');
         onTarget(target);
         stdout.writeln(printer.dim('翻訳先を $target に変更しました'));
-      case ':tone' when parts.length > 1:
-        final tone = ToneStyle.values.asNameMap()[parts[1]];
-        if (tone == null) {
-          printer.printError(
-            'トーンは ${ToneStyle.values.map((t) => t.name).join(' / ')} から選んでください',
-          );
-        } else {
-          onTone(tone);
-          stdout.writeln(printer.dim('トーンを ${tone.name} に変更しました'));
-        }
+      case ':tone':
+        final tone = parts.sublist(1).join(' ');
+        onTone(tone);
+        stdout.writeln(
+          printer.dim(tone.isEmpty ? 'トーン指示を解除しました' : 'トーンを "$tone" に変更しました'),
+        );
       case ':help':
         stdout.writeln('''
 :to <言語>     翻訳先の言語を変更 (例: :to 日本語)
-:tone <トーン>  トーンを変更 (${ToneStyle.values.map((t) => t.name).join(' / ')})
+:tone <指示>   トーンを自由記述で変更 (例: :tone フランクな口調で) — :tone のみで解除
 :help          このヘルプを表示
 :q             終了''');
       default:

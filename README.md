@@ -21,7 +21,8 @@ pub workspace によるモノレポ構成です。
 └── packages/
     ├── kore_client/         # 純 Dart の LLM 翻訳クライアント (Flutter 非依存)
     ├── kore_cli/            # CLI / 対話 TUI
-    └── kore_lints/          # 共有 lint 設定 (yumemi_lints ベース)
+    ├── kore_lints/          # 共有 lint 設定 (yumemi_lints ベース)
+    └── partial_json/        # 生成途中で切れた JSON を補完する汎用ユーティリティ
 ```
 
 ### アーキテクチャ
@@ -43,9 +44,12 @@ LlmClient 群 (抽象なし・各社独立の薄いラッパー)
 - 薄いラッパーは各社 API の型付きオブジェクト (freezed / discriminated union)
   をそのまま流します。翻訳の知識は持ちません
 - `TranslationClient` 実装が各社オブジェクトから思考/本文デルタを取り出し、
-  [llm_json_stream](https://pub.dev/packages/llm_json_stream) による
-  逐次パース + ストリーム完了後の厳密パースで
+  生成途中 JSON の補完 (`partial_json` パッケージ、未完文字列と閉じ括弧を
+  閉じて再パース) による逐次スナップショット + ストリーム完了後の厳密パースで
   `TranslationEvent {thinking, result}` を流します
+- システムプロンプトはフロントエンド (アプリ設定 / CLI オプション) が組み立て、
+  ユーザーが自由に調整できます。kore_client が持つプロンプト知識は、パーサーと
+  対になるレスポンススキーマ指示 (`translationSchemaPrompt`) のみです
 - 設定は sealed な `LlmClientConfig` (プロバイダ毎のバリアント、実デフォルト
   値付き)。クライアントの構築 (DI) は composition root — アプリの provider と
   CLI の main — が config バリアントの switch で行います
@@ -76,6 +80,7 @@ flutter run -d windows   # ほか: -d <android-device> / macos / linux
 
 設定画面で LLM プロバイダ・API キー (・必要ならベース URL とモデル) を設定します。
 API キーは `flutter_secure_storage` で端末にのみ保存されます。
+システムプロンプトも編集できます (`{{target}}` / `{{tone}}` が翻訳時に置換されます)。
 
 ### CLI
 
@@ -85,6 +90,8 @@ set OPENAI_API_KEY=sk-...                # PowerShell: $env:OPENAI_API_KEY = 'sk
 dart run bin/kore.dart "こんにちは" --to English
 dart run bin/kore.dart -i                # 対話 (TUI) モード
 dart run bin/kore.dart -p anthropic "Hello" -t 日本語
+dart run bin/kore.dart "了解です" --tone "フランクな口調で"   # トーンは自由記述
+dart run bin/kore.dart "Hi" --prompt "関西弁に翻訳して"       # プロンプト差し替え
 ```
 
 環境変数: `KORE_PROVIDER` (openai / anthropic / google), `KORE_BASE_URL`,
@@ -99,6 +106,7 @@ AI エージェント (Claude Code / Codex 等) 向けの運用手順は [AGENTS
 flutter analyze                          # 静的解析 (yumemi_lints)
 flutter test                             # アプリのウィジェットテスト
 (cd packages/kore_client && dart test)   # クライアントのユニットテスト
+(cd packages/partial_json && dart test)  # JSON 補完のユニットテスト
 ```
 
 コード生成 (freezed / riverpod_generator / go_router_builder / json_serializable)

@@ -3,7 +3,6 @@ import 'package:kore_client/src/llm/http/anthropic/anthropic_stream_models.dart'
 import 'package:kore_client/src/translation/translation_client.dart';
 import 'package:kore_client/src/translation/translation_delta.dart';
 import 'package:kore_client/src/translation/translation_models.dart';
-import 'package:kore_client/src/translation/translation_prompt_builder.dart';
 
 /// [TranslationClient] backed by the Anthropic Messages API.
 final class AnthropicTranslationClient implements TranslationClient {
@@ -12,29 +11,27 @@ final class AnthropicTranslationClient implements TranslationClient {
   final AnthropicLlmClient llm;
 
   @override
-  Stream<TranslationEvent> streamTranslation(TranslationRequest request) {
+  Stream<TranslationEvent> streamTranslation({
+    required String systemPrompt,
+    required String text,
+    bool thinking = true,
+  }) {
     final events = llm.streamMessages(
-      systemPrompt: TranslationPromptBuilder(request).build(),
-      userText: request.text,
+      systemPrompt: systemPrompt,
+      userText: text,
       // Claude 5 models only accept adaptive thinking, and their `display`
       // defaults to "omitted" (empty thinking blocks) — "summarized" opts in
       // to receiving the thinking text.
-      thinking: request.thinking
-          ? const {'type': 'adaptive', 'display': 'summarized'}
-          : const {'type': 'disabled'},
+      thinking: thinking ? const {'type': 'adaptive', 'display': 'summarized'} : const {'type': 'disabled'},
     );
     return assembleTranslationEvents(events.expand(_deltasOf));
   }
 
   Iterable<TranslationDelta> _deltasOf(AnthropicStreamEvent event) sync* {
     switch (event) {
-      case AnthropicContentBlockDeltaEvent(
-        delta: AnthropicTextDelta(:final text),
-      ):
+      case AnthropicContentBlockDeltaEvent(delta: AnthropicTextDelta(:final text)):
         yield TranslationTextDelta(text);
-      case AnthropicContentBlockDeltaEvent(
-        delta: AnthropicThinkingDelta(:final thinking),
-      ):
+      case AnthropicContentBlockDeltaEvent(delta: AnthropicThinkingDelta(:final thinking)):
         yield TranslationThinkingDelta(thinking);
       default:
         break;

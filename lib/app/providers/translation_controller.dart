@@ -22,7 +22,11 @@ class TranslationController extends _$TranslationController {
 
   /// Cancels the previous request (if any) and starts a new streaming
   /// translation.
-  Future<void> translate(TranslationRequest request) async {
+  Future<void> translate({
+    required String systemPrompt,
+    required String text,
+    required bool thinking,
+  }) async {
     await _subscription?.cancel();
     state = const AsyncLoading();
     final TranslationClient client;
@@ -33,7 +37,7 @@ class TranslationController extends _$TranslationController {
       return;
     }
     _subscription = client
-        .streamTranslation(request)
+        .streamTranslation(systemPrompt: systemPrompt, text: text, thinking: thinking)
         .listen(
           (event) => state = AsyncData(event),
           onError: (Object error, StackTrace stackTrace) => state = AsyncError(error, stackTrace),

@@ -5,9 +5,9 @@ import 'package:json_annotation/json_annotation.dart';
 import 'package:kore_client/src/exceptions.dart';
 import 'package:kore_client/src/llm/http/api_error.dart';
 import 'package:kore_client/src/llm/http/open_ai/open_ai_stream_models.dart';
-import 'package:kore_client/src/llm/http/safe_json.dart';
 import 'package:kore_client/src/llm/http/sse.dart';
 import 'package:kore_client/src/llm/llm_client_config.dart';
+import 'package:kore_client/src/safe_json.dart';
 
 /// Thin wrapper over OpenAI-compatible Chat Completions APIs
 /// (OpenAI, Groq, Ollama, LM Studio, OpenRouter, ...).

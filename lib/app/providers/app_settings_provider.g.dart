@@ -32,7 +32,7 @@ final class AppSettingsStorageProvider extends $AsyncNotifierProvider<AppSetting
   AppSettingsStorage create() => AppSettingsStorage();
 }
 
-String _$appSettingsStorageHash() => r'99c38101eac4310a339e008ea324a06ab69dd4f3';
+String _$appSettingsStorageHash() => r'f29d8af66781e1f8886359077c717d9f8c0a436a';
 
 abstract class _$AppSettingsStorage extends $AsyncNotifier<AppSettings> {
   FutureOr<AppSettings> build();

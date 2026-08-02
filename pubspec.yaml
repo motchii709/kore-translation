@@ -11,6 +11,7 @@ workspace:
   - packages/kore_cli
   - packages/kore_client
   - packages/kore_lints
+  - packages/partial_json
 
 dependencies:
   cupertino_icons: ^1.0.9

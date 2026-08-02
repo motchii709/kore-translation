@@ -10,6 +10,7 @@ const _baseUrlStorageKey = 'base_url';
 const _apiKeyStorageKey = 'api_key';
 const _modelStorageKey = 'model';
 const _thinkingStorageKey = 'thinking';
+const _systemPromptStorageKey = 'system_prompt';
 
 @riverpod
 class AppSettingsStorage extends _$AppSettingsStorage {
@@ -31,6 +32,7 @@ class AppSettingsStorage extends _$AppSettingsStorage {
         'false' => false,
         _ => defaults.thinking,
       },
+      systemPrompt: await storage.read(key: _systemPromptStorageKey) ?? defaults.systemPrompt,
     );
   }
 
@@ -47,6 +49,10 @@ class AppSettingsStorage extends _$AppSettingsStorage {
       await storage.write(
         key: _thinkingStorageKey,
         value: '${settings.thinking}',
+      );
+      await storage.write(
+        key: _systemPromptStorageKey,
+        value: settings.systemPrompt,
       );
       return settings;
     });

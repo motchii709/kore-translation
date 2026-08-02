@@ -488,14 +488,6 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "3.0.2"
-  llm_json_stream:
-    dependency: transitive
-    description:
-      name: llm_json_stream
-      sha256: "2ac1c8b49e59376d5363540c2aa2cc1c3f7f9bd84ac502e1673537eee44fc689"
-      url: "https://pub.dev"
-    source: hosted
-    version: "1.0.0"
   logging:
     dependency: transitive
     description:

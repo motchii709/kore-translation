@@ -3,7 +3,6 @@ import 'package:kore_client/src/llm/http/deep_seek/deep_seek_stream_models.dart'
 import 'package:kore_client/src/translation/translation_client.dart';
 import 'package:kore_client/src/translation/translation_delta.dart';
 import 'package:kore_client/src/translation/translation_models.dart';
-import 'package:kore_client/src/translation/translation_prompt_builder.dart';
 
 /// [TranslationClient] backed by the DeepSeek API. Reasoning models
 /// (deepseek-reasoner) stream their thinking via `reasoning_content`.
@@ -13,16 +12,20 @@ final class DeepSeekTranslationClient implements TranslationClient {
   final DeepSeekLlmClient llm;
 
   @override
-  Stream<TranslationEvent> streamTranslation(TranslationRequest request) {
+  Stream<TranslationEvent> streamTranslation({
+    required String systemPrompt,
+    required String text,
+    bool thinking = true,
+  }) {
     final chunks = llm.streamChatCompletions(
-      systemPrompt: TranslationPromptBuilder(request).build(),
-      userText: request.text,
+      systemPrompt: systemPrompt,
+      userText: text,
     );
     return assembleTranslationEvents(
       // DeepSeek has no request parameter for reasoning (it depends on the
       // model), so an unwanted reasoning stream is dropped here instead.
       chunks.expand(
-        (chunk) => _deltasOf(chunk, includeThinking: request.thinking),
+        (chunk) => _deltasOf(chunk, includeThinking: thinking),
       ),
     );
   }

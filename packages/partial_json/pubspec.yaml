@@ -1,0 +1,12 @@
+name: partial_json
+description: Incrementally completes and decodes truncated streaming JSON (e.g. from an LLM), skipping surrounding yap like Markdown fences.
+publish_to: none
+version: 0.1.0
+resolution: workspace
+
+environment:
+  sdk: ^3.12.2
+
+dev_dependencies:
+  kore_lints: ^0.1.0
+  test: ^1.26.2 # resolves to a version compatible with the test_api pinned by flutter_test

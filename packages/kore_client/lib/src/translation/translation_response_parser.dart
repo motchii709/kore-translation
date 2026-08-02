@@ -21,6 +21,24 @@ TranslationResult parseTranslationResponse(String content) {
   }
 }
 
+/// Converts a snapshot decoded from the in-progress reply (see
+/// `PartialJsonDecoder`) into a provisional [TranslationResult], or null
+/// when it is not renderable yet: not a JSON object, a schema mismatch at
+/// this cut point (e.g. an alternative whose required text has not arrived),
+/// or no translation text to show.
+TranslationResult? tryPartialTranslationResult(Object? json) {
+  if (json is! Map<String, dynamic>) {
+    return null;
+  }
+  final TranslationResult result;
+  try {
+    result = TranslationResult.fromJson(json);
+  } on CheckedFromJsonException {
+    return null;
+  }
+  return result.translation.isEmpty ? null : result;
+}
+
 /// Some models wrap JSON in a Markdown code fence despite instructions.
 String _stripCodeFence(String content) {
   final trimmed = content.trim();

@@ -79,10 +79,7 @@ Map<String, Object> _geminiParts(List<Map<String, Object>> parts) => {
 };
 
 void main() {
-  const request = TranslationRequest(
-    text: 'こんにちは',
-    targetLanguage: 'English',
-  );
+  const prompt = 'You are a professional translator. Translate into English.';
 
   test('OpenAiTranslationClient streams snapshots and a validated final result', () async {
     final adapter = _FakeAdapter(
@@ -97,7 +94,7 @@ void main() {
     final events = await _client(
       const LlmClientConfig.openAi(apiKey: 'test-key'),
       adapter,
-    ).streamTranslation(request).toList();
+    ).streamTranslation(systemPrompt: prompt, text: 'こんにちは').toList();
 
     expect(events.map((e) => e.result?.translation), contains('He'));
     final last = events.last;
@@ -119,7 +116,7 @@ void main() {
         model: 'llama3',
       ),
       adapter,
-    ).streamTranslation(request).toList();
+    ).streamTranslation(systemPrompt: prompt, text: 'こんにちは').toList();
 
     expect(events.last.result?.translation, 'Hello');
     expect(adapter.lastRequest?.headers.containsKey('Authorization'), isFalse);
@@ -138,7 +135,7 @@ void main() {
     final events = await _client(
       const LlmClientConfig.deepSeek(apiKey: 'test-key'),
       adapter,
-    ).streamTranslation(request).toList();
+    ).streamTranslation(systemPrompt: prompt, text: 'こんにちは').toList();
 
     expect(events.first.thinking, '挨拶の翻訳を考える');
     expect(events.first.result, isNull);
@@ -158,7 +155,7 @@ void main() {
     final events = await _client(
       const LlmClientConfig.anthropic(apiKey: 'test-key'),
       adapter,
-    ).streamTranslation(request).toList();
+    ).streamTranslation(systemPrompt: prompt, text: 'こんにちは').toList();
 
     expect(events.first.thinking, '考え中');
     expect(events.first.result, isNull);
@@ -175,11 +172,11 @@ void main() {
     );
     final client = _client(const LlmClientConfig.anthropic(apiKey: 'test-key'), adapter);
 
-    await client.streamTranslation(request).last;
+    await client.streamTranslation(systemPrompt: prompt, text: 'こんにちは').last;
     var data = adapter.lastRequest?.data as Map<String, Object?>;
     expect(data['thinking'], {'type': 'adaptive', 'display': 'summarized'});
 
-    await client.streamTranslation(request.copyWith(thinking: false)).last;
+    await client.streamTranslation(systemPrompt: prompt, text: 'こんにちは', thinking: false).last;
     data = adapter.lastRequest?.data as Map<String, Object?>;
     expect(data['thinking'], {'type': 'disabled'});
   });
@@ -195,7 +192,7 @@ void main() {
     final events = await _client(
       const LlmClientConfig.deepSeek(apiKey: 'test-key'),
       adapter,
-    ).streamTranslation(request.copyWith(thinking: false)).toList();
+    ).streamTranslation(systemPrompt: prompt, text: 'こんにちは', thinking: false).toList();
 
     expect(events.map((e) => e.thinking), everyElement(isEmpty));
     expect(events.last.result?.translation, 'Hello');
@@ -216,7 +213,7 @@ void main() {
     final events = await _client(
       const LlmClientConfig.google(apiKey: 'test-key'),
       adapter,
-    ).streamTranslation(request).toList();
+    ).streamTranslation(systemPrompt: prompt, text: 'こんにちは').toList();
 
     expect(events.map((e) => e.thinking), contains('推論の要約'));
     expect(events.last.result?.translation, 'Hello');
@@ -231,7 +228,10 @@ void main() {
       ]),
     );
     expect(
-      _client(const LlmClientConfig.anthropic(apiKey: 'test-key'), adapter).streamTranslation(request).last,
+      _client(
+        const LlmClientConfig.anthropic(apiKey: 'test-key'),
+        adapter,
+      ).streamTranslation(systemPrompt: prompt, text: 'こんにちは').last,
       throwsA(
         isA<KoreClientException>().having((e) => e.message, 'message', 'Overloaded'),
       ),
@@ -244,7 +244,10 @@ void main() {
       statusCode: 401,
     );
     expect(
-      _client(const LlmClientConfig.openAi(apiKey: 'test-key'), adapter).streamTranslation(request).last,
+      _client(
+        const LlmClientConfig.openAi(apiKey: 'test-key'),
+        adapter,
+      ).streamTranslation(systemPrompt: prompt, text: 'こんにちは').last,
       throwsA(
         isA<DioException>()
             .having((e) => e.response?.statusCode, 'statusCode', 401)

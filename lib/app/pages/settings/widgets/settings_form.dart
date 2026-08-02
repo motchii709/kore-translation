@@ -3,6 +3,7 @@ import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:kore_client/kore_client.dart';
 import 'package:kore_honyaku/app/constants/llm_provider_ui.dart';
+import 'package:kore_honyaku/app/constants/translation_prompt.dart';
 import 'package:kore_honyaku/app/models/app_settings.dart';
 import 'package:kore_honyaku/app/providers/app_settings_provider.dart';
 import 'package:kore_honyaku/app/ui/components/app_section_header.dart';
@@ -22,6 +23,7 @@ class SettingsForm extends HookConsumerWidget {
     final modelController = useTextEditingController(text: initialSettings.model);
     final obscureApiKey = useState(true);
     final thinking = useState(initialSettings.thinking);
+    final systemPromptController = useTextEditingController(text: initialSettings.systemPrompt);
     final defaults = LlmClientConfig.forProvider(provider.value, apiKey: '');
     // Generic OpenAI-compatible endpoints have no universal defaults, so the
     // endpoint and model must be filled in; local servers need no API key.
@@ -40,6 +42,7 @@ class SettingsForm extends HookConsumerWidget {
               apiKey: apiKeyController.text.trim(),
               model: modelController.text.trim(),
               thinking: thinking.value,
+              systemPrompt: systemPromptController.text.trim(),
             ),
           );
       if (context.mounted) {
@@ -107,6 +110,20 @@ class SettingsForm extends HookConsumerWidget {
           subtitle: const Text('対応モデルの思考を有効にし、ストリーミング表示します'),
           value: thinking.value,
           onChanged: (value) => thinking.value = value,
+        ),
+        const SizedBox(height: 16),
+        TextField(
+          controller: systemPromptController,
+          minLines: 3,
+          maxLines: 8,
+          decoration: const InputDecoration(
+            labelText: 'システムプロンプト',
+            hintText: defaultTranslationPromptTemplate,
+            helperText:
+                '空欄の場合はデフォルトを使用します。{{target}} と {{tone}} が翻訳時に置換されます。\n'
+                '応答フォーマットの指示は自動で付加されます',
+            helperMaxLines: 3,
+          ),
         ),
         const SizedBox(height: 24),
         FilledButton.icon(

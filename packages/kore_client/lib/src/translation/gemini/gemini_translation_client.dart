@@ -3,7 +3,6 @@ import 'package:kore_client/src/llm/http/gemini/gemini_stream_models.dart';
 import 'package:kore_client/src/translation/translation_client.dart';
 import 'package:kore_client/src/translation/translation_delta.dart';
 import 'package:kore_client/src/translation/translation_models.dart';
-import 'package:kore_client/src/translation/translation_prompt_builder.dart';
 
 /// [TranslationClient] backed by the Google AI (Gemini) API.
 final class GeminiTranslationClient implements TranslationClient {
@@ -12,12 +11,16 @@ final class GeminiTranslationClient implements TranslationClient {
   final GeminiLlmClient llm;
 
   @override
-  Stream<TranslationEvent> streamTranslation(TranslationRequest request) {
+  Stream<TranslationEvent> streamTranslation({
+    required String systemPrompt,
+    required String text,
+    bool thinking = true,
+  }) {
     final chunks = llm.streamGenerateContent(
-      systemPrompt: TranslationPromptBuilder(request).build(),
-      userText: request.text,
+      systemPrompt: systemPrompt,
+      userText: text,
       // Thoughts are only included in the response when explicitly requested.
-      thinkingConfig: request.thinking ? const {'includeThoughts': true} : null,
+      thinkingConfig: thinking ? const {'includeThoughts': true} : null,
     );
     return assembleTranslationEvents(chunks.expand(_deltasOf));
   }

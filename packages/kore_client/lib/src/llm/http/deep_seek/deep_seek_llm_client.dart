@@ -5,9 +5,9 @@ import 'package:json_annotation/json_annotation.dart';
 import 'package:kore_client/src/exceptions.dart';
 import 'package:kore_client/src/llm/http/api_error.dart';
 import 'package:kore_client/src/llm/http/deep_seek/deep_seek_stream_models.dart';
-import 'package:kore_client/src/llm/http/safe_json.dart';
 import 'package:kore_client/src/llm/http/sse.dart';
 import 'package:kore_client/src/llm/llm_client_config.dart';
+import 'package:kore_client/src/safe_json.dart';
 
 /// Thin wrapper over the DeepSeek Chat Completions API.
 final class DeepSeekLlmClient {

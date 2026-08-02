@@ -3,9 +3,10 @@ import 'package:kore_client/kore_client.dart';
 
 part 'app_settings.freezed.dart';
 
-/// User-configurable API settings, persisted in secure storage.
+/// User-configurable settings, persisted in secure storage.
 ///
-/// Empty [baseUrl] / [model] mean "use the provider default".
+/// Empty [baseUrl] / [model] mean "use the provider default"; an empty
+/// [systemPrompt] means "use the default prompt template".
 @freezed
 abstract class AppSettings with _$AppSettings {
   const factory AppSettings({
@@ -14,6 +15,7 @@ abstract class AppSettings with _$AppSettings {
     @Default('') String apiKey,
     @Default('') String model,
     @Default(true) bool thinking,
+    @Default('') String systemPrompt,
   }) = _AppSettings;
 
   const AppSettings._();

@@ -1,17 +1,16 @@
 import 'package:flutter/material.dart';
-import 'package:kore_client/kore_client.dart';
 import 'package:kore_honyaku/app/constants/translation_presets.dart';
 import 'package:kore_honyaku/app/ui/components/app_section_header.dart';
 
-/// Input form: source text, target language chips, tone selector and the
+/// Input form: source text, target language chips, tone chips and the
 /// translate button.
 class TranslateInputSection extends StatelessWidget {
   const TranslateInputSection({
     required this.controller,
     required this.targetLanguage,
     required this.onTargetLanguageChanged,
-    required this.tone,
-    required this.onToneChanged,
+    required this.tones,
+    required this.onTonesChanged,
     required this.isLoading,
     required this.onSubmit,
     super.key,
@@ -20,8 +19,8 @@ class TranslateInputSection extends StatelessWidget {
   final TextEditingController controller;
   final String targetLanguage;
   final ValueChanged<String> onTargetLanguageChanged;
-  final ToneStyle tone;
-  final ValueChanged<ToneStyle> onToneChanged;
+  final Set<TonePreset> tones;
+  final ValueChanged<Set<TonePreset>> onTonesChanged;
   final bool isLoading;
   final VoidCallback onSubmit;
 
@@ -59,13 +58,20 @@ class TranslateInputSection extends StatelessWidget {
           ],
         ),
         const SizedBox(height: 16),
-        const AppSectionHeader(title: 'トーン'),
-        SegmentedButton<ToneStyle>(
-          segments: [
-            for (final style in ToneStyle.values) ButtonSegment(value: style, label: Text(style.label)),
+        const AppSectionHeader(title: 'トーン (複数選択可)'),
+        Wrap(
+          spacing: 8,
+          runSpacing: 8,
+          children: [
+            for (final preset in TranslationPresets.tones)
+              FilterChip(
+                label: Text(preset.label),
+                selected: tones.contains(preset),
+                onSelected: (selected) => onTonesChanged(
+                  selected ? {...tones, preset} : ({...tones}..remove(preset)),
+                ),
+              ),
           ],
-          selected: {tone},
-          onSelectionChanged: (selection) => onToneChanged(selection.first),
         ),
         const SizedBox(height: 24),
         FilledButton.icon(

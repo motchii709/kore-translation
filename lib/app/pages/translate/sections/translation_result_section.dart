@@ -57,10 +57,7 @@ class _UpdateView extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
         if (update.thinking.isNotEmpty) ...[
-          _ThinkingView(
-            thinking: update.thinking,
-            isGenerating: result == null,
-          ),
+          _ThinkingView(update.thinking),
           const SizedBox(height: 16),
         ],
         if (result != null)
@@ -75,13 +72,11 @@ class _UpdateView extends StatelessWidget {
   }
 }
 
-/// The model's reasoning, streamed live. The layout stays identical after
-/// generation finishes (only the header changes), so the UI below never jumps.
+/// The model's reasoning, streamed live.
 class _ThinkingView extends StatelessWidget {
-  const _ThinkingView({required this.thinking, required this.isGenerating});
+  const _ThinkingView(this.thinking);
 
   final String thinking;
-  final bool isGenerating;
 
   @override
   Widget build(BuildContext context) {
@@ -89,7 +84,7 @@ class _ThinkingView extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
-        AppSectionHeader(title: isGenerating ? '思考中...' : '思考'),
+        const AppSectionHeader(title: '思考'),
         Card(
           child: Padding(
             padding: const EdgeInsets.all(16),

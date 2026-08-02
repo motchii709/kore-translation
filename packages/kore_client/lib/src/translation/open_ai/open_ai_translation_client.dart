@@ -3,7 +3,6 @@ import 'package:kore_client/src/llm/http/open_ai/open_ai_stream_models.dart';
 import 'package:kore_client/src/translation/translation_client.dart';
 import 'package:kore_client/src/translation/translation_delta.dart';
 import 'package:kore_client/src/translation/translation_models.dart';
-import 'package:kore_client/src/translation/translation_prompt_builder.dart';
 
 /// [TranslationClient] backed by an OpenAI-compatible API.
 final class OpenAiTranslationClient implements TranslationClient {
@@ -12,10 +11,14 @@ final class OpenAiTranslationClient implements TranslationClient {
   final OpenAiLlmClient llm;
 
   @override
-  Stream<TranslationEvent> streamTranslation(TranslationRequest request) {
+  Stream<TranslationEvent> streamTranslation({
+    required String systemPrompt,
+    required String text,
+    bool thinking = true,
+  }) {
     final chunks = llm.streamChatCompletions(
-      systemPrompt: TranslationPromptBuilder(request).build(),
-      userText: request.text,
+      systemPrompt: systemPrompt,
+      userText: text,
     );
     return assembleTranslationEvents(chunks.expand(_deltasOf));
   }

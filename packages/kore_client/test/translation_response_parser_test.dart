@@ -1,5 +1,6 @@
 import 'package:kore_client/kore_client.dart';
 import 'package:kore_client/src/translation/translation_response_parser.dart';
+import 'package:partial_json/partial_json.dart';
 import 'package:test/test.dart';
 
 void main() {
@@ -56,6 +57,58 @@ void main() {
         () => parseTranslationResponse('{"translation": 123}'),
         throwsA(isA<KoreClientException>()),
       );
+    });
+  });
+
+  group('tryPartialTranslationResult', () {
+    test('returns null for a non-object snapshot', () {
+      expect(tryPartialTranslationResult(null), isNull);
+      expect(tryPartialTranslationResult([1, 2]), isNull);
+    });
+
+    test('returns null before the translation has text', () {
+      expect(tryPartialTranslationResult({'detected_language': '日本語'}), isNull);
+      expect(tryPartialTranslationResult({'translation': ''}), isNull);
+    });
+
+    test('returns null on a schema mismatch at the current cut point', () {
+      expect(
+        tryPartialTranslationResult({
+          'translation': 'Hi',
+          'alternatives': [<String, Object?>{}],
+        }),
+        isNull,
+      );
+    });
+
+    test('builds a result from a partial object', () {
+      final result = tryPartialTranslationResult({'translation': 'Hi'});
+      expect(result?.translation, 'Hi');
+      expect(result?.alternatives, isEmpty);
+    });
+
+    test('renders or skips every cut point of a fenced reply, monotonically', () {
+      const reply =
+          '```json\n'
+          r'{"detected_language": "日本語", "translation": "Say \"hi\"!\n", '
+          '"alternatives": [{"text": "Hi", "nuance": "カジュアル"}, {"text": "Hey"}], '
+          '"explanation": "挨拶です。"}\n```';
+      final decoder = PartialJsonDecoder();
+      var previousTranslation = '';
+      for (var cut = 0; cut < reply.length; cut++) {
+        decoder.add(reply[cut]);
+        final result = tryPartialTranslationResult(decoder.decode());
+        if (result == null) {
+          continue; // Not renderable at this cut point; the next delta heals it.
+        }
+        expect(
+          result.translation,
+          startsWith(previousTranslation),
+          reason: 'cut after $cut',
+        );
+        previousTranslation = result.translation;
+      }
+      expect(previousTranslation, 'Say "hi"!\n');
     });
   });
 }
