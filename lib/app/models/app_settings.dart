@@ -1,23 +1,20 @@
 import 'package:freezed_annotation/freezed_annotation.dart';
+import 'package:kore_honyaku/app/constants/translation_prompt.dart';
 import 'package:llm_clients/llm_clients.dart';
 
 part 'app_settings.freezed.dart';
 
 /// User-configurable settings, persisted in secure storage.
 ///
-/// Empty [baseUrl] / [model] mean "use the provider default"; an empty
-/// [systemPrompt] means "use the default prompt template".
+/// [llm] is stored verbatim as the [LlmClientConfig] union's JSON. The
+/// settings form materializes real values into its fields (variant defaults
+/// included), so what is stored here is what gets used.
 @freezed
 abstract class AppSettings with _$AppSettings {
   const factory AppSettings({
-    @Default(LlmProvider.openAi) LlmProvider provider,
-    @Default('') String baseUrl,
-    @Default('') String apiKey,
-    @Default('') String model,
-    @Default('') String acpCommand,
-    @Default('') String codexCommand,
+    @Default(LlmClientConfig.openAi(apiKey: '')) LlmClientConfig llm,
     @Default(true) bool thinking,
-    @Default('') String systemPrompt,
+    @Default(defaultTranslationPromptTemplate) String systemPrompt,
   }) = _AppSettings;
 
   const AppSettings._();
@@ -26,24 +23,13 @@ abstract class AppSettings with _$AppSettings {
   ///
   /// OpenAI-compatible endpoints may be local servers without authentication,
   /// so they require an endpoint and model instead of an API key. Agent
-  /// backends hold their own credentials; ACP needs a launch command while
-  /// Codex has a real default.
-  bool get isConfigured => switch (provider) {
-    LlmProvider.openAiCompatible => baseUrl.isNotEmpty && model.isNotEmpty,
-    LlmProvider.acp => acpCommand.isNotEmpty,
-    LlmProvider.codex => true,
-    _ => apiKey.isNotEmpty,
+  /// backends hold their own credentials and only need a launch command.
+  bool get isConfigured => switch (llm) {
+    OpenAiCompatibleConfig(:final baseUrl, :final model) => baseUrl.isNotEmpty && model.isNotEmpty,
+    AcpConfig(:final command) || CodexConfig(:final command) => command.isNotEmpty,
+    OpenAiConfig(:final apiKey) ||
+    AnthropicConfig(:final apiKey) ||
+    GeminiConfig(:final apiKey) ||
+    DeepSeekConfig(:final apiKey) => apiKey.isNotEmpty,
   };
-
-  LlmClientConfig toLlmClientConfig() => LlmClientConfig.forProvider(
-    provider,
-    apiKey: apiKey,
-    baseUrl: baseUrl,
-    model: model,
-    command: switch (provider) {
-      LlmProvider.acp => acpCommand,
-      LlmProvider.codex => codexCommand,
-      _ => '',
-    },
-  );
 }

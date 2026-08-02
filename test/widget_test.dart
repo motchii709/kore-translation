@@ -3,10 +3,11 @@ import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:kore_honyaku/app/models/app_settings.dart';
 import 'package:kore_honyaku/app/providers/app_settings_provider.dart';
 import 'package:kore_honyaku/main.dart';
+import 'package:llm_clients/llm_clients.dart';
 
 class _ConfiguredStorage extends AppSettingsStorage {
   @override
-  Future<AppSettings> build() async => const AppSettings(apiKey: 'test-key');
+  Future<AppSettings> build() async => const AppSettings(llm: LlmClientConfig.openAi(apiKey: 'test-key'));
 }
 
 class _UnconfiguredStorage extends AppSettingsStorage {

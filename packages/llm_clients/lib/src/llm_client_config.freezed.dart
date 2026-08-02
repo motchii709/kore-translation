@@ -11,11 +11,57 @@ part of 'llm_client_config.dart';
 
 // dart format off
 T _$identity<T>(T value) => value;
+LlmClientConfig _$LlmClientConfigFromJson(
+  Map<String, dynamic> json
+) {
+        switch (json['provider']) {
+                  case 'openai':
+          return OpenAiConfig.fromJson(
+            json
+          );
+                case 'openai-compatible':
+          return OpenAiCompatibleConfig.fromJson(
+            json
+          );
+                case 'anthropic':
+          return AnthropicConfig.fromJson(
+            json
+          );
+                case 'google':
+          return GeminiConfig.fromJson(
+            json
+          );
+                case 'deepseek':
+          return DeepSeekConfig.fromJson(
+            json
+          );
+                case 'acp':
+          return AcpConfig.fromJson(
+            json
+          );
+                case 'codex':
+          return CodexConfig.fromJson(
+            json
+          );
+        
+          default:
+            throw CheckedFromJsonException(
+  json,
+  'provider',
+  'LlmClientConfig',
+  'Invalid union type "${json['provider']}"!'
+);
+        }
+      
+}
+
 /// @nodoc
 mixin _$LlmClientConfig {
 
 
 
+  /// Serializes this LlmClientConfig to a JSON map.
+  Map<String, dynamic> toJson();
 
 
 @override
@@ -23,7 +69,7 @@ bool operator ==(Object other) {
   return identical(this, other) || (other.runtimeType == runtimeType&&other is LlmClientConfig);
 }
 
-
+@JsonKey(includeFromJson: false, includeToJson: false)
 @override
 int get hashCode => runtimeType.hashCode;
 
@@ -134,7 +180,7 @@ return codex(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeWhen<TResult extends Object?>({TResult Function( String apiKey,  String baseUrl,  String model)?  openAi,TResult Function( String apiKey,  String baseUrl,  String model)?  openAiCompatible,TResult Function( String apiKey,  String baseUrl,  String model)?  anthropic,TResult Function( String apiKey,  String baseUrl,  String model)?  google,TResult Function( String apiKey,  String baseUrl,  String model)?  deepSeek,TResult Function( String command)?  acp,TResult Function( String command,  String model)?  codex,required TResult orElse(),}) {final _that = this;
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>({TResult Function(@JsonKey(name: 'api_key')  String apiKey, @JsonKey(name: 'base_url')  String baseUrl,  String model)?  openAi,TResult Function(@JsonKey(name: 'api_key')  String apiKey, @JsonKey(name: 'base_url')  String baseUrl,  String model)?  openAiCompatible,TResult Function(@JsonKey(name: 'api_key')  String apiKey, @JsonKey(name: 'base_url')  String baseUrl,  String model)?  anthropic,TResult Function(@JsonKey(name: 'api_key')  String apiKey, @JsonKey(name: 'base_url')  String baseUrl,  String model)?  google,TResult Function(@JsonKey(name: 'api_key')  String apiKey, @JsonKey(name: 'base_url')  String baseUrl,  String model)?  deepSeek,TResult Function( String command)?  acp,TResult Function( String command,  String model)?  codex,required TResult orElse(),}) {final _that = this;
 switch (_that) {
 case OpenAiConfig() when openAi != null:
 return openAi(_that.apiKey,_that.baseUrl,_that.model);case OpenAiCompatibleConfig() when openAiCompatible != null:
@@ -161,7 +207,7 @@ return codex(_that.command,_that.model);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult when<TResult extends Object?>({required TResult Function( String apiKey,  String baseUrl,  String model)  openAi,required TResult Function( String apiKey,  String baseUrl,  String model)  openAiCompatible,required TResult Function( String apiKey,  String baseUrl,  String model)  anthropic,required TResult Function( String apiKey,  String baseUrl,  String model)  google,required TResult Function( String apiKey,  String baseUrl,  String model)  deepSeek,required TResult Function( String command)  acp,required TResult Function( String command,  String model)  codex,}) {final _that = this;
+@optionalTypeArgs TResult when<TResult extends Object?>({required TResult Function(@JsonKey(name: 'api_key')  String apiKey, @JsonKey(name: 'base_url')  String baseUrl,  String model)  openAi,required TResult Function(@JsonKey(name: 'api_key')  String apiKey, @JsonKey(name: 'base_url')  String baseUrl,  String model)  openAiCompatible,required TResult Function(@JsonKey(name: 'api_key')  String apiKey, @JsonKey(name: 'base_url')  String baseUrl,  String model)  anthropic,required TResult Function(@JsonKey(name: 'api_key')  String apiKey, @JsonKey(name: 'base_url')  String baseUrl,  String model)  google,required TResult Function(@JsonKey(name: 'api_key')  String apiKey, @JsonKey(name: 'base_url')  String baseUrl,  String model)  deepSeek,required TResult Function( String command)  acp,required TResult Function( String command,  String model)  codex,}) {final _that = this;
 switch (_that) {
 case OpenAiConfig():
 return openAi(_that.apiKey,_that.baseUrl,_that.model);case OpenAiCompatibleConfig():
@@ -184,7 +230,7 @@ return codex(_that.command,_that.model);}
 /// }
 /// ```
 
-@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>({TResult? Function( String apiKey,  String baseUrl,  String model)?  openAi,TResult? Function( String apiKey,  String baseUrl,  String model)?  openAiCompatible,TResult? Function( String apiKey,  String baseUrl,  String model)?  anthropic,TResult? Function( String apiKey,  String baseUrl,  String model)?  google,TResult? Function( String apiKey,  String baseUrl,  String model)?  deepSeek,TResult? Function( String command)?  acp,TResult? Function( String command,  String model)?  codex,}) {final _that = this;
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>({TResult? Function(@JsonKey(name: 'api_key')  String apiKey, @JsonKey(name: 'base_url')  String baseUrl,  String model)?  openAi,TResult? Function(@JsonKey(name: 'api_key')  String apiKey, @JsonKey(name: 'base_url')  String baseUrl,  String model)?  openAiCompatible,TResult? Function(@JsonKey(name: 'api_key')  String apiKey, @JsonKey(name: 'base_url')  String baseUrl,  String model)?  anthropic,TResult? Function(@JsonKey(name: 'api_key')  String apiKey, @JsonKey(name: 'base_url')  String baseUrl,  String model)?  google,TResult? Function(@JsonKey(name: 'api_key')  String apiKey, @JsonKey(name: 'base_url')  String baseUrl,  String model)?  deepSeek,TResult? Function( String command)?  acp,TResult? Function( String command,  String model)?  codex,}) {final _that = this;
 switch (_that) {
 case OpenAiConfig() when openAi != null:
 return openAi(_that.apiKey,_that.baseUrl,_that.model);case OpenAiCompatibleConfig() when openAiCompatible != null:
@@ -202,15 +248,19 @@ return codex(_that.command,_that.model);case _:
 }
 
 /// @nodoc
-
+@JsonSerializable()
 
 class OpenAiConfig extends LlmClientConfig {
-  const OpenAiConfig({required this.apiKey, this.baseUrl = 'https://api.openai.com/v1', this.model = 'gpt-5-mini'}): super._();
-  
+  const OpenAiConfig({@JsonKey(name: 'api_key') required this.apiKey, @JsonKey(name: 'base_url') this.baseUrl = 'https://api.openai.com/v1', this.model = 'gpt-5-mini', final  String? $type}): $type = $type ?? 'openai',super._();
+  factory OpenAiConfig.fromJson(Map<String, dynamic> json) => _$OpenAiConfigFromJson(json);
 
- final  String apiKey;
-@JsonKey() final  String baseUrl;
+@JsonKey(name: 'api_key') final  String apiKey;
+@JsonKey(name: 'base_url') final  String baseUrl;
 @JsonKey() final  String model;
+
+@JsonKey(name: 'provider')
+final String $type;
+
 
 /// Create a copy of LlmClientConfig
 /// with the given fields replaced by the non-null parameter values.
@@ -218,14 +268,17 @@ class OpenAiConfig extends LlmClientConfig {
 @pragma('vm:prefer-inline')
 $OpenAiConfigCopyWith<OpenAiConfig> get copyWith => _$OpenAiConfigCopyWithImpl<OpenAiConfig>(this, _$identity);
 
-
+@override
+Map<String, dynamic> toJson() {
+  return _$OpenAiConfigToJson(this, );
+}
 
 @override
 bool operator ==(Object other) {
   return identical(this, other) || (other.runtimeType == runtimeType&&other is OpenAiConfig&&(identical(other.apiKey, apiKey) || other.apiKey == apiKey)&&(identical(other.baseUrl, baseUrl) || other.baseUrl == baseUrl)&&(identical(other.model, model) || other.model == model));
 }
 
-
+@JsonKey(includeFromJson: false, includeToJson: false)
 @override
 int get hashCode => Object.hash(runtimeType,apiKey,baseUrl,model);
 
@@ -242,7 +295,7 @@ abstract mixin class $OpenAiConfigCopyWith<$Res> implements $LlmClientConfigCopy
   factory $OpenAiConfigCopyWith(OpenAiConfig value, $Res Function(OpenAiConfig) _then) = _$OpenAiConfigCopyWithImpl;
 @useResult
 $Res call({
- String apiKey, String baseUrl, String model
+@JsonKey(name: 'api_key') String apiKey,@JsonKey(name: 'base_url') String baseUrl, String model
 });
 
 
@@ -272,15 +325,19 @@ as String,
 }
 
 /// @nodoc
-
+@JsonSerializable()
 
 class OpenAiCompatibleConfig extends LlmClientConfig {
-  const OpenAiCompatibleConfig({this.apiKey = '', this.baseUrl = '', this.model = ''}): super._();
-  
+  const OpenAiCompatibleConfig({@JsonKey(name: 'api_key') this.apiKey = '', @JsonKey(name: 'base_url') this.baseUrl = '', this.model = '', final  String? $type}): $type = $type ?? 'openai-compatible',super._();
+  factory OpenAiCompatibleConfig.fromJson(Map<String, dynamic> json) => _$OpenAiCompatibleConfigFromJson(json);
 
-@JsonKey() final  String apiKey;
-@JsonKey() final  String baseUrl;
+@JsonKey(name: 'api_key') final  String apiKey;
+@JsonKey(name: 'base_url') final  String baseUrl;
 @JsonKey() final  String model;
+
+@JsonKey(name: 'provider')
+final String $type;
+
 
 /// Create a copy of LlmClientConfig
 /// with the given fields replaced by the non-null parameter values.
@@ -288,14 +345,17 @@ class OpenAiCompatibleConfig extends LlmClientConfig {
 @pragma('vm:prefer-inline')
 $OpenAiCompatibleConfigCopyWith<OpenAiCompatibleConfig> get copyWith => _$OpenAiCompatibleConfigCopyWithImpl<OpenAiCompatibleConfig>(this, _$identity);
 
-
+@override
+Map<String, dynamic> toJson() {
+  return _$OpenAiCompatibleConfigToJson(this, );
+}
 
 @override
 bool operator ==(Object other) {
   return identical(this, other) || (other.runtimeType == runtimeType&&other is OpenAiCompatibleConfig&&(identical(other.apiKey, apiKey) || other.apiKey == apiKey)&&(identical(other.baseUrl, baseUrl) || other.baseUrl == baseUrl)&&(identical(other.model, model) || other.model == model));
 }
 
-
+@JsonKey(includeFromJson: false, includeToJson: false)
 @override
 int get hashCode => Object.hash(runtimeType,apiKey,baseUrl,model);
 
@@ -312,7 +372,7 @@ abstract mixin class $OpenAiCompatibleConfigCopyWith<$Res> implements $LlmClient
   factory $OpenAiCompatibleConfigCopyWith(OpenAiCompatibleConfig value, $Res Function(OpenAiCompatibleConfig) _then) = _$OpenAiCompatibleConfigCopyWithImpl;
 @useResult
 $Res call({
- String apiKey, String baseUrl, String model
+@JsonKey(name: 'api_key') String apiKey,@JsonKey(name: 'base_url') String baseUrl, String model
 });
 
 
@@ -342,15 +402,19 @@ as String,
 }
 
 /// @nodoc
-
+@JsonSerializable()
 
 class AnthropicConfig extends LlmClientConfig {
-  const AnthropicConfig({required this.apiKey, this.baseUrl = 'https://api.anthropic.com', this.model = 'claude-sonnet-5'}): super._();
-  
+  const AnthropicConfig({@JsonKey(name: 'api_key') required this.apiKey, @JsonKey(name: 'base_url') this.baseUrl = 'https://api.anthropic.com', this.model = 'claude-sonnet-5', final  String? $type}): $type = $type ?? 'anthropic',super._();
+  factory AnthropicConfig.fromJson(Map<String, dynamic> json) => _$AnthropicConfigFromJson(json);
 
- final  String apiKey;
-@JsonKey() final  String baseUrl;
+@JsonKey(name: 'api_key') final  String apiKey;
+@JsonKey(name: 'base_url') final  String baseUrl;
 @JsonKey() final  String model;
+
+@JsonKey(name: 'provider')
+final String $type;
+
 
 /// Create a copy of LlmClientConfig
 /// with the given fields replaced by the non-null parameter values.
@@ -358,14 +422,17 @@ class AnthropicConfig extends LlmClientConfig {
 @pragma('vm:prefer-inline')
 $AnthropicConfigCopyWith<AnthropicConfig> get copyWith => _$AnthropicConfigCopyWithImpl<AnthropicConfig>(this, _$identity);
 
-
+@override
+Map<String, dynamic> toJson() {
+  return _$AnthropicConfigToJson(this, );
+}
 
 @override
 bool operator ==(Object other) {
   return identical(this, other) || (other.runtimeType == runtimeType&&other is AnthropicConfig&&(identical(other.apiKey, apiKey) || other.apiKey == apiKey)&&(identical(other.baseUrl, baseUrl) || other.baseUrl == baseUrl)&&(identical(other.model, model) || other.model == model));
 }
 
-
+@JsonKey(includeFromJson: false, includeToJson: false)
 @override
 int get hashCode => Object.hash(runtimeType,apiKey,baseUrl,model);
 
@@ -382,7 +449,7 @@ abstract mixin class $AnthropicConfigCopyWith<$Res> implements $LlmClientConfigC
   factory $AnthropicConfigCopyWith(AnthropicConfig value, $Res Function(AnthropicConfig) _then) = _$AnthropicConfigCopyWithImpl;
 @useResult
 $Res call({
- String apiKey, String baseUrl, String model
+@JsonKey(name: 'api_key') String apiKey,@JsonKey(name: 'base_url') String baseUrl, String model
 });
 
 
@@ -412,15 +479,19 @@ as String,
 }
 
 /// @nodoc
-
+@JsonSerializable()
 
 class GeminiConfig extends LlmClientConfig {
-  const GeminiConfig({required this.apiKey, this.baseUrl = 'https://generativelanguage.googleapis.com', this.model = 'gemini-2.5-flash'}): super._();
-  
+  const GeminiConfig({@JsonKey(name: 'api_key') required this.apiKey, @JsonKey(name: 'base_url') this.baseUrl = 'https://generativelanguage.googleapis.com', this.model = 'gemini-2.5-flash', final  String? $type}): $type = $type ?? 'google',super._();
+  factory GeminiConfig.fromJson(Map<String, dynamic> json) => _$GeminiConfigFromJson(json);
 
- final  String apiKey;
-@JsonKey() final  String baseUrl;
+@JsonKey(name: 'api_key') final  String apiKey;
+@JsonKey(name: 'base_url') final  String baseUrl;
 @JsonKey() final  String model;
+
+@JsonKey(name: 'provider')
+final String $type;
+
 
 /// Create a copy of LlmClientConfig
 /// with the given fields replaced by the non-null parameter values.
@@ -428,14 +499,17 @@ class GeminiConfig extends LlmClientConfig {
 @pragma('vm:prefer-inline')
 $GeminiConfigCopyWith<GeminiConfig> get copyWith => _$GeminiConfigCopyWithImpl<GeminiConfig>(this, _$identity);
 
-
+@override
+Map<String, dynamic> toJson() {
+  return _$GeminiConfigToJson(this, );
+}
 
 @override
 bool operator ==(Object other) {
   return identical(this, other) || (other.runtimeType == runtimeType&&other is GeminiConfig&&(identical(other.apiKey, apiKey) || other.apiKey == apiKey)&&(identical(other.baseUrl, baseUrl) || other.baseUrl == baseUrl)&&(identical(other.model, model) || other.model == model));
 }
 
-
+@JsonKey(includeFromJson: false, includeToJson: false)
 @override
 int get hashCode => Object.hash(runtimeType,apiKey,baseUrl,model);
 
@@ -452,7 +526,7 @@ abstract mixin class $GeminiConfigCopyWith<$Res> implements $LlmClientConfigCopy
   factory $GeminiConfigCopyWith(GeminiConfig value, $Res Function(GeminiConfig) _then) = _$GeminiConfigCopyWithImpl;
 @useResult
 $Res call({
- String apiKey, String baseUrl, String model
+@JsonKey(name: 'api_key') String apiKey,@JsonKey(name: 'base_url') String baseUrl, String model
 });
 
 
@@ -482,15 +556,19 @@ as String,
 }
 
 /// @nodoc
-
+@JsonSerializable()
 
 class DeepSeekConfig extends LlmClientConfig {
-  const DeepSeekConfig({required this.apiKey, this.baseUrl = 'https://api.deepseek.com', this.model = 'deepseek-chat'}): super._();
-  
+  const DeepSeekConfig({@JsonKey(name: 'api_key') required this.apiKey, @JsonKey(name: 'base_url') this.baseUrl = 'https://api.deepseek.com', this.model = 'deepseek-chat', final  String? $type}): $type = $type ?? 'deepseek',super._();
+  factory DeepSeekConfig.fromJson(Map<String, dynamic> json) => _$DeepSeekConfigFromJson(json);
 
- final  String apiKey;
-@JsonKey() final  String baseUrl;
+@JsonKey(name: 'api_key') final  String apiKey;
+@JsonKey(name: 'base_url') final  String baseUrl;
 @JsonKey() final  String model;
+
+@JsonKey(name: 'provider')
+final String $type;
+
 
 /// Create a copy of LlmClientConfig
 /// with the given fields replaced by the non-null parameter values.
@@ -498,14 +576,17 @@ class DeepSeekConfig extends LlmClientConfig {
 @pragma('vm:prefer-inline')
 $DeepSeekConfigCopyWith<DeepSeekConfig> get copyWith => _$DeepSeekConfigCopyWithImpl<DeepSeekConfig>(this, _$identity);
 
-
+@override
+Map<String, dynamic> toJson() {
+  return _$DeepSeekConfigToJson(this, );
+}
 
 @override
 bool operator ==(Object other) {
   return identical(this, other) || (other.runtimeType == runtimeType&&other is DeepSeekConfig&&(identical(other.apiKey, apiKey) || other.apiKey == apiKey)&&(identical(other.baseUrl, baseUrl) || other.baseUrl == baseUrl)&&(identical(other.model, model) || other.model == model));
 }
 
-
+@JsonKey(includeFromJson: false, includeToJson: false)
 @override
 int get hashCode => Object.hash(runtimeType,apiKey,baseUrl,model);
 
@@ -522,7 +603,7 @@ abstract mixin class $DeepSeekConfigCopyWith<$Res> implements $LlmClientConfigCo
   factory $DeepSeekConfigCopyWith(DeepSeekConfig value, $Res Function(DeepSeekConfig) _then) = _$DeepSeekConfigCopyWithImpl;
 @useResult
 $Res call({
- String apiKey, String baseUrl, String model
+@JsonKey(name: 'api_key') String apiKey,@JsonKey(name: 'base_url') String baseUrl, String model
 });
 
 
@@ -552,13 +633,17 @@ as String,
 }
 
 /// @nodoc
-
+@JsonSerializable()
 
 class AcpConfig extends LlmClientConfig {
-  const AcpConfig({this.command = ''}): super._();
-  
+  const AcpConfig({this.command = '', final  String? $type}): $type = $type ?? 'acp',super._();
+  factory AcpConfig.fromJson(Map<String, dynamic> json) => _$AcpConfigFromJson(json);
 
 @JsonKey() final  String command;
+
+@JsonKey(name: 'provider')
+final String $type;
+
 
 /// Create a copy of LlmClientConfig
 /// with the given fields replaced by the non-null parameter values.
@@ -566,14 +651,17 @@ class AcpConfig extends LlmClientConfig {
 @pragma('vm:prefer-inline')
 $AcpConfigCopyWith<AcpConfig> get copyWith => _$AcpConfigCopyWithImpl<AcpConfig>(this, _$identity);
 
-
+@override
+Map<String, dynamic> toJson() {
+  return _$AcpConfigToJson(this, );
+}
 
 @override
 bool operator ==(Object other) {
   return identical(this, other) || (other.runtimeType == runtimeType&&other is AcpConfig&&(identical(other.command, command) || other.command == command));
 }
 
-
+@JsonKey(includeFromJson: false, includeToJson: false)
 @override
 int get hashCode => Object.hash(runtimeType,command);
 
@@ -618,14 +706,18 @@ as String,
 }
 
 /// @nodoc
-
+@JsonSerializable()
 
 class CodexConfig extends LlmClientConfig {
-  const CodexConfig({this.command = 'codex app-server', this.model = ''}): super._();
-  
+  const CodexConfig({this.command = 'codex app-server', this.model = '', final  String? $type}): $type = $type ?? 'codex',super._();
+  factory CodexConfig.fromJson(Map<String, dynamic> json) => _$CodexConfigFromJson(json);
 
 @JsonKey() final  String command;
 @JsonKey() final  String model;
+
+@JsonKey(name: 'provider')
+final String $type;
+
 
 /// Create a copy of LlmClientConfig
 /// with the given fields replaced by the non-null parameter values.
@@ -633,14 +725,17 @@ class CodexConfig extends LlmClientConfig {
 @pragma('vm:prefer-inline')
 $CodexConfigCopyWith<CodexConfig> get copyWith => _$CodexConfigCopyWithImpl<CodexConfig>(this, _$identity);
 
-
+@override
+Map<String, dynamic> toJson() {
+  return _$CodexConfigToJson(this, );
+}
 
 @override
 bool operator ==(Object other) {
   return identical(this, other) || (other.runtimeType == runtimeType&&other is CodexConfig&&(identical(other.command, command) || other.command == command)&&(identical(other.model, model) || other.model == model));
 }
 
-
+@JsonKey(includeFromJson: false, includeToJson: false)
 @override
 int get hashCode => Object.hash(runtimeType,command,model);
 

@@ -10,8 +10,7 @@ import 'package:llm_clients/llm_clients.dart';
 final class _FakeAppSettingsStorage extends AppSettingsStorage {
   @override
   Future<AppSettings> build() async => const AppSettings(
-    provider: LlmProvider.codex,
-    codexCommand: 'dart test/fixtures/fake_codex_app_server.dart',
+    llm: LlmClientConfig.codex(command: 'dart test/fixtures/fake_codex_app_server.dart'),
   );
 }
 

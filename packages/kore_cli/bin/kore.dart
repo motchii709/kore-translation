@@ -3,7 +3,6 @@ import 'dart:io';
 import 'package:args/args.dart';
 import 'package:dio/dio.dart';
 import 'package:json_rpc_2/json_rpc_2.dart';
-import 'package:kore_cli/src/cli_config.dart';
 import 'package:kore_cli/src/config_file.dart';
 import 'package:kore_cli/src/interactive.dart';
 import 'package:kore_cli/src/output.dart';
@@ -13,23 +12,9 @@ import 'package:llm_clients/llm_clients.dart';
 
 Future<void> main(List<String> arguments) async {
   final parser = ArgParser()
-    ..addOption(
-      'provider',
-      abbr: 'p',
-      allowed: LlmProvider.values.map((p) => p.id),
-      help: 'LLMプロバイダ (既定: openai)',
-    )
     ..addOption('to', abbr: 't', help: '翻訳先の言語 (既定: English)')
     ..addOption('tone', help: '翻訳のトーン (自由記述、例: "フランクな口調で")')
     ..addOption('prompt', help: 'システムプロンプトを差し替える (応答フォーマットの指示は自動で付加)')
-    ..addOption('model', abbr: 'm', help: '使用するモデル')
-    ..addOption('base-url', help: 'APIのベースURL')
-    ..addOption('api-key', help: 'APIキー')
-    ..addOption('acp-command', help: 'ACPエージェントの起動コマンド (-p acp 用)')
-    ..addOption(
-      'codex-command',
-      help: 'Codex app-server の起動コマンド (既定: "codex app-server"、-p codex 用)',
-    )
     ..addFlag('thinking', defaultsTo: true, help: '対応モデルの思考を有効にする')
     ..addOption('config', help: '設定ファイルのパス (既定: ~/.kore/config.yaml)')
     ..addFlag('interactive', abbr: 'i', negatable: false, help: '対話(TUI)モード')
@@ -39,31 +24,18 @@ Future<void> main(List<String> arguments) async {
   final printer = ResultPrinter();
 
   final ArgResults args;
-  final Map<String, String> fileConfig;
-  final LlmClientConfig config;
+  final String configPath;
+  final CliConfig cliConfig;
   try {
     args = parser.parse(arguments);
-    fileConfig = loadCliConfigFile(args.option('config') ?? defaultCliConfigPath());
-    config = resolveCliConfig(
-      providerId: args.option('provider'),
-      baseUrl: args.option('base-url'),
-      apiKey: args.option('api-key'),
-      model: args.option('model'),
-      acpCommand: args.option('acp-command'),
-      codexCommand: args.option('codex-command'),
-      fileConfig: fileConfig,
-    );
+    configPath = args.option('config') ?? defaultCliConfigPath();
+    cliConfig = loadCliConfig(configPath);
   } on FormatException catch (e) {
     printer.printError(e.message);
     stderr.writeln(parser.usage);
     exitCode = 64;
     return;
   }
-
-  final target = args.option('to') ?? fileConfig['to'] ?? 'English';
-  final tone = args.option('tone') ?? fileConfig['tone'] ?? '';
-  final customPrompt = args.option('prompt') ?? fileConfig['prompt'];
-  final thinking = args.wasParsed('thinking') ? args.flag('thinking') : fileConfig['thinking'] != 'false';
 
   if (args.flag('help')) {
     stdout.writeln('Kore!? — LLM翻訳CLI');
@@ -73,19 +45,28 @@ Future<void> main(List<String> arguments) async {
     stdout.writeln();
     stdout.writeln(parser.usage);
     stdout.writeln();
-    stdout.writeln('設定ファイル: ${defaultCliConfigPath()} (YAML、--config で変更可)');
-    stdout.writeln('キー: ${cliConfigKeys.join(' / ')}');
-    stdout.writeln('優先順位: オプション > 設定ファイル > 既定値');
+    stdout.writeln('接続設定は設定ファイルでのみ定義します: ${defaultCliConfigPath()}');
+    stdout.writeln('''
+例:
+  llm:
+    provider: codex   # openai / openai-compatible / anthropic / google / deepseek / acp / codex
+    # model: gpt-5.6-sol
+  to: English         # 翻訳オプションの既定 (tone / thinking / prompt も可)
+
+llm のフィールドはプロバイダごとに api_key / base_url / model / command です。''');
     return;
   }
 
-  switch (config) {
+  final llm = cliConfig.llm;
+  if (llm == null) {
+    printer.printError('設定ファイル ($configPath) に llm がありません。(kore -h で設定例)');
+    exitCode = 78;
+    return;
+  }
+  switch (llm) {
     // ACP agents authenticate on their own; they need a launch command.
     case AcpConfig(command: ''):
-      printer.printError(
-        'ACPコマンドが設定されていません。--acp-command か、設定ファイル '
-        '(${defaultCliConfigPath()}) の acp-command を指定してください。',
-      );
+      printer.printError('llm の command が空です。ACPエージェントの起動コマンドを設定してください。');
       exitCode = 78;
       return;
     // Local OpenAI-compatible servers (Ollama, LM Studio) need no API key.
@@ -93,15 +74,17 @@ Future<void> main(List<String> arguments) async {
         AnthropicConfig(apiKey: '') ||
         GeminiConfig(apiKey: '') ||
         DeepSeekConfig(apiKey: ''):
-      printer.printError(
-        'APIキーが設定されていません。--api-key か、設定ファイル '
-        '(${defaultCliConfigPath()}) の api-key を指定してください。',
-      );
+      printer.printError('llm の api_key が空です。');
       exitCode = 78;
       return;
     default:
       break;
   }
+
+  final target = args.option('to') ?? cliConfig.to ?? 'English';
+  final tone = args.option('tone') ?? cliConfig.tone ?? '';
+  final customPrompt = args.option('prompt') ?? cliConfig.prompt;
+  final thinking = args.wasParsed('thinking') ? args.flag('thinking') : cliConfig.thinking ?? true;
 
   Dio dio() => Dio(
     BaseOptions(
@@ -111,7 +94,7 @@ Future<void> main(List<String> arguments) async {
   );
   final TranslationClient client;
   StdioAgentProcess? agent;
-  switch (config) {
+  switch (llm) {
     case final OpenAiConfig config:
       client = OpenAiTranslationClient(
         llm: OpenAiLlmClient(config: config, dio: dio()),

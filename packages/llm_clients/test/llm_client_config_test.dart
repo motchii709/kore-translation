@@ -1,3 +1,4 @@
+import 'package:json_annotation/json_annotation.dart';
 import 'package:llm_clients/llm_clients.dart';
 import 'package:test/test.dart';
 
@@ -8,52 +9,10 @@ void main() {
       expect(config, isA<OpenAiConfig>().having((c) => c.baseUrl, 'baseUrl', 'https://api.openai.com/v1').having((c) => c.model, 'model', 'gpt-5-mini'));
     });
 
-    test('forProvider builds the variant matching the provider', () {
-      LlmClientConfig configOf(LlmProvider provider) => LlmClientConfig.forProvider(provider, apiKey: 'key');
-
-      expect(configOf(LlmProvider.openAi), isA<OpenAiConfig>());
-      expect(configOf(LlmProvider.openAiCompatible), isA<OpenAiCompatibleConfig>());
-      expect(configOf(LlmProvider.anthropic), isA<AnthropicConfig>());
-      expect(configOf(LlmProvider.google), isA<GeminiConfig>());
-      expect(configOf(LlmProvider.deepSeek), isA<DeepSeekConfig>());
-      expect(configOf(LlmProvider.acp), isA<AcpConfig>());
-      expect(configOf(LlmProvider.codex), isA<CodexConfig>());
-    });
-
-    test('forProvider treats empty strings as "use the default"', () {
-      final config = LlmClientConfig.forProvider(
-        LlmProvider.openAi,
-        apiKey: 'sk-test',
-      );
-      expect(config, isA<OpenAiConfig>().having((c) => c.baseUrl, 'baseUrl', 'https://api.openai.com/v1').having((c) => c.model, 'model', 'gpt-5-mini'));
-    });
-
-    test('forProvider prefers explicit overrides', () {
-      final config = LlmClientConfig.forProvider(
-        LlmProvider.openAi,
-        apiKey: 'sk-test',
-        baseUrl: 'http://localhost:11434/v1',
-        model: 'llama3',
-      );
-      expect(config, isA<OpenAiConfig>().having((c) => c.baseUrl, 'baseUrl', 'http://localhost:11434/v1').having((c) => c.model, 'model', 'llama3'));
-    });
-
-    test('forProvider carries the ACP command through', () {
-      final config = LlmClientConfig.forProvider(
-        LlmProvider.acp,
-        command: 'npx -y @agentclientprotocol/claude-agent-acp',
-      );
-      expect(config, isA<AcpConfig>().having((c) => c.command, 'command', 'npx -y @agentclientprotocol/claude-agent-acp'));
-    });
-
-    test('forProvider merges the Codex defaults', () {
+    test('the agent variants carry real defaults too', () {
       expect(
-        LlmClientConfig.forProvider(LlmProvider.codex),
+        const LlmClientConfig.codex(),
         isA<CodexConfig>().having((c) => c.command, 'command', 'codex app-server').having((c) => c.model, 'model', ''),
-      );
-      expect(
-        LlmClientConfig.forProvider(LlmProvider.codex, command: 'codex-nightly app-server', model: 'gpt-5.6-sol'),
-        isA<CodexConfig>().having((c) => c.command, 'command', 'codex-nightly app-server').having((c) => c.model, 'model', 'gpt-5.6-sol'),
       );
     });
 
@@ -63,18 +22,33 @@ void main() {
         LlmProvider.anthropic,
       );
     });
-  });
 
-  group('LlmProvider.fromId', () {
-    test('resolves known ids and rejects unknown ids', () {
-      expect(LlmProvider.fromId('openai'), LlmProvider.openAi);
-      expect(LlmProvider.fromId('anthropic'), LlmProvider.anthropic);
-      expect(LlmProvider.fromId('google'), LlmProvider.google);
-      expect(LlmProvider.fromId('deepseek'), LlmProvider.deepSeek);
-      expect(LlmProvider.fromId('acp'), LlmProvider.acp);
-      expect(LlmProvider.fromId('codex'), LlmProvider.codex);
-      expect(LlmProvider.fromId('unknown'), isNull);
-      expect(LlmProvider.fromId(null), isNull);
+    test('serializes as a union discriminated by the provider id', () {
+      const config = LlmClientConfig.openAi(apiKey: 'sk-test');
+      expect(config.toJson(), {
+        'provider': 'openai',
+        'api_key': 'sk-test',
+        'base_url': 'https://api.openai.com/v1',
+        'model': 'gpt-5-mini',
+      });
+      expect(LlmClientConfig.fromJson(config.toJson()), config);
+    });
+
+    test('fromJson applies the variant defaults to omitted fields', () {
+      expect(
+        LlmClientConfig.fromJson({'provider': 'codex'}),
+        const LlmClientConfig.codex(),
+      );
+      expect(
+        LlmClientConfig.fromJson({'provider': 'anthropic', 'api_key': 'k'}),
+        const LlmClientConfig.anthropic(apiKey: 'k'),
+      );
+    });
+
+    test('fromJson rejects unknown providers and missing required fields', () {
+      expect(() => LlmClientConfig.fromJson({'provider': 'nope'}), throwsA(isA<CheckedFromJsonException>()));
+      expect(() => LlmClientConfig.fromJson({'provider': 'openai'}), throwsA(isA<CheckedFromJsonException>()));
     });
   });
+
 }

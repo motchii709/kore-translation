@@ -1,25 +1,4 @@
-/// Stable identifiers for the supported LLM backends, used for persistence
-/// and CLI options. Anything beyond identity (defaults, labels, environment
-/// conventions) lives with the code that needs it.
-enum LlmProvider {
-  openAi('openai'),
-  openAiCompatible('openai-compatible'),
-  anthropic('anthropic'),
-  google('google'),
-  deepSeek('deepseek'),
-  acp('acp'),
-  codex('codex');
-
-  const LlmProvider(this.id);
-
-  final String id;
-
-  static LlmProvider? fromId(String? id) {
-    for (final provider in values) {
-      if (provider.id == id) {
-        return provider;
-      }
-    }
-    return null;
-  }
-}
+/// Identifiers for the supported LLM backends. Anything beyond identity
+/// (defaults, labels, wire ids) lives with the code that needs it — the
+/// persisted discriminator values are defined on `LlmClientConfig`.
+enum LlmProvider { openAi, openAiCompatible, anthropic, google, deepSeek, acp, codex }

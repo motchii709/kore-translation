@@ -61,8 +61,10 @@ LlmClient 群 (llm_clients、抽象なし・各社独立の薄いラッパー)
   ユーザーが自由に調整できます。kore_client が持つプロンプト知識は、パーサーと
   対になるレスポンススキーマ指示 (`translationSchemaPrompt`) のみです
 - 設定は sealed な `LlmClientConfig` (プロバイダ毎のバリアント、実デフォルト
-  値付き)。クライアントの構築 (DI) は composition root — アプリの provider と
-  CLI の main — が config バリアントの switch で行います
+  値付き)。union はそのまま永続化スキーマでもあり (`provider` を判別子に
+  JSON/YAML と相互変換)、アプリの secure storage も CLI の設定ファイルも
+  これを直書きします。クライアントの構築 (DI) は composition root —
+  アプリの provider と CLI の main — が config バリアントの switch で行います
 - トランスポートエラー (`DioException`) は変換せず生のまま UI へ届きます
   (ストリーミングのエラーボディのみ読み取って例外に残します)
 - エージェントバックエンド (ACP / Codex app-server) は stdio の JSON-RPC
@@ -98,43 +100,51 @@ dart run build_runner build                            # アプリのコード�
 flutter run -d windows   # ほか: -d <android-device> / macos / linux
 ```
 
-設定画面で LLM プロバイダ・API キー (・必要ならベース URL とモデル) を設定します。
-API キーは `flutter_secure_storage` で端末にのみ保存されます。
+設定画面で LLM プロバイダ・API キー・ベース URL・モデルを設定します。
+フィールドには実際に使われる値がそのまま入っており、プロバイダを切り替えると
+そのプロバイダのデフォルト値が流し込まれます (「空欄なら既定値」のような暗黙の
+挙動はありません)。API キーは `flutter_secure_storage` で端末にのみ保存されます。
 プロバイダに「ACPエージェント」を選んだ場合は、API キーの代わりに起動コマンド
 (例: `npx -y @agentclientprotocol/claude-agent-acp`) を設定します。
-「Codex」は `codex login` 済みなら設定不要でそのまま使えます。
-システムプロンプトも編集できます (`{{target}}` / `{{tone}}` が翻訳時に置換されます)。
+「Codex」は起動コマンドが既定で入っているので、保存するだけで使えます
+(認証は `codex login`)。エージェント系はサブプロセスを起動するため、
+Android / iOS では選択肢に表示されません。
+システムプロンプトも同様にデフォルトの本文が入った状態から直接編集できます
+(`{{target}}` / `{{tone}}` が翻訳時に置換されます)。
 
 ### CLI
 
-```sh
-cd packages/kore_cli
-dart run bin/kore.dart --api-key sk-... "こんにちは" --to English
-dart run bin/kore.dart -i                # 対話 (TUI) モード
-dart run bin/kore.dart -p anthropic --api-key sk-ant-... "Hello" -t 日本語
-dart run bin/kore.dart "了解です" --tone "フランクな口調で"   # トーンは自由記述
-dart run bin/kore.dart "Hi" --prompt "関西弁に翻訳して"       # プロンプト差し替え
-
-# ACP エージェント (Claude Code) に翻訳させる — API キー不要
-dart run bin/kore.dart -p acp --acp-command "npx -y @agentclientprotocol/claude-agent-acp" "こんにちは"
-
-# Codex (app-server) に翻訳させる — codex login 済みなら設定不要
-dart run bin/kore.dart -p codex "こんにちは"
-```
-
-毎回オプションを渡す代わりに、`~/.kore/config.yaml` (`--config` で変更可) に
-書けます。キーはオプション名と同じで、優先順位は
-オプション > 設定ファイル > 既定値です。
+接続設定は `~/.kore/config.yaml` (`--config` で変更可) にのみ書きます。
+`llm` の中身は `LlmClientConfig` の discriminated union そのままです
+(`provider` が判別子、フィールドは snake_case。必須フィールドの欠落は
+union の定義どおりエラーになります):
 
 ```yaml
 # ~/.kore/config.yaml
-provider: codex     # openai / openai-compatible / anthropic / google / deepseek / acp / codex
-# api-key: sk-...
-# base-url: ...
-# model: ...
-# acp-command: npx -y @agentclientprotocol/claude-agent-acp
-# codex-command: codex app-server
-to: English         # 翻訳先の既定。ほかに tone / thinking / prompt も指定可
+llm:
+  provider: codex        # openai / openai-compatible / anthropic / google / deepseek / acp / codex
+  # model: gpt-5.6-sol
+to: English              # 翻訳オプションの既定 (tone / thinking / prompt も可)
+```
+
+プロバイダごとの `llm` の例:
+
+```yaml
+llm: { provider: openai, api_key: sk-... }
+llm: { provider: openai-compatible, base_url: "http://localhost:11434/v1", model: llama3 }
+llm: { provider: acp, command: npx -y @agentclientprotocol/claude-agent-acp }  # API キー不要
+llm: { provider: codex }                    # codex login 済みならこれだけで動く
+```
+
+コマンドラインの引数は翻訳オプションだけです (引数 > 設定ファイル > 既定値):
+
+```sh
+cd packages/kore_cli
+dart run bin/kore.dart "こんにちは"
+dart run bin/kore.dart -i                # 対話 (TUI) モード
+dart run bin/kore.dart "Hello" -t 日本語
+dart run bin/kore.dart "了解です" --tone "フランクな口調で"   # トーンは自由記述
+dart run bin/kore.dart "Hi" --prompt "関西弁に翻訳して"       # プロンプト差し替え
 ```
 
 ## 開発

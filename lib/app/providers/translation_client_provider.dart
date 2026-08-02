@@ -32,7 +32,7 @@ Future<TranslationClient> translationClient(Ref ref) async {
     return agent;
   }
 
-  switch (settings.toLlmClientConfig()) {
+  switch (settings.llm) {
     case final OpenAiConfig config:
       return OpenAiTranslationClient(
         llm: OpenAiLlmClient(config: config, dio: dio()),

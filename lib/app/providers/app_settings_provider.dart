@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:kore_honyaku/app/models/app_settings.dart';
 import 'package:kore_honyaku/app/providers/secure_storage_provider.dart';
 import 'package:llm_clients/llm_clients.dart';
@@ -5,32 +7,31 @@ import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 part 'app_settings_provider.g.dart';
 
-const _providerStorageKey = 'provider';
-const _baseUrlStorageKey = 'base_url';
-const _apiKeyStorageKey = 'api_key';
-const _modelStorageKey = 'model';
-const _acpCommandStorageKey = 'acp_command';
-const _codexCommandStorageKey = 'codex_command';
+const _llmStorageKey = 'llm';
 const _thinkingStorageKey = 'thinking';
 const _systemPromptStorageKey = 'system_prompt';
+
+/// Identifies the storage layout. Backward compatibility is a non-goal:
+/// data written under any other version is discarded wholesale instead of
+/// migrated. Bump on every incompatible change.
+const _schemaVersion = '1';
+const _schemaVersionKey = 'schema_version';
 
 @riverpod
 class AppSettingsStorage extends _$AppSettingsStorage {
   @override
   Future<AppSettings> build() async {
     final storage = ref.watch(secureStorageProvider);
+    if (await storage.read(key: _schemaVersionKey) != _schemaVersion) {
+      await storage.deleteAll();
+      await storage.write(key: _schemaVersionKey, value: _schemaVersion);
+    }
     const defaults = AppSettings();
     return AppSettings(
-      provider:
-          LlmProvider.fromId(
-            await storage.read(key: _providerStorageKey),
-          ) ??
-          defaults.provider,
-      baseUrl: await storage.read(key: _baseUrlStorageKey) ?? defaults.baseUrl,
-      apiKey: await storage.read(key: _apiKeyStorageKey) ?? defaults.apiKey,
-      model: await storage.read(key: _modelStorageKey) ?? defaults.model,
-      acpCommand: await storage.read(key: _acpCommandStorageKey) ?? defaults.acpCommand,
-      codexCommand: await storage.read(key: _codexCommandStorageKey) ?? defaults.codexCommand,
+      llm: switch (await storage.read(key: _llmStorageKey)) {
+        null => defaults.llm,
+        final json => LlmClientConfig.fromJson(jsonDecode(json) as Map<String, dynamic>),
+      },
       thinking: switch (await storage.read(key: _thinkingStorageKey)) {
         'true' => true,
         'false' => false,
@@ -44,19 +45,8 @@ class AppSettingsStorage extends _$AppSettingsStorage {
     state = await AsyncValue.guard(() async {
       final storage = ref.read(secureStorageProvider);
       await storage.write(
-        key: _providerStorageKey,
-        value: settings.provider.id,
-      );
-      await storage.write(key: _baseUrlStorageKey, value: settings.baseUrl);
-      await storage.write(key: _apiKeyStorageKey, value: settings.apiKey);
-      await storage.write(key: _modelStorageKey, value: settings.model);
-      await storage.write(
-        key: _acpCommandStorageKey,
-        value: settings.acpCommand,
-      );
-      await storage.write(
-        key: _codexCommandStorageKey,
-        value: settings.codexCommand,
+        key: _llmStorageKey,
+        value: jsonEncode(settings.llm.toJson()),
       );
       await storage.write(
         key: _thinkingStorageKey,

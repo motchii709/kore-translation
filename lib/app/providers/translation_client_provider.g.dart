@@ -61,4 +61,4 @@ final class TranslationClientProvider
   }
 }
 
-String _$translationClientHash() => r'a6b4cbdf28c0b681c3a1193308fdf338371bbf97';
+String _$translationClientHash() => r'b8c1dc1b13712eb6f88cea9e0a7dc156a9d028ba';

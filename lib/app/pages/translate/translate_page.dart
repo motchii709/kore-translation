@@ -29,16 +29,15 @@ class TranslatePage extends HookConsumerWidget {
         return;
       }
       FocusScope.of(context).unfocus();
-      final template = switch (settings?.systemPrompt) {
-        null || '' => defaultTranslationPromptTemplate,
-        final custom => custom,
-      };
       unawaited(
         ref
             .read(translationControllerProvider.notifier)
             .translate(
               systemPrompt: buildTranslationSystemPrompt(
-                template: template,
+                // The settings form materializes the template into its
+                // field, so the stored value is used verbatim; the default
+                // only covers the moment before settings have loaded.
+                template: settings?.systemPrompt ?? defaultTranslationPromptTemplate,
                 targetLanguage: targetLanguage.value,
                 // Join in declaration order so the prompt is deterministic.
                 toneInstruction: [
