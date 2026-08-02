@@ -57,6 +57,8 @@ class TranslationController extends _$TranslationController {
             if (result == null || !ref.mounted) {
               return;
             }
+            // An insert failure surfaces as an uncaught error by design:
+            // the translation itself succeeded and stays on screen.
             unawaited(
               ref
                   .read(appDatabaseProvider)

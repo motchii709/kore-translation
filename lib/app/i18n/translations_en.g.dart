@@ -137,6 +137,7 @@ class _Translations$translate$result$en extends Translations$translate$result$ja
 	@override String get thinking => 'Thinking';
 	@override String get title => 'Translation';
 	@override String detectedLanguage({required Object language}) => 'Detected language: ${language}';
+	@override String languagePair({required Object source, required Object target}) => '${source} → ${target}';
 	@override String get copy => 'Copy';
 	@override String get copied => 'Copied';
 	@override String get alternatives => 'Alternatives';
@@ -176,7 +177,7 @@ class _Translations$settings$api$en extends Translations$settings$api$ja {
 	@override String get thinking => 'Thinking';
 	@override String get thinkingSubtitle => 'Enable the model\'s thinking and stream it live';
 	@override String get systemPrompt => 'System prompt';
-	@override String get systemPromptHelper => '{{target}} and {{tone}} are substituted at translation time.\nResponse-format instructions are appended automatically';
+	@override String get systemPromptHelper => '{{language}} (selected), {{app}} (app language) and {{tone}} are substituted at translation time.\nThis is the entire prompt — changing the response-format part can break parsing';
 }
 
 // Path: settings.openAiCompatible
@@ -262,6 +263,7 @@ extension on TranslationsEn {
 			'translate.result.thinking' => 'Thinking',
 			'translate.result.title' => 'Translation',
 			'translate.result.detectedLanguage' => ({required Object language}) => 'Detected language: ${language}',
+			'translate.result.languagePair' => ({required Object source, required Object target}) => '${source} → ${target}',
 			'translate.result.copy' => 'Copy',
 			'translate.result.copied' => 'Copied',
 			'translate.result.alternatives' => 'Alternatives',
@@ -300,7 +302,7 @@ extension on TranslationsEn {
 			'settings.api.thinking' => 'Thinking',
 			'settings.api.thinkingSubtitle' => 'Enable the model\'s thinking and stream it live',
 			'settings.api.systemPrompt' => 'System prompt',
-			'settings.api.systemPromptHelper' => '{{target}} and {{tone}} are substituted at translation time.\nResponse-format instructions are appended automatically',
+			'settings.api.systemPromptHelper' => '{{language}} (selected), {{app}} (app language) and {{tone}} are substituted at translation time.\nThis is the entire prompt — changing the response-format part can break parsing',
 			'settings.openAiCompatible.requiredMark' => 'Required',
 			'settings.openAiCompatible.apiKeyHelper' => 'Optional for local servers',
 			'settings.acp.command' => 'ACP command',

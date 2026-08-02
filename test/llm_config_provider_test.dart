@@ -4,9 +4,10 @@ import 'package:flutter_secure_storage/test/test_flutter_secure_storage_platform
 import 'package:flutter_secure_storage_platform_interface/flutter_secure_storage_platform_interface.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
+import 'package:json_annotation/json_annotation.dart';
 import 'package:kore_translation/app/constants/translation_prompt.dart';
-import 'package:kore_translation/app/i18n/translations.g.dart';
 import 'package:kore_translation/app/providers/llm_config_provider.dart';
+import 'package:kore_translation/main.dart';
 import 'package:llm_clients/llm_clients.dart';
 
 void main() {
@@ -18,7 +19,8 @@ void main() {
   }
 
   ProviderContainer container() {
-    final container = ProviderContainer();
+    // Mirrors the app's ProviderScope: retries disabled so errors surface.
+    final container = ProviderContainer(retry: noRetry);
     addTearDown(container.dispose);
     return container;
   }
@@ -27,23 +29,23 @@ void main() {
     useStorage({});
     final config = await container().read(llmConfigStorageProvider.future);
 
-    // Tests run under the base locale (ja), so the seeded template is the
-    // Japanese-language one.
     expect(config, defaultLlmConfig);
     expect(config.systemPrompt, defaultTranslationPromptTemplate);
   });
 
-  test('data from another schema version is discarded wholesale', () async {
-    final data = useStorage({
-      // The version-1 layout: the system prompt lived outside the union.
-      'schema_version': '1',
-      'llm': '{"provider":"openai","api_key":"sk-old"}',
-      'system_prompt': 'old prompt',
-    });
-    final config = await container().read(llmConfigStorageProvider.future);
+  test('stored data that no longer parses surfaces the error raw', () async {
+    // Beta policy: no versioning, no migrations, no automatic wipes — the
+    // user deletes the profile from the advanced settings instead.
+    useStorage({'llm': '{"provider":"no-such-provider"}'});
+    final scope = container();
+    // Keep the auto-dispose provider alive while its future settles.
+    final subscription = scope.listen(llmConfigStorageProvider, (_, _) {});
+    addTearDown(subscription.close);
 
-    expect(config, defaultLlmConfig);
-    expect(data, {'schema_version': '2'});
+    await expectLater(
+      scope.read(llmConfigStorageProvider.future),
+      throwsA(isA<CheckedFromJsonException>()),
+    );
   });
 
   test('save round-trips thinking and system prompt inside the union JSON', () async {

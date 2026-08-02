@@ -50,7 +50,7 @@ Future<void> main(List<String> arguments) async {
     provider: codex   # openai / openai-compatible / anthropic / google / deepseek / acp / codex
     # model: gpt-5.6-sol
     # thinking: false # 対応プロバイダの思考のオン/オフ
-    # system_prompt: 関西弁に翻訳して   # 組み込みプロンプトの差し替え (応答フォーマット指示は自動で付加)
+    # system_prompt: ...               # プロンプト全体の差し替え (応答フォーマット指示も自前で書く)
   to: English         # 翻訳オプションの既定 (tone も可)
 
 llm のフィールドはプロバイダごとに api_key / base_url / model / command / thinking / system_prompt です。''');
@@ -158,6 +158,8 @@ llm のフィールドはプロバイダごとに api_key / base_url / model / c
           .last;
       final result = event.result;
       if (result == null) {
+        // Unreachable by contract: assembleTranslationEvents either ends
+        // with a validated result or throws. Forced by the nullable field.
         printer.printError('翻訳結果を取得できませんでした');
         exitCode = 1;
         return;
@@ -176,8 +178,9 @@ llm のフィールドはプロバイダごとに api_key / base_url / model / c
       exitCode = 1;
     } on RpcException catch (e) {
       // ACP failures (authentication, refused sessions, ...) arrive as raw
-      // JSON-RPC errors, mirroring how DioException stays raw.
-      printer.printError(e.message);
+      // JSON-RPC errors, mirroring how DioException stays raw. The message
+      // is a single sentence by contract; the server detail rides in data.
+      printer.printError('$e\n${e.data ?? ''}');
       exitCode = 1;
     }
   } finally {

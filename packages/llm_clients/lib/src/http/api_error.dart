@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:llm_clients/src/exceptions.dart';
 
@@ -26,6 +28,12 @@ void throwIfApiError(Map<String, dynamic> json) {
   try {
     envelope = ApiErrorEnvelope.fromJson(json);
   } on CheckedFromJsonException {
+    // Not the standard envelope shape. An `error` key is still a reported
+    // failure, though — carry it raw rather than letting it degrade into a
+    // generic parse error downstream.
+    if (json case {'error': final Object error}) {
+      throw LlmApiException(jsonEncode(error));
+    }
     return;
   }
   final message = envelope.error?.message;

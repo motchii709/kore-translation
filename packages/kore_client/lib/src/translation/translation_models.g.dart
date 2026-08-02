@@ -32,6 +32,10 @@ _TranslationResult _$TranslationResultFromJson(
         'detected_language',
         (v) => v as String? ?? '',
       ),
+      targetLanguage: $checkedConvert(
+        'target_language',
+        (v) => v as String? ?? '',
+      ),
       alternatives: $checkedConvert(
         'alternatives',
         (v) =>
@@ -46,12 +50,16 @@ _TranslationResult _$TranslationResultFromJson(
     );
     return val;
   },
-  fieldKeyMap: const {'detectedLanguage': 'detected_language'},
+  fieldKeyMap: const {
+    'detectedLanguage': 'detected_language',
+    'targetLanguage': 'target_language',
+  },
 );
 
 Map<String, dynamic> _$TranslationResultToJson(_TranslationResult instance) => <String, dynamic>{
   'translation': instance.translation,
   'detected_language': instance.detectedLanguage,
+  'target_language': instance.targetLanguage,
   'alternatives': instance.alternatives,
   'explanation': instance.explanation,
 };

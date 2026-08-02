@@ -58,7 +58,7 @@ settings:
     thinking: "思考 (thinking)"
     thinkingSubtitle: "モデルの思考を有効にし、ストリーミング表示します"
     systemPrompt: "システムプロンプト"
-    systemPromptHelper: "{{target}} と {{tone}} が翻訳時に置換されます。\n応答フォーマットと解説言語の指示は自動で付加されます"
+    systemPromptHelper: "{{language}} (選択言語)・{{app}} (アプリの言語)・{{tone}} が翻訳時に置換されます。\nこれがプロンプト全体です。応答フォーマット指示を変えるとパースが壊れることがあります"
   openAiCompatible:
     requiredMark: "必須"
     apiKeyHelper: "ローカルサーバの場合は空欄可"

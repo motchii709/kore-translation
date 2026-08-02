@@ -55,16 +55,26 @@ final class CodexLlmClient {
       _routeDelta(params, (delta) => CodexTurnEvent.reasoningTextDelta(delta: delta));
     });
     peer.registerMethod('turn/completed', _onTurnCompleted);
-    // Connection failures also complete every in-flight request, so the
-    // done future's error adds nothing. Unregistered notifications
-    // (thread/started, tokenUsage, ...) are dropped by json_rpc_2.
-    peer.listen().ignore();
+    // A running turn has no pending request (deltas and completion arrive
+    // as notifications), so a connection dying mid-turn would leave the
+    // live turn waiting forever: fail the survivors when the connection
+    // ends. The request-side error itself stays redundant (_request
+    // normalizes it) and unregistered notifications (thread/started,
+    // tokenUsage, ...) are dropped by json_rpc_2.
+    peer.listen().whenComplete(() {
+      for (final events in [..._eventsByThread.values]) {
+        if (!events.isClosed) {
+          events.addError(const LlmApiException('The Codex app-server connection closed mid-turn'));
+          unawaited(events.close());
+        }
+      }
+    }).ignore();
     return peer;
   }
 
   Future<void> _initialize() async {
     await _request('initialize', {
-      'clientInfo': {'name': 'kore translation', 'version': '0.1.0'},
+      'clientInfo': {'name': 'kore translation', 'version': '0.1.1'},
     });
     _peer.sendNotification('initialized');
   }
@@ -132,6 +142,8 @@ final class CodexLlmClient {
       if (!events.isClosed) {
         unawaited(events.close());
         if (turnId != null && !_peer.isClosed) {
+          // Best-effort: the consumer is gone, so the response (or its
+          // error) has no audience.
           _peer.sendRequest('turn/interrupt', {'threadId': threadId, 'turnId': turnId}).ignore();
         }
       }

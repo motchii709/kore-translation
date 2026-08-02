@@ -19,7 +19,12 @@ final class CliConfig {
 /// The default config file location: `~/.kore/config.yaml`.
 String defaultCliConfigPath([Map<String, String>? environment]) {
   final env = environment ?? Platform.environment;
-  final home = env['USERPROFILE'] ?? env['HOME'] ?? '';
+  final home = env['USERPROFILE'] ?? env['HOME'];
+  if (home == null) {
+    // A silent fallback (e.g. to the working directory) could pick up an
+    // unrelated config file; a broken environment fails loudly instead.
+    throw StateError('Neither USERPROFILE nor HOME is set; cannot resolve ~/.kore/config.yaml');
+  }
   return p.join(home, '.kore', 'config.yaml');
 }
 
@@ -38,7 +43,8 @@ CliConfig loadCliConfig(String path) {
   try {
     document = loadYaml(file.readAsStringSync());
   } on YamlException catch (e) {
-    throw FormatException('Invalid config file $path: ${e.message}');
+    // $e keeps the line/column and source snippet of the parse error.
+    throw FormatException('Invalid config file $path: $e');
   }
   if (document == null) {
     return const CliConfig(); // An empty file.

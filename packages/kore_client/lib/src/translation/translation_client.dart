@@ -11,8 +11,8 @@ abstract interface class TranslationClient {
   /// strictly parsed result.
   ///
   /// [systemPrompt] is assembled by the frontend (and thus freely adjustable
-  /// by the user); append [translationSchemaPrompt] to it so the reply stays
-  /// parsable. Whether thinking is requested is not a request parameter:
+  /// by the user); its default includes [translationSchemaPrompt] so the
+  /// reply stays parsable. Whether thinking is requested is not a request parameter:
   /// backends that can control it read it from their own config variant.
   Stream<TranslationEvent> streamTranslation({
     required String systemPrompt,
@@ -22,9 +22,10 @@ abstract interface class TranslationClient {
 
 /// Response-format instruction shared by every translation prompt.
 ///
-/// Owned by kore_client and appended by frontends after their user-adjustable
-/// instruction, so the requested schema and the parsers
-/// (`parseTranslationResponse`, `tryPartialTranslationResult`) stay in sync.
+/// Owned by kore_client and seeded into the frontends' default prompts, so
+/// the requested schema and the parsers (`parseTranslationResponse`,
+/// `tryPartialTranslationResult`) stay in sync. Users may edit or remove it
+/// from their prompt at their own risk; a broken reply surfaces raw.
 const translationSchemaPrompt = '''
 Respond with a JSON object only, using exactly this schema:
 {

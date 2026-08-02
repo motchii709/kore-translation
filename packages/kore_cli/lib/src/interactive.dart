@@ -78,6 +78,8 @@ class InteractiveSession {
             .last;
         final result = event.result;
         if (result == null) {
+          // Unreachable by contract: assembleTranslationEvents either ends
+          // with a validated result or throws. Forced by the nullable field.
           printer.printError('翻訳結果を取得できませんでした');
         } else {
           printer.printResult(result);
@@ -90,8 +92,10 @@ class InteractiveSession {
         printer.printError('$e\n${e.response?.data ?? ''}');
       } on RpcException catch (e) {
         // ACP failures (authentication, refused sessions, ...) arrive as
-        // raw JSON-RPC errors, mirroring how DioException stays raw.
-        printer.printError(e.message);
+        // raw JSON-RPC errors, mirroring how DioException stays raw. The
+        // message is a single sentence by contract; the server detail
+        // rides in data.
+        printer.printError('$e\n${e.data ?? ''}');
       }
       stdout.writeln();
     }

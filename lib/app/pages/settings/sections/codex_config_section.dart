@@ -71,11 +71,11 @@ class CodexConfigSection extends HookConsumerWidget {
         TextField(
           controller: systemPrompt,
           minLines: 3,
-          maxLines: 8,
+          maxLines: 16,
           decoration: InputDecoration(
             labelText: context.t.settings.api.systemPrompt,
             helperText: '${context.t.settings.api.systemPromptHelper}\n${context.t.settings.codex.promptNote}',
-            helperMaxLines: 3,
+            helperMaxLines: 4,
           ),
         ),
         const SizedBox(height: 24),

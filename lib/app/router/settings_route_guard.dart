@@ -33,6 +33,9 @@ SettingsRouteState settingsRouteStateFromConfig(
 ) {
   return switch (config) {
     AsyncLoading() => SettingsRouteState.loading,
+    // A load error redirects like a missing profile: the model settings
+    // page renders the raw error, and the advanced settings (with the
+    // delete buttons) stay reachable from there.
     AsyncError() => SettingsRouteState.unconfigured,
     AsyncData(:final value) => value.isConfigured ? SettingsRouteState.configured : SettingsRouteState.unconfigured,
   };

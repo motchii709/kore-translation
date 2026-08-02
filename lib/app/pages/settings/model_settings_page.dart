@@ -11,6 +11,7 @@ import 'package:kore_translation/app/pages/settings/sections/gemini_config_secti
 import 'package:kore_translation/app/pages/settings/sections/open_ai_compatible_config_section.dart';
 import 'package:kore_translation/app/pages/settings/sections/open_ai_config_section.dart';
 import 'package:kore_translation/app/providers/llm_config_provider.dart';
+import 'package:kore_translation/app/router/app_router.dart';
 import 'package:kore_translation/app/ui/layout/app_breakpoints.dart';
 import 'package:llm_clients/llm_clients.dart';
 import 'package:silky_scroll/silky_scroll.dart';
@@ -25,7 +26,19 @@ class ModelSettingsPage extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final config = ref.watch(llmConfigStorageProvider);
     return Scaffold(
-      appBar: AppBar(title: Text(context.t.settings.model)),
+      appBar: AppBar(
+        title: Text(context.t.settings.model),
+        actions: [
+          // While unconfigured the route guard confines the user to the
+          // settings pages, so the recovery path (the delete buttons in the
+          // advanced settings) must be reachable from here.
+          IconButton(
+            onPressed: () => const AdvancedSettingsRoute().go(context),
+            tooltip: context.t.settings.advanced.title,
+            icon: const Icon(Icons.tune_outlined),
+          ),
+        ],
+      ),
       body: SafeArea(
         child: switch (config) {
           AsyncData(:final value) => _ModelSettingsForm(initial: value),

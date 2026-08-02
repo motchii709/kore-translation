@@ -17,9 +17,9 @@ class HistoryResultSection extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    // Stored JSON always matches this build's TranslationResult: schema
-    // changes bump the database version, which wipes the store instead of
-    // migrating.
+    // Stored JSON that no longer matches this build's TranslationResult
+    // surfaces raw right here (beta policy: no migrations); the user
+    // recovers by deleting the database from the advanced settings.
     final result = TranslationResult.fromJson(jsonDecode(entry.resultJson) as Map<String, dynamic>);
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,

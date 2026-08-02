@@ -41,7 +41,7 @@ final class AcpLlmClient {
       // Capabilities omitted here are unsupported: no file system access,
       // no terminal.
       'clientCapabilities': <String, Object?>{},
-      'clientInfo': {'name': 'kore translation', 'version': '0.1.0'},
+      'clientInfo': {'name': 'kore translation', 'version': '0.1.1'},
     });
   }
 
@@ -87,6 +87,8 @@ final class AcpLlmClient {
             ],
           })
           .then(
+            // After cancellation the agent's stop reason is 'cancelled' and
+            // nobody is listening; surfacing either would be noise.
             (result) {
               final stopReason = result['stopReason'];
               if (stopReason != 'end_turn' && !cancelled) {

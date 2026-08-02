@@ -26,7 +26,7 @@ void main() {
   });
 
   Map<String, String> useStorage() {
-    final data = {'schema_version': '2'};
+    final data = <String, String>{};
     FlutterSecureStoragePlatform.instance = TestFlutterSecureStoragePlatform(data);
     return data;
   }

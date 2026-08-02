@@ -207,6 +207,9 @@ class Translations$translate$result$ja {
 	/// ja: '検出言語: $language'
 	String detectedLanguage({required Object language}) => '検出言語: ${language}';
 
+	/// ja: '$source → $target'
+	String languagePair({required Object source, required Object target}) => '${source} → ${target}';
+
 	/// ja: 'コピー'
 	String get copy => 'コピー';
 
@@ -288,8 +291,8 @@ class Translations$settings$api$ja {
 	/// ja: 'システムプロンプト'
 	String get systemPrompt => 'システムプロンプト';
 
-	/// ja: '{{target}} と {{tone}} が翻訳時に置換されます。 応答フォーマットの指示は自動で付加されます'
-	String get systemPromptHelper => '{{target}} と {{tone}} が翻訳時に置換されます。\n応答フォーマットの指示は自動で付加されます';
+	/// ja: '{{language}} (選択言語)・{{app}} (アプリの言語)・{{tone}} が翻訳時に置換されます。 これがプロンプト全体です。応答フォーマット指示を変えるとパースが壊れることがあります'
+	String get systemPromptHelper => '{{language}} (選択言語)・{{app}} (アプリの言語)・{{tone}} が翻訳時に置換されます。\nこれがプロンプト全体です。応答フォーマット指示を変えるとパースが壊れることがあります';
 }
 
 // Path: settings.openAiCompatible
@@ -427,6 +430,7 @@ extension on Translations {
 			'translate.result.thinking' => '思考',
 			'translate.result.title' => '翻訳結果',
 			'translate.result.detectedLanguage' => ({required Object language}) => '検出言語: ${language}',
+			'translate.result.languagePair' => ({required Object source, required Object target}) => '${source} → ${target}',
 			'translate.result.copy' => 'コピー',
 			'translate.result.copied' => 'コピーしました',
 			'translate.result.alternatives' => '別の言い方',
@@ -465,7 +469,7 @@ extension on Translations {
 			'settings.api.thinking' => '思考 (thinking)',
 			'settings.api.thinkingSubtitle' => 'モデルの思考を有効にし、ストリーミング表示します',
 			'settings.api.systemPrompt' => 'システムプロンプト',
-			'settings.api.systemPromptHelper' => '{{target}} と {{tone}} が翻訳時に置換されます。\n応答フォーマットの指示は自動で付加されます',
+			'settings.api.systemPromptHelper' => '{{language}} (選択言語)・{{app}} (アプリの言語)・{{tone}} が翻訳時に置換されます。\nこれがプロンプト全体です。応答フォーマット指示を変えるとパースが壊れることがあります',
 			'settings.openAiCompatible.requiredMark' => '必須',
 			'settings.openAiCompatible.apiKeyHelper' => 'ローカルサーバの場合は空欄可',
 			'settings.acp.command' => 'ACPコマンド',

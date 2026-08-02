@@ -58,7 +58,7 @@ settings:
     thinking: "Thinking"
     thinkingSubtitle: "Enable the model's thinking and stream it live"
     systemPrompt: "System prompt"
-    systemPromptHelper: "{{target}} and {{tone}} are substituted at translation time.\nResponse-format and explanation-language instructions are appended automatically"
+    systemPromptHelper: "{{language}} (selected), {{app}} (app language) and {{tone}} are substituted at translation time.\nThis is the entire prompt — changing the response-format part can break parsing"
   openAiCompatible:
     requiredMark: "Required"
     apiKeyHelper: "Optional for local servers"

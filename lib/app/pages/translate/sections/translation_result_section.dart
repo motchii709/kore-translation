@@ -4,18 +4,27 @@ import 'package:flutter/services.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:kore_client/kore_client.dart';
 import 'package:kore_translation/app/i18n/translations.g.dart';
+import 'package:kore_translation/app/pages/translate/sections/history_result_section.dart';
+import 'package:kore_translation/app/providers/history_provider.dart';
+import 'package:kore_translation/app/providers/translation_controller.dart';
 import 'package:kore_translation/app/ui/components/app_section_header.dart';
 import 'package:llm_clients/llm_clients.dart';
 
-/// Renders the state of the latest translation request.
-class TranslationResultSection extends StatelessWidget {
-  const TranslationResultSection({required this.update, super.key});
-
-  final AsyncValue<TranslationEvent?> update;
+/// The result pane: a selected history entry, or the state of the latest
+/// translation request. Watches its own providers, so streaming deltas
+/// rebuild only this pane.
+class TranslationResultSection extends ConsumerWidget {
+  const TranslationResultSection({super.key});
 
   @override
-  Widget build(BuildContext context) {
-    return switch (update) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    // A selected history entry takes over the pane; a new translation
+    // clears the selection again.
+    final selectedEntry = ref.watch(selectedHistoryEntryProvider);
+    if (selectedEntry != null) {
+      return HistoryResultSection(entry: selectedEntry);
+    }
+    return switch (ref.watch(translationControllerProvider)) {
       AsyncData(value: null) => const _EmptyHint(),
       AsyncData(value: final update?) => _UpdateView(update),
       AsyncError(:final error) => _ErrorCard(error),
@@ -124,9 +133,10 @@ class TranslationResultView extends StatelessWidget {
                 if (translation.detectedLanguage.isNotEmpty) ...[
                   Text(
                     // The output language is the model's decision (language
-                    // pairing), so it is shown too. History entries from
-                    // before target_language existed fall back to the
-                    // detected language alone.
+                    // pairing), so it is shown too. Like every meta field,
+                    // empty means the model did not provide it (see
+                    // TranslationResult) — then only the detected language
+                    // is worth a line.
                     translation.targetLanguage.isEmpty
                         ? context.t.translate.result.detectedLanguage(language: translation.detectedLanguage)
                         : context.t.translate.result.languagePair(

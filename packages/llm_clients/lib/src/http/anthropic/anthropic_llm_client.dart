@@ -57,7 +57,7 @@ final class AnthropicLlmClient {
       await for (final event in sseDataEvents(body.stream)) {
         final json = tryJsonDecode(event);
         if (json is! Map<String, dynamic>) {
-          continue;
+          continue; // Skip non-JSON lines (this API is not expected to send any).
         }
         throwIfApiError(json);
         try {

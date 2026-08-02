@@ -39,19 +39,11 @@ class AppDatabase extends $AppDatabase {
 
   static const _uiSettingsRowId = 0;
 
+  // Beta policy: no migrations and no version bumps. Stale data after a
+  // schema change surfaces raw errors (SQL or JSON parsing), and the user
+  // recovers by deleting the database from the advanced settings.
   @override
   int get schemaVersion => 1;
-
-  @override
-  MigrationStrategy get migration => MigrationStrategy(
-    // Beta policy: there are no migrations and no automatic recovery. A
-    // schema change surfaces as this error and the user recovers by
-    // deleting the database from the advanced settings. Bump
-    // [schemaVersion] on every incompatible change, including changes to
-    // the persisted TranslationResult JSON and to the stored enum names.
-    onUpgrade: (m, from, to) =>
-        throw StateError('Database schema changed ($from -> $to); delete the database from the advanced settings.'),
-  );
 
   /// History, newest first.
   Stream<List<HistoryEntry>> watchEntries() =>
