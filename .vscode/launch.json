@@ -1,0 +1,35 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "name": "kore_honyaku (Windows)",
+      "request": "launch",
+      "type": "dart",
+      "program": "lib/main.dart",
+      "deviceId": "windows"
+    },
+    {
+      "name": "kore_honyaku (Android)",
+      "request": "launch",
+      "type": "dart",
+      "program": "lib/main.dart",
+      "deviceId": "android"
+    },
+    {
+      "name": "kore_cli (interactive)",
+      "request": "launch",
+      "type": "dart",
+      "cwd": "packages/kore_cli",
+      "program": "bin/kore.dart",
+      "console": "terminal",
+      "args": ["--interactive"]
+    },
+    {
+      "name": "kore_client (tests)",
+      "request": "launch",
+      "type": "dart",
+      "cwd": "packages/kore_client",
+      "program": "test/"
+    }
+  ]
+}

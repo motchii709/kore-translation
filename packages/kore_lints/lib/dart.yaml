@@ -1,0 +1,3 @@
+# Flutter に依存しない Dart パッケージ (kore_client, kore_cli) 用の共有 lint 設定
+# NOTE: yumemi_lints 4.4.0 時点の最新定義 (Dart 3.11)。
+include: package:yumemi_lints/dart/3.11/recommended.yaml

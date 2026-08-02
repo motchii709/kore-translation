@@ -1,0 +1,7 @@
+targets:
+  $default:
+    builders:
+      json_serializable:
+        options:
+          # スキーマ不一致を TypeError ではなく CheckedFromJsonException にする
+          checked: true

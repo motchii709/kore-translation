@@ -1,0 +1,6 @@
+include: package:kore_lints/recommended.yaml
+
+analyzer:
+  exclude:
+    - "**/*.freezed.dart"
+    - "**/*.g.dart"

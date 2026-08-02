@@ -1,0 +1,9 @@
+# Flutter パッケージ用の共有 lint 設定
+# NOTE: yumemi_lints 4.4.0 時点の最新定義 (Flutter 3.41)。更新時は
+#       `dart run yumemi_lints update` 相当でバージョンを見直すこと。
+include: package:yumemi_lints/flutter/3.41/recommended.yaml
+
+linter:
+  rules:
+    # フレームワーク・ライブラリ作者向けのルールで、アプリでは過剰なため無効化
+    diagnostic_describe_all_properties: false
