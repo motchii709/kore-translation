@@ -16,6 +16,20 @@
       "deviceId": "android"
     },
     {
+      "name": "kore_translation (macOS)",
+      "request": "launch",
+      "type": "dart",
+      "program": "lib/main.dart",
+      "deviceId": "macos"
+    },
+    {
+      "name": "kore_translation (iOS Simulator)",
+      "request": "launch",
+      "type": "dart",
+      "program": "lib/main.dart",
+      "deviceId": "iphone"
+    },
+    {
       "name": "kore_cli (interactive)",
       "request": "launch",
       "type": "dart",

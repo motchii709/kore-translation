@@ -31,14 +31,21 @@ final class CodexLlmClient {
   Peer _connect() {
     // codex app-server omits the `jsonrpc` field (observed on the wire),
     // and json_rpc_2 drops responses without it, so decode here and patch
-    // the field in before the peer sees the message.
+    // the field in before the peer sees the message. Non-JSON lines
+    // (login-shell rc output, stray log lines) are dropped instead of
+    // erroring the whole connection.
     final messages = StreamChannel<Object?>(
-      channel.stream.map((line) {
-        final message = jsonDecode(line);
+      channel.stream.expand((line) {
+        final Object? message;
+        try {
+          message = jsonDecode(line);
+        } on FormatException {
+          return const <Object?>[];
+        }
         if (message is Map<String, dynamic>) {
           message.putIfAbsent('jsonrpc', () => '2.0');
         }
-        return message;
+        return [message];
       }),
       StreamSinkTransformer<Object?, String>.fromHandlers(
         handleData: (message, sink) => sink.add(jsonEncode(message)),

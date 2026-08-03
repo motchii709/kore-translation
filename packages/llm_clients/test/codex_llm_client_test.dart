@@ -127,6 +127,18 @@ void main() {
     expect(server.threadStartParams, containsPair('model', 'gpt-test-mini'));
   });
 
+  test('ignores non-JSON lines on the wire (login-shell rc output, logs)', () async {
+    final transport = StreamChannelController<String>();
+    final server = _FakeAppServer(transport, onTurn: (server, params) => server.completeTurn());
+    // Noise before the handshake, like a shell rc file printing on startup.
+    transport.foreign.sink.add('mise: activated');
+
+    final client = CodexLlmClient(config: const CodexConfig(), channel: transport.local);
+    await client.streamTurn(systemPrompt: 's', userText: 'u').drain<void>();
+
+    expect(server.receivedMethods, contains('turn/start'));
+  });
+
   test('a failed turn surfaces the turn error as LlmApiException', () async {
     final transport = StreamChannelController<String>();
     _FakeAppServer(
