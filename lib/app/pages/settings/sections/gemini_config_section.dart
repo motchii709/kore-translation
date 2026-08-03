@@ -16,15 +16,12 @@ import 'package:kore_translation/app/providers/llm_config_provider.dart';
 class GeminiConfigSection extends HookConsumerWidget {
   const GeminiConfigSection({required this.initial, super.key});
 
-  final LlmClientConfig initial;
+  final GeminiConfig? initial;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final config = switch (initial) {
-      final GeminiConfig config => config,
-      // Coming from another provider: start from this provider's defaults.
-      _ => const GeminiConfig(apiKey: '', systemPrompt: defaultTranslationPromptTemplate),
-    };
+    // Fresh install or another provider: start from this provider's defaults.
+    final config = initial ?? const GeminiConfig(apiKey: '', systemPrompt: defaultTranslationPromptTemplate);
     final baseUrl = useTextEditingController(text: config.baseUrl);
     final apiKey = useTextEditingController(text: config.apiKey);
     final model = useTextEditingController(text: config.model);

@@ -13,9 +13,9 @@ import 'package:kore_translation/app/providers/translation_controller.dart';
 import 'package:kore_translation/app/providers/ui_settings_provider.dart';
 import 'package:kore_translation/app/ui/components/app_section_header.dart';
 
-/// Input form: source text, language chips, style, tone chips and the
-/// translate button. Owns its state and submits itself, so edits here never
-/// rebuild the rest of the page.
+/// Input form: source text with the translate button right under it, then
+/// the language, style and tone chips. Owns its state and submits itself,
+/// so edits here never rebuild the rest of the page.
 class TranslateInputSection extends HookConsumerWidget {
   const TranslateInputSection({super.key});
 
@@ -46,8 +46,10 @@ class TranslateInputSection extends HookConsumerWidget {
         return;
       }
 
+      // Null (unconfigured) cannot reach this page — the router confines it
+      // to the setup page — so the check only settles the type.
       final llmConfig = await ref.read(llmConfigStorageProvider.future);
-      if (!context.mounted) {
+      if (llmConfig == null || !context.mounted) {
         return;
       }
 
@@ -105,6 +107,17 @@ class TranslateInputSection extends HookConsumerWidget {
           ),
         ),
         const SizedBox(height: 16),
+        FilledButton.icon(
+          onPressed: isLoading ? null : submit,
+          icon: isLoading
+              ? const SizedBox.square(
+                  dimension: 16,
+                  child: CircularProgressIndicator(strokeWidth: 2),
+                )
+              : const Icon(Icons.translate),
+          label: Text(isLoading ? context.t.translate.inProgress : context.t.translate.action),
+        ),
+        const SizedBox(height: 16),
         AppSectionHeader(title: context.t.translate.language),
         Wrap(
           spacing: 8,
@@ -153,17 +166,6 @@ class TranslateInputSection extends HookConsumerWidget {
                     tones.value = selected ? {...tones.value, tone} : ({...tones.value}..remove(tone)),
               ),
           ],
-        ),
-        const SizedBox(height: 24),
-        FilledButton.icon(
-          onPressed: isLoading ? null : submit,
-          icon: isLoading
-              ? const SizedBox.square(
-                  dimension: 16,
-                  child: CircularProgressIndicator(strokeWidth: 2),
-                )
-              : const Icon(Icons.translate),
-          label: Text(isLoading ? context.t.translate.inProgress : context.t.translate.action),
         ),
       ],
     );

@@ -12,9 +12,8 @@ import 'package:kore_translation/app/pages/settings/sections/gemini_config_secti
 import 'package:kore_translation/app/pages/settings/sections/open_ai_compatible_config_section.dart';
 import 'package:kore_translation/app/pages/settings/sections/open_ai_config_section.dart';
 import 'package:kore_translation/app/providers/llm_config_provider.dart';
-import 'package:kore_translation/app/router/app_router.dart';
 import 'package:kore_translation/app/ui/layout/app_breakpoints.dart';
-import 'package:silky_scroll/silky_scroll.dart';
+import 'package:kore_translation/app/ui/scroll/use_animated_scroll_controller.dart';
 
 /// The agent backends spawn a local subprocess, which phones cannot do.
 const Set<LlmProvider> _localProcessProviders = {LlmProvider.acp, LlmProvider.codex};
@@ -28,16 +27,6 @@ class ModelSettingsPage extends ConsumerWidget {
     return Scaffold(
       appBar: AppBar(
         title: Text(context.t.settings.model),
-        actions: [
-          // While unconfigured the route guard confines the user to the
-          // settings pages, so the recovery path (the delete buttons in the
-          // advanced settings) must be reachable from here.
-          IconButton(
-            onPressed: () => const AdvancedSettingsRoute().go(context),
-            tooltip: context.t.settings.advanced.title,
-            icon: const Icon(Icons.tune_outlined),
-          ),
-        ],
       ),
       body: SafeArea(
         child: switch (config) {
@@ -52,23 +41,29 @@ class ModelSettingsPage extends ConsumerWidget {
 
 /// Provider picker plus the selected provider's own config section, which
 /// owns every field of the profile and its save button. Switching providers
-/// starts again from the saved profile.
+/// starts again from the saved profile; on a fresh install (null) only the
+/// picker shows until a provider is chosen.
 ///
 /// The scroll view spans the full window so the scrollbar sits at the
 /// window's right edge; only the content is width-constrained.
 class _ModelSettingsForm extends HookWidget {
   const _ModelSettingsForm({required this.initial});
 
-  final LlmClientConfig initial;
+  final LlmClientConfig? initial;
 
   @override
   Widget build(BuildContext context) {
-    final provider = useState(initial.provider);
+    // A build-local copy, so the `is` checks below promote it: the saved
+    // profile seeds only its own provider's section, the rest start from
+    // their defaults.
+    final saved = initial;
+    final provider = useState(saved?.provider);
     final canRunLocalProcess = switch (defaultTargetPlatform) {
       TargetPlatform.android || TargetPlatform.iOS => false,
       _ => true,
     };
-    return SilkySingleChildScrollView(
+    return SingleChildScrollView(
+      controller: useAnimatedScrollController(),
       padding: const EdgeInsets.all(16),
       child: Center(
         child: ConstrainedBox(
@@ -91,16 +86,20 @@ class _ModelSettingsForm extends HookWidget {
                   }
                 },
               ),
-              const SizedBox(height: 24),
-              switch (provider.value) {
-                LlmProvider.openAi => OpenAiConfigSection(initial: initial),
-                LlmProvider.openAiCompatible => OpenAiCompatibleConfigSection(initial: initial),
-                LlmProvider.anthropic => AnthropicConfigSection(initial: initial),
-                LlmProvider.google => GeminiConfigSection(initial: initial),
-                LlmProvider.deepSeek => DeepSeekConfigSection(initial: initial),
-                LlmProvider.acp => AcpConfigSection(initial: initial),
-                LlmProvider.codex => CodexConfigSection(initial: initial),
-              },
+              if (provider.value case final selected?) ...[
+                const SizedBox(height: 24),
+                switch (selected) {
+                  LlmProvider.openAi => OpenAiConfigSection(initial: saved is OpenAiConfig ? saved : null),
+                  LlmProvider.openAiCompatible => OpenAiCompatibleConfigSection(
+                    initial: saved is OpenAiCompatibleConfig ? saved : null,
+                  ),
+                  LlmProvider.anthropic => AnthropicConfigSection(initial: saved is AnthropicConfig ? saved : null),
+                  LlmProvider.google => GeminiConfigSection(initial: saved is GeminiConfig ? saved : null),
+                  LlmProvider.deepSeek => DeepSeekConfigSection(initial: saved is DeepSeekConfig ? saved : null),
+                  LlmProvider.acp => AcpConfigSection(initial: saved is AcpConfig ? saved : null),
+                  LlmProvider.codex => CodexConfigSection(initial: saved is CodexConfig ? saved : null),
+                },
+              ],
             ],
           ),
         ),

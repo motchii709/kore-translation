@@ -1,7 +1,7 @@
 name: kore_translation
 description: kore translation (Kore翻訳) — LLM translation app built with Flutter. No backend, calls APIs directly.
 publish_to: none
-version: 0.1.4+5
+version: 0.1.5+6
 
 environment:
   sdk: ^3.12.2
@@ -45,7 +45,7 @@ dependencies:
   llm_sdk_core: ^0.1.0
   path_provider: ^2.1.6
   riverpod_annotation: ^4.0.3 # riverpod_generator 4.0.5 pins 4.0.3
-  silky_scroll: ^2.6.4
+  scroll_animator: ^0.3.0
   slang: ^4.18.0
   slang_flutter: ^4.18.0
 

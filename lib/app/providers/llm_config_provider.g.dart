@@ -16,7 +16,7 @@ final llmConfigStorageProvider = LlmConfigStorageProvider._();
 
 /// The stored LLM profile ([LlmClientConfig] is the whole persistence
 /// schema; there is nothing to configure outside of it).
-final class LlmConfigStorageProvider extends $AsyncNotifierProvider<LlmConfigStorage, LlmClientConfig> {
+final class LlmConfigStorageProvider extends $AsyncNotifierProvider<LlmConfigStorage, LlmClientConfig?> {
   /// The stored LLM profile ([LlmClientConfig] is the whole persistence
   /// schema; there is nothing to configure outside of it).
   LlmConfigStorageProvider._()
@@ -38,22 +38,22 @@ final class LlmConfigStorageProvider extends $AsyncNotifierProvider<LlmConfigSto
   LlmConfigStorage create() => LlmConfigStorage();
 }
 
-String _$llmConfigStorageHash() => r'8dbb9e1e0cf06b7b7e1812afa49f8cd42cb41fc7';
+String _$llmConfigStorageHash() => r'c19a6a973a323fbbefc024d3bd684a76464f0e76';
 
 /// The stored LLM profile ([LlmClientConfig] is the whole persistence
 /// schema; there is nothing to configure outside of it).
 
-abstract class _$LlmConfigStorage extends $AsyncNotifier<LlmClientConfig> {
-  FutureOr<LlmClientConfig> build();
+abstract class _$LlmConfigStorage extends $AsyncNotifier<LlmClientConfig?> {
+  FutureOr<LlmClientConfig?> build();
   @$mustCallSuper
   @override
   WhenComplete runBuild() {
-    final ref = this.ref as $Ref<AsyncValue<LlmClientConfig>, LlmClientConfig>;
+    final ref = this.ref as $Ref<AsyncValue<LlmClientConfig?>, LlmClientConfig?>;
     final element =
         ref.element
             as $ClassProviderElement<
-              AnyNotifier<AsyncValue<LlmClientConfig>, LlmClientConfig>,
-              AsyncValue<LlmClientConfig>,
+              AnyNotifier<AsyncValue<LlmClientConfig?>, LlmClientConfig?>,
+              AsyncValue<LlmClientConfig?>,
               Object?,
               Object?
             >;

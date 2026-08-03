@@ -6,7 +6,6 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:json_annotation/json_annotation.dart';
 import 'package:kore_config/kore_config.dart';
-import 'package:kore_translation/app/constants/translation_prompt.dart';
 import 'package:kore_translation/app/providers/llm_config_provider.dart';
 import 'package:kore_translation/main.dart';
 
@@ -25,12 +24,11 @@ void main() {
     return container;
   }
 
-  test('empty storage yields the fresh-install default', () async {
+  test('empty storage yields null — the unconfigured state', () async {
     useStorage({});
     final config = await container().read(llmConfigStorageProvider.future);
 
-    expect(config, defaultLlmConfig);
-    expect(config.systemPrompt, defaultTranslationPromptTemplate);
+    expect(config, isNull);
   });
 
   test('stored data that no longer parses surfaces the error raw', () async {
@@ -58,7 +56,7 @@ void main() {
     await scope.read(llmConfigStorageProvider.notifier).reset();
 
     expect(data, isEmpty);
-    expect(scope.read(llmConfigStorageProvider).value, defaultLlmConfig);
+    expect(scope.read(llmConfigStorageProvider).value, isNull);
   });
 
   test('save round-trips thinking and system prompt inside the union JSON', () async {

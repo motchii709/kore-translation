@@ -57,4 +57,4 @@ final class LlmSessionProvider extends $FunctionalProvider<AsyncValue<LlmSession
   }
 }
 
-String _$llmSessionHash() => r'aaa79c5700c8bf4adfcb4225c0196a818270c052';
+String _$llmSessionHash() => r'0290e4f3da5fe2db41e01a57ef2fbff39a6538e3';

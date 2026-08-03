@@ -10,9 +10,9 @@ import 'package:kore_translation/app/providers/llm_config_provider.dart';
 import 'package:kore_translation/app/providers/ui_settings_provider.dart';
 import 'package:kore_translation/app/ui/components/app_section_header.dart';
 import 'package:kore_translation/app/ui/layout/app_breakpoints.dart';
-import 'package:silky_scroll/silky_scroll.dart';
+import 'package:kore_translation/app/ui/scroll/use_animated_scroll_controller.dart';
 
-class AdvancedSettingsPage extends ConsumerWidget {
+class AdvancedSettingsPage extends HookConsumerWidget {
   const AdvancedSettingsPage({super.key});
 
   @override
@@ -21,7 +21,8 @@ class AdvancedSettingsPage extends ConsumerWidget {
     return Scaffold(
       appBar: AppBar(title: Text(context.t.settings.advanced.title)),
       body: SafeArea(
-        child: SilkySingleChildScrollView(
+        child: SingleChildScrollView(
+          controller: useAnimatedScrollController(),
           padding: const EdgeInsets.all(16),
           child: Center(
             child: ConstrainedBox(

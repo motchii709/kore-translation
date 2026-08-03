@@ -16,15 +16,12 @@ import 'package:kore_translation/app/providers/llm_config_provider.dart';
 class AnthropicConfigSection extends HookConsumerWidget {
   const AnthropicConfigSection({required this.initial, super.key});
 
-  final LlmClientConfig initial;
+  final AnthropicConfig? initial;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final config = switch (initial) {
-      final AnthropicConfig config => config,
-      // Coming from another provider: start from this provider's defaults.
-      _ => const AnthropicConfig(apiKey: '', systemPrompt: defaultTranslationPromptTemplate),
-    };
+    // Fresh install or another provider: start from this provider's defaults.
+    final config = initial ?? const AnthropicConfig(apiKey: '', systemPrompt: defaultTranslationPromptTemplate);
     final baseUrl = useTextEditingController(text: config.baseUrl);
     final apiKey = useTextEditingController(text: config.apiKey);
     final model = useTextEditingController(text: config.model);

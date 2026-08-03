@@ -15,15 +15,12 @@ import 'package:kore_translation/app/providers/llm_config_provider.dart';
 class CodexConfigSection extends HookConsumerWidget {
   const CodexConfigSection({required this.initial, super.key});
 
-  final LlmClientConfig initial;
+  final CodexConfig? initial;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final config = switch (initial) {
-      final CodexConfig config => config,
-      // Coming from another provider: start from this provider's defaults.
-      _ => const CodexConfig(systemPrompt: defaultTranslationPromptTemplate),
-    };
+    // Fresh install or another provider: start from this provider's defaults.
+    final config = initial ?? const CodexConfig(systemPrompt: defaultTranslationPromptTemplate);
     final command = useTextEditingController(text: config.command);
     final model = useTextEditingController(text: config.model);
     final thinking = useState(config.thinking);

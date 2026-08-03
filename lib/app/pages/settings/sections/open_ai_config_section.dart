@@ -14,15 +14,12 @@ import 'package:kore_translation/app/providers/llm_config_provider.dart';
 class OpenAiConfigSection extends HookConsumerWidget {
   const OpenAiConfigSection({required this.initial, super.key});
 
-  final LlmClientConfig initial;
+  final OpenAiConfig? initial;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final config = switch (initial) {
-      final OpenAiConfig config => config,
-      // Coming from another provider: start from this provider's defaults.
-      _ => const OpenAiConfig(apiKey: '', systemPrompt: defaultTranslationPromptTemplate),
-    };
+    // Fresh install or another provider: start from this provider's defaults.
+    final config = initial ?? const OpenAiConfig(apiKey: '', systemPrompt: defaultTranslationPromptTemplate);
     final baseUrl = useTextEditingController(text: config.baseUrl);
     final apiKey = useTextEditingController(text: config.apiKey);
     final model = useTextEditingController(text: config.model);

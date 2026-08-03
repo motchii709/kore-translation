@@ -1,8 +1,7 @@
 abstract final class AppRoutePaths {
   static const translate = '/';
 
-  /// Prefix of every settings page — the route guard's allowlist while the
-  /// app is unconfigured.
-  static const settings = '/settings';
-  static const modelSettings = '/settings/model';
+  /// The forced-setup page, the redirect target while no LLM profile is
+  /// usable; top-level, so it has no back to escape through.
+  static const setup = '/setup';
 }

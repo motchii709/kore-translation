@@ -9,7 +9,7 @@ import 'package:kore_translation/app/providers/llm_session_provider.dart';
 /// fixture, without touching secure storage.
 final class _FakeLlmConfigStorage extends LlmConfigStorage {
   @override
-  Future<LlmClientConfig> build() async =>
+  Future<LlmClientConfig?> build() async =>
       const LlmClientConfig.codex(command: 'dart test/fixtures/fake_codex_app_server.dart');
 }
 

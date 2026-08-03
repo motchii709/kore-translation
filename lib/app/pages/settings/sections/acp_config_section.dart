@@ -14,15 +14,12 @@ import 'package:kore_translation/app/providers/llm_config_provider.dart';
 class AcpConfigSection extends HookConsumerWidget {
   const AcpConfigSection({required this.initial, super.key});
 
-  final LlmClientConfig initial;
+  final AcpConfig? initial;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final config = switch (initial) {
-      final AcpConfig config => config,
-      // Coming from another provider: start from this provider's defaults.
-      _ => const AcpConfig(systemPrompt: defaultTranslationPromptTemplate),
-    };
+    // Fresh install or another provider: start from this provider's defaults.
+    final config = initial ?? const AcpConfig(systemPrompt: defaultTranslationPromptTemplate);
     final command = useTextEditingController(text: config.command);
     final systemPrompt = useTextEditingController(text: config.systemPrompt);
 

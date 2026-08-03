@@ -9,12 +9,12 @@ import 'package:kore_translation/main.dart';
 
 class _ConfiguredStorage extends LlmConfigStorage {
   @override
-  Future<LlmClientConfig> build() async => const LlmClientConfig.openAi(apiKey: 'test-key');
+  Future<LlmClientConfig?> build() async => const LlmClientConfig.openAi(apiKey: 'test-key');
 }
 
 class _UnconfiguredStorage extends LlmConfigStorage {
   @override
-  Future<LlmClientConfig> build() async => defaultLlmConfig;
+  Future<LlmClientConfig?> build() async => null;
 }
 
 Widget _app(LlmConfigStorage Function() storage) => TranslationProvider(

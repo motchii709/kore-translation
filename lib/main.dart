@@ -47,6 +47,14 @@ class KoreApp extends ConsumerWidget {
     };
     return MaterialApp.router(
       title: 'Kore!?',
+      // Interactive widgets win the gesture arena, so only true background
+      // taps land here — dismissing the soft keyboard, which taps outside a
+      // field do not do by themselves on mobile.
+      builder: (context, child) => GestureDetector(
+        behavior: HitTestBehavior.translucent,
+        onTap: () => FocusManager.instance.primaryFocus?.unfocus(),
+        child: child,
+      ),
       locale: TranslationProvider.of(context).flutterLocale,
       supportedLocales: AppLocaleUtils.supportedLocales,
       localizationsDelegates: GlobalMaterialLocalizations.delegates,

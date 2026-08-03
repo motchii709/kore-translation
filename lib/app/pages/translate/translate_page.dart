@@ -1,11 +1,14 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
+import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:kore_translation/app/i18n/translations.g.dart';
 import 'package:kore_translation/app/pages/translate/sections/translate_input_section.dart';
 import 'package:kore_translation/app/pages/translate/sections/translation_result_section.dart';
 import 'package:kore_translation/app/pages/translate/widgets/history_list.dart';
 import 'package:kore_translation/app/router/app_router.dart';
 import 'package:kore_translation/app/ui/layout/app_breakpoints.dart';
-import 'package:silky_scroll/silky_scroll.dart';
+import 'package:kore_translation/app/ui/scroll/use_animated_scroll_controller.dart';
 
 /// Pure layout shell: the sections own their state and provider watches, so
 /// this page rebuilds only on window-size changes.
@@ -30,9 +33,9 @@ class TranslatePage extends StatelessWidget {
             onSelected: (destination) {
               switch (destination) {
                 case _SettingsDestination.model:
-                  const ModelSettingsRoute().go(context);
+                  unawaited(const ModelSettingsRoute().push<void>(context));
                 case _SettingsDestination.advanced:
-                  const AdvancedSettingsRoute().go(context);
+                  unawaited(const AdvancedSettingsRoute().push<void>(context));
               }
             },
             itemBuilder: (context) => [
@@ -113,14 +116,15 @@ class _TwoPaneLayout extends StatelessWidget {
   }
 }
 
-class _Pane extends StatelessWidget {
+class _Pane extends HookWidget {
   const _Pane({required this.child});
 
   final Widget child;
 
   @override
   Widget build(BuildContext context) {
-    return SilkySingleChildScrollView(
+    return SingleChildScrollView(
+      controller: useAnimatedScrollController(),
       padding: const EdgeInsets.all(24),
       child: Center(
         child: ConstrainedBox(
@@ -135,12 +139,13 @@ class _Pane extends StatelessWidget {
 /// Phone and small windows: one scrollable column. The scroll view spans
 /// the full window so the scrollbar sits at the window edge; only the
 /// content is width-constrained.
-class _SingleColumnLayout extends StatelessWidget {
+class _SingleColumnLayout extends HookWidget {
   const _SingleColumnLayout();
 
   @override
   Widget build(BuildContext context) {
-    return SilkySingleChildScrollView(
+    return SingleChildScrollView(
+      controller: useAnimatedScrollController(),
       padding: const EdgeInsets.all(16),
       child: Center(
         child: ConstrainedBox(

@@ -16,6 +16,11 @@ part 'llm_session_provider.g.dart';
 @Riverpod(keepAlive: true)
 Future<LlmSession> llmSession(Ref ref) async {
   final llmConfig = await ref.watch(llmConfigStorageProvider.future);
+  // Unconfigured: nothing to open yet, so the warm-up listen just leaves
+  // this loading; saving a profile rebuilds it through the watch above.
+  if (llmConfig == null) {
+    return Completer<LlmSession>().future;
+  }
   final session = await llmClientFrom(llmConfig).open();
   // Rebuilt (e.g. by a settings change) while still opening: the losing
   // generation closes its own session and bows out.
