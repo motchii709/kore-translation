@@ -1,0 +1,18 @@
+name: Setup Flutter
+description: >
+  Install Flutter by cloning the SDK repo at the given version. Clone is used
+  instead of prebuilt archives because Flutter does not publish arm64 SDK
+  archives for Windows/Linux; the flutter tool bootstraps the host-specific
+  Dart SDK on first run.
+inputs:
+  flutter-version:
+    description: Flutter version tag to clone (e.g. 3.44.8)
+    required: true
+runs:
+  using: composite
+  steps:
+    - name: Clone Flutter SDK
+      shell: bash
+      run: |
+        git clone --depth 1 --branch "${{ inputs.flutter-version }}" https://github.com/flutter/flutter "$RUNNER_TEMP/flutter"
+        echo "$RUNNER_TEMP/flutter/bin" >> "$GITHUB_PATH"
