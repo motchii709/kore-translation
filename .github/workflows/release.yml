@@ -32,19 +32,26 @@ jobs:
           } >> "$GITHUB_OUTPUT"
 
   build-windows:
-    name: Build Windows
+    name: Build Windows (${{ matrix.arch }})
     needs: check
     if: needs.check.outputs.released == 'false'
-    runs-on: windows-latest
+    strategy:
+      matrix:
+        include:
+          - runner: windows-latest
+            arch: x64
+          - runner: windows-11-arm
+            arch: arm64
+    runs-on: ${{ matrix.runner }}
     steps:
       - uses: actions/checkout@v7
       - uses: jdx/mise-action@v4
       - run: flutter pub get
       - run: flutter build windows --release
-      - run: Compress-Archive -Path build/windows/x64/runner/Release/* -DestinationPath "kore-${{ needs.check.outputs.version }}-windows-x64.zip"
+      - run: Compress-Archive -Path build/windows/${{ matrix.arch }}/runner/Release/* -DestinationPath "kore-${{ needs.check.outputs.version }}-windows-${{ matrix.arch }}.zip"
       - uses: actions/upload-artifact@v7
         with:
-          name: windows
+          name: windows-${{ matrix.arch }}
           path: kore-*.zip
 
   build-android:
@@ -64,10 +71,17 @@ jobs:
           path: kore-*.apk
 
   build-linux:
-    name: Build Linux
+    name: Build Linux (${{ matrix.arch }})
     needs: check
     if: needs.check.outputs.released == 'false'
-    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        include:
+          - runner: ubuntu-latest
+            arch: x64
+          - runner: ubuntu-24.04-arm
+            arch: arm64
+    runs-on: ${{ matrix.runner }}
     steps:
       - uses: actions/checkout@v7
       - name: Install Linux desktop dependencies
@@ -78,11 +92,11 @@ jobs:
       - run: flutter pub get
       - run: flutter build linux --release
       - run: |
-          mv build/linux/x64/release/bundle kore
-          tar -czf "kore-${{ needs.check.outputs.version }}-linux-x64.tar.gz" kore
+          mv build/linux/${{ matrix.arch }}/release/bundle kore
+          tar -czf "kore-${{ needs.check.outputs.version }}-linux-${{ matrix.arch }}.tar.gz" kore
       - uses: actions/upload-artifact@v7
         with:
-          name: linux
+          name: linux-${{ matrix.arch }}
           path: kore-*.tar.gz
 
   build-macos:
