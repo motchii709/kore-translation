@@ -85,9 +85,44 @@ jobs:
           name: linux
           path: kore-*.tar.gz
 
+  build-macos:
+    name: Build macOS
+    needs: check
+    if: needs.check.outputs.released == 'false'
+    runs-on: macos-latest
+    steps:
+      - uses: actions/checkout@v7
+      - uses: jdx/mise-action@v4
+      - run: flutter pub get
+      - run: flutter build macos --release
+      - run: ditto -c -k --sequesterRsrc --keepParent "build/macos/Build/Products/Release/kore translation.app" "kore-${{ needs.check.outputs.version }}-macos-universal.zip"
+      - uses: actions/upload-artifact@v7
+        with:
+          name: macos
+          path: kore-*.zip
+
+  build-ios:
+    name: Build iOS (unsigned)
+    needs: check
+    if: needs.check.outputs.released == 'false'
+    runs-on: macos-latest
+    steps:
+      - uses: actions/checkout@v7
+      - uses: jdx/mise-action@v4
+      - run: flutter pub get
+      - run: flutter build ios --release --no-codesign
+      - run: |
+          mkdir Payload
+          mv build/ios/iphoneos/Runner.app Payload/
+          zip -qry "kore-${{ needs.check.outputs.version }}-ios-unsigned.ipa" Payload
+      - uses: actions/upload-artifact@v7
+        with:
+          name: ios
+          path: kore-*.ipa
+
   release:
     name: Create release
-    needs: [check, build-windows, build-android, build-linux]
+    needs: [check, build-windows, build-android, build-linux, build-macos, build-ios]
     runs-on: ubuntu-latest
     steps:
       - uses: actions/download-artifact@v8
