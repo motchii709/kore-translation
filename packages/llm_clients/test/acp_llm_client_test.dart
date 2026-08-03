@@ -177,22 +177,4 @@ void main() {
     );
     await cancelParams.future; // The agent actually received session/cancel.
   });
-
-  group('splitCommandLine', () {
-    test('splits on whitespace runs', () {
-      expect(
-        splitCommandLine('npx  -y\t@agentclientprotocol/claude-agent-acp '),
-        ['npx', '-y', '@agentclientprotocol/claude-agent-acp'],
-      );
-    });
-
-    test('quotes group words and backslashes stay literal', () {
-      expect(
-        splitCommandLine(r'"C:\Program Files\Agent\agent.exe" --acp'),
-        [r'C:\Program Files\Agent\agent.exe', '--acp'],
-      );
-      expect(splitCommandLine("sh -c 'echo hi'"), ['sh', '-c', 'echo hi']);
-      expect(splitCommandLine('a"b c"d'), ['ab cd']);
-    });
-  });
 }

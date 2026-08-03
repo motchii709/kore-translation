@@ -25,27 +25,29 @@ final class CodexLlmClient {
 
   final _eventsByThread = <String, StreamController<CodexTurnEvent>>{};
 
+  /// The error that ended the connection (the agent process dying with its
+  /// stderr trail, wire corruption), if any: json_rpc_2 reports closure to
+  /// requesters as a bare StateError, so the cause is kept here for
+  /// [_connectionClosed].
+  Object? _connectionError;
+
   late final Peer _peer = _connect();
   late final Future<void> _initialized = _initialize();
 
   Peer _connect() {
     // codex app-server omits the `jsonrpc` field (observed on the wire),
     // and json_rpc_2 drops responses without it, so decode here and patch
-    // the field in before the peer sees the message. Non-JSON lines
-    // (login-shell rc output, stray log lines) are dropped instead of
-    // erroring the whole connection.
+    // the field in before the peer sees the message. The channel carries
+    // one JSON-RPC message per event, so a line that fails to decode is
+    // corruption: the decode error ends the connection loudly rather than
+    // leaving the turn waiting for a `turn/completed` that never comes.
     final messages = StreamChannel<Object?>(
-      channel.stream.expand((line) {
-        final Object? message;
-        try {
-          message = jsonDecode(line);
-        } on FormatException {
-          return const <Object?>[];
-        }
+      channel.stream.map((line) {
+        final message = jsonDecode(line);
         if (message is Map<String, dynamic>) {
           message.putIfAbsent('jsonrpc', () => '2.0');
         }
-        return [message];
+        return message;
       }),
       StreamSinkTransformer<Object?, String>.fromHandlers(
         handleData: (message, sink) => sink.add(jsonEncode(message)),
@@ -65,17 +67,21 @@ final class CodexLlmClient {
     // A running turn has no pending request (deltas and completion arrive
     // as notifications), so a connection dying mid-turn would leave the
     // live turn waiting forever: fail the survivors when the connection
-    // ends. The request-side error itself stays redundant (_request
-    // normalizes it) and unregistered notifications (thread/started,
-    // tokenUsage, ...) are dropped by json_rpc_2.
-    peer.listen().whenComplete(() {
-      for (final events in [..._eventsByThread.values]) {
-        if (!events.isClosed) {
-          events.addError(const LlmApiException('The Codex app-server connection closed mid-turn'));
-          unawaited(events.close());
-        }
-      }
-    }).ignore();
+    // ends. Unregistered notifications (thread/started, tokenUsage, ...)
+    // are dropped by json_rpc_2.
+    unawaited(
+      peer
+          .listen()
+          .then<void>((_) {}, onError: (Object error) => _connectionError = error)
+          .whenComplete(() {
+            for (final events in [..._eventsByThread.values]) {
+              if (!events.isClosed) {
+                events.addError(_connectionClosed('mid-turn'));
+                unawaited(events.close());
+              }
+            }
+          }),
+    );
     return peer;
   }
 
@@ -91,12 +97,23 @@ final class CodexLlmClient {
       return await _peer.sendRequest(method, params) as Map<String, dynamic>;
       // json_rpc_2 reports a connection that died mid-request (typically a
       // crashed or misconfigured server) with a StateError; normalizing it
-      // here at the source keeps callers on the Exception hierarchy. The
-      // server's stderr carries the actual cause.
+      // here at the source keeps callers on the Exception hierarchy.
       // ignore: avoid_catching_errors
     } on StateError {
-      throw LlmApiException('The Codex app-server connection closed during $method');
+      throw _connectionClosed('during $method');
     }
+  }
+
+  LlmApiException _connectionClosed(String context) {
+    final error = _connectionError;
+    // The transport's own exception (agent death with its stderr trail)
+    // already says everything; only wrap causes that are not ours.
+    if (error is LlmApiException) {
+      return error;
+    }
+    return LlmApiException(
+      'The Codex app-server connection closed $context${error == null ? '' : ': $error'}',
+    );
   }
 
   /// Streams the events of one turn, run on a fresh ephemeral thread so

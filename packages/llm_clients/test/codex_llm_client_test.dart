@@ -127,16 +127,21 @@ void main() {
     expect(server.threadStartParams, containsPair('model', 'gpt-test-mini'));
   });
 
-  test('ignores non-JSON lines on the wire (login-shell rc output, logs)', () async {
+  test('a non-JSON line on the wire fails the turn instead of hanging it', () async {
     final transport = StreamChannelController<String>();
-    final server = _FakeAppServer(transport, onTurn: (server, params) => server.completeTurn());
-    // Noise before the handshake, like a shell rc file printing on startup.
-    transport.foreign.sink.add('mise: activated');
+    _FakeAppServer(
+      transport,
+      // The channel contract (StdioAgentProcess) is one JSON-RPC message
+      // per event, so this is corruption; without an error the turn would
+      // wait for its turn/completed notification forever.
+      onTurn: (server, params) => transport.foreign.sink.add('corrupted line'),
+    );
 
     final client = CodexLlmClient(config: const CodexConfig(), channel: transport.local);
-    await client.streamTurn(systemPrompt: 's', userText: 'u').drain<void>();
-
-    expect(server.receivedMethods, contains('turn/start'));
+    await expectLater(
+      client.streamTurn(systemPrompt: 's', userText: 'u').drain<void>(),
+      throwsA(isA<LlmApiException>()),
+    );
   });
 
   test('a failed turn surfaces the turn error as LlmApiException', () async {

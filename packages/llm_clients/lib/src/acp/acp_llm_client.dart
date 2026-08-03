@@ -22,6 +22,11 @@ final class AcpLlmClient {
 
   final _updatesBySession = <String, StreamController<AcpSessionUpdate>>{};
 
+  /// The error that ended the connection (the agent process dying with its
+  /// stderr trail), if any: json_rpc_2 reports closure to requesters as a
+  /// bare StateError, so the cause is kept here for [_connectionClosed].
+  Object? _connectionError;
+
   late final Peer _peer = _connect();
   late final Future<void> _initialized = _initialize();
 
@@ -29,9 +34,9 @@ final class AcpLlmClient {
     final peer = Peer(channel);
     peer.registerMethod('session/update', _onSessionUpdate);
     peer.registerMethod('session/request_permission', _onRequestPermission);
-    // Connection failures also complete every in-flight request, so the
-    // done future's error adds nothing.
-    peer.listen().ignore();
+    // A turn always has its session/prompt request pending, so a dying
+    // connection reaches the consumer through that request's error.
+    unawaited(peer.listen().then<void>((_) {}, onError: (Object error) => _connectionError = error));
     return peer;
   }
 
@@ -50,12 +55,23 @@ final class AcpLlmClient {
       return await _peer.sendRequest(method, params) as Map<String, dynamic>;
       // json_rpc_2 reports a connection that died mid-request (typically a
       // crashed or misconfigured agent) with a StateError; normalizing it
-      // here at the source keeps callers on the Exception hierarchy. The
-      // agent's stderr carries the actual cause.
+      // here at the source keeps callers on the Exception hierarchy.
       // ignore: avoid_catching_errors
     } on StateError {
-      throw LlmApiException('The ACP agent connection closed during $method');
+      throw _connectionClosed('during $method');
     }
+  }
+
+  LlmApiException _connectionClosed(String context) {
+    final error = _connectionError;
+    // The transport's own exception (agent death with its stderr trail)
+    // already says everything; only wrap causes that are not ours.
+    if (error is LlmApiException) {
+      return error;
+    }
+    return LlmApiException(
+      'The ACP agent connection closed $context${error == null ? '' : ': $error'}',
+    );
   }
 
   /// Streams the session updates of one prompt turn.
