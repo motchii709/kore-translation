@@ -1,13 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
+import 'package:kore_config/kore_config.dart';
 import 'package:kore_translation/app/constants/translation_prompt.dart';
 import 'package:kore_translation/app/i18n/translations.g.dart';
 import 'package:kore_translation/app/pages/settings/widgets/api_key_field.dart';
 import 'package:kore_translation/app/pages/settings/widgets/save_settings_button.dart';
 import 'package:kore_translation/app/pages/settings/widgets/thinking_switch_tile.dart';
 import 'package:kore_translation/app/providers/llm_config_provider.dart';
-import 'package:llm_clients/llm_clients.dart';
 
 /// The whole API settings form for the DeepSeek API: connection fields, the
 /// thinking toggle, the system prompt and save. Values are trimmed on save

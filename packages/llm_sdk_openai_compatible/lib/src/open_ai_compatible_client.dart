@@ -1,0 +1,61 @@
+import 'package:dio/dio.dart';
+import 'package:llm_sdk_core/llm_sdk_core.dart';
+import 'package:llm_sdk_openai_compatible/src/open_ai_compatible_llm_client.dart';
+import 'package:llm_sdk_openai_compatible/src/open_ai_compatible_stream_models.dart';
+
+/// [LlmClient] backed by a generic OpenAI-compatible endpoint.
+final class OpenAiCompatibleClient implements LlmClient {
+  OpenAiCompatibleClient({required this.baseUrl, required this.model, this.apiKey = ''});
+
+  final String apiKey;
+  final String baseUrl;
+  final String model;
+
+  @override
+  Future<LlmSession> open() async => OpenAiCompatibleSession(
+    apiKey: apiKey,
+    baseUrl: baseUrl,
+    model: model,
+    dio: Dio(
+      BaseOptions(
+        connectTimeout: const Duration(seconds: 10),
+        receiveTimeout: const Duration(seconds: 120),
+      ),
+    ),
+  );
+}
+
+/// The started session; owns [dio].
+final class OpenAiCompatibleSession implements LlmSession {
+  OpenAiCompatibleSession({required String apiKey, required String baseUrl, required String model, required this.dio})
+    : _llm = OpenAiCompatibleLlmClient(apiKey: apiKey, baseUrl: baseUrl, model: model, dio: dio);
+
+  /// The HTTP transport the session owns, from [OpenAiCompatibleClient.open] to [close].
+  final Dio dio;
+
+  final OpenAiCompatibleLlmClient _llm;
+
+  @override
+  bool get isAlive => true;
+
+  @override
+  Future<void> close() async => dio.close(); // Graceful: in-flight requests finish.
+
+  @override
+  Stream<LlmStreamEvent> streamText({required String system, required String user, bool jsonOutput = false}) {
+    final chunks = _llm.streamChatCompletions(
+      systemPrompt: system,
+      userText: user,
+      responseFormat: jsonOutput ? const {'type': 'json_object'} : null,
+    );
+    return chunks.expand(_eventsOf);
+  }
+
+  Iterable<LlmStreamEvent> _eventsOf(OpenAiCompatibleChatChunk chunk) sync* {
+    final delta = chunk.choices.isEmpty ? null : chunk.choices.first.delta;
+    // The first chunk arrives with `content: ""`; drop empty deltas here.
+    if (delta?.content case final String text when text.isNotEmpty) {
+      yield LlmTextDelta(text);
+    }
+  }
+}

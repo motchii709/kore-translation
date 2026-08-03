@@ -2,7 +2,7 @@ import 'dart:convert';
 import 'dart:io';
 
 import 'package:json_annotation/json_annotation.dart';
-import 'package:llm_clients/llm_clients.dart';
+import 'package:kore_config/kore_config.dart';
 import 'package:path/path.dart' as p;
 import 'package:yaml/yaml.dart';
 

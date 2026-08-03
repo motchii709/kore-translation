@@ -38,7 +38,7 @@ final class LlmConfigStorageProvider extends $AsyncNotifierProvider<LlmConfigSto
   LlmConfigStorage create() => LlmConfigStorage();
 }
 
-String _$llmConfigStorageHash() => r'189386149334a05aae330eb9951bf2078cd49466';
+String _$llmConfigStorageHash() => r'8dbb9e1e0cf06b7b7e1812afa49f8cd42cb41fc7';
 
 /// The stored LLM profile ([LlmClientConfig] is the whole persistence
 /// schema; there is nothing to configure outside of it).

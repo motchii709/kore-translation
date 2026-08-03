@@ -5,20 +5,20 @@ import 'package:json_rpc_2/json_rpc_2.dart';
 import 'package:kore_cli/src/output.dart';
 import 'package:kore_cli/src/prompt.dart';
 import 'package:kore_client/kore_client.dart';
-import 'package:llm_clients/llm_clients.dart';
+import 'package:llm_sdk_core/llm_sdk_core.dart';
 
 /// Simple interactive TUI: type text to translate, use `:` commands to
 /// change settings.
 class InteractiveSession {
   InteractiveSession({
-    required this.client,
+    required this.session,
     required this.printer,
     this.initialTarget = 'English',
     this.initialTone = '',
     this.customPrompt = '',
   });
 
-  final TranslationClient client;
+  final LlmSession session;
   final ResultPrinter printer;
   final String initialTarget;
   final String initialTone;
@@ -66,16 +66,15 @@ class InteractiveSession {
 
       stdout.writeln(printer.dim('翻訳中...'));
       try {
-        final event = await client
-            .streamTranslation(
-              systemPrompt: buildCliSystemPrompt(
-                targetLanguage: target,
-                toneInstruction: tone,
-                customPrompt: customPrompt,
-              ),
-              text: input,
-            )
-            .last;
+        final event = await streamTranslation(
+          session,
+          systemPrompt: buildCliSystemPrompt(
+            targetLanguage: target,
+            toneInstruction: tone,
+            customPrompt: customPrompt,
+          ),
+          text: input,
+        ).last;
         final result = event.result;
         if (result == null) {
           // Unreachable by contract: assembleTranslationEvents either ends

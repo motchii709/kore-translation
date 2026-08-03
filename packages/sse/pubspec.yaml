@@ -1,0 +1,11 @@
+name: sse
+description: Server-Sent Events line parsing. Carries no provider knowledge.
+publish_to: none
+version: 0.1.0
+resolution: workspace
+
+environment:
+  sdk: ^3.12.2
+
+dev_dependencies:
+  kore_lints: ^0.1.0

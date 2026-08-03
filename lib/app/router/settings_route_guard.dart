@@ -1,6 +1,6 @@
+import 'package:kore_config/kore_config.dart';
 import 'package:kore_translation/app/providers/llm_config_provider.dart';
 import 'package:kore_translation/app/router/app_route_paths.dart';
-import 'package:llm_clients/llm_clients.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 part 'settings_route_guard.g.dart';

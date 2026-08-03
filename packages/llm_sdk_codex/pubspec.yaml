@@ -1,0 +1,22 @@
+name: llm_sdk_codex
+description: Codex app-server provider for the kore LLM SDK - stdio JSON-RPC wire client and LlmClient adapter.
+publish_to: none
+version: 0.1.0
+resolution: workspace
+
+environment:
+  sdk: ^3.12.2
+
+dependencies:
+  async: ^2.13.1
+  freezed_annotation: ^3.1.0
+  json_rpc_2: ^4.1.0
+  llm_sdk_core: ^0.1.0
+  stdio_agent: ^0.1.0
+  stream_channel: ^2.1.4
+
+dev_dependencies:
+  build_runner: ^2.13.1
+  freezed: ^3.2.5
+  kore_lints: ^0.1.0
+  test: ^1.26.2 # resolves to a version compatible with the test_api pinned by flutter_test

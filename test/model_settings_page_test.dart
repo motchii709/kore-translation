@@ -6,9 +6,9 @@ import 'package:flutter_secure_storage/test/test_flutter_secure_storage_platform
 import 'package:flutter_secure_storage_platform_interface/flutter_secure_storage_platform_interface.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
+import 'package:kore_config/kore_config.dart';
 import 'package:kore_translation/app/i18n/translations.g.dart';
 import 'package:kore_translation/app/pages/settings/model_settings_page.dart';
-import 'package:llm_clients/llm_clients.dart';
 
 Widget _app() => TranslationProvider(
   child: const ProviderScope(

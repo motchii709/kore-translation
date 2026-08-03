@@ -1,0 +1,11 @@
+name: llm_sdk_core
+description: Provider-agnostic LLM SDK spec - the session lifecycle and stream events implemented by the llm_sdk_* provider packages.
+publish_to: none
+version: 0.1.0
+resolution: workspace
+
+environment:
+  sdk: ^3.12.2
+
+dev_dependencies:
+  kore_lints: ^0.1.0

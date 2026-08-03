@@ -1,7 +1,7 @@
 import 'dart:io';
 
 import 'package:kore_cli/src/config_file.dart';
-import 'package:llm_clients/llm_clients.dart';
+import 'package:kore_config/kore_config.dart';
 import 'package:path/path.dart' as p;
 import 'package:test/test.dart';
 

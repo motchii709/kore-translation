@@ -1,8 +1,8 @@
 import 'dart:convert';
 
+import 'package:kore_config/kore_config.dart';
 import 'package:kore_translation/app/constants/translation_prompt.dart';
 import 'package:kore_translation/app/providers/secure_storage_provider.dart';
-import 'package:llm_clients/llm_clients.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 part 'llm_config_provider.g.dart';

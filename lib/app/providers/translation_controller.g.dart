@@ -44,7 +44,7 @@ final class TranslationControllerProvider extends $AsyncNotifierProvider<Transla
   TranslationController create() => TranslationController();
 }
 
-String _$translationControllerHash() => r'05692aa1ba329d93c2aae057cdddb0e161ea2b9a';
+String _$translationControllerHash() => r'c6584e181f070099a4b9eb098bb7f2431b1feedb';
 
 /// Holds the latest translation progress. `null` means nothing has been
 /// translated yet. While streaming, the model's thinking and progressively

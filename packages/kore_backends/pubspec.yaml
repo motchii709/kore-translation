@@ -1,0 +1,22 @@
+name: kore_backends
+description: Composition root for kore translation - maps kore_config's LlmClientConfig variants onto their llm_sdk provider clients. The only place that knows every backend.
+publish_to: none
+version: 0.1.0
+resolution: workspace
+
+environment:
+  sdk: ^3.12.2
+
+dependencies:
+  kore_config: ^0.1.0
+  llm_sdk_acp: ^0.1.0
+  llm_sdk_anthropic: ^0.1.0
+  llm_sdk_codex: ^0.1.0
+  llm_sdk_core: ^0.1.0
+  llm_sdk_deep_seek: ^0.1.0
+  llm_sdk_google: ^0.1.0
+  llm_sdk_openai: ^0.1.0
+  llm_sdk_openai_compatible: ^0.1.0
+
+dev_dependencies:
+  kore_lints: ^0.1.0

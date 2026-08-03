@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
+import 'package:kore_config/kore_config.dart';
 import 'package:kore_translation/app/i18n/translations.g.dart';
 import 'package:kore_translation/app/providers/app_database_provider.dart';
 import 'package:kore_translation/app/providers/llm_config_provider.dart';
 import 'package:kore_translation/main.dart';
-import 'package:llm_clients/llm_clients.dart';
 
 class _ConfiguredStorage extends LlmConfigStorage {
   @override

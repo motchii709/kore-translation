@@ -1,0 +1,22 @@
+name: llm_sdk_google
+description: Google AI (Gemini) provider for the kore LLM SDK - typed streaming wire client and LlmClient adapter.
+publish_to: none
+version: 0.1.0
+resolution: workspace
+
+environment:
+  sdk: ^3.12.2
+
+dependencies:
+  dio: ^5.11.0
+  freezed_annotation: ^3.1.0
+  json_annotation: ^4.12.0
+  llm_sdk_core: ^0.1.0
+  sse: ^0.1.0
+
+dev_dependencies:
+  build_runner: ^2.13.1
+  freezed: ^3.2.5
+  json_serializable: ^6.14.1
+  kore_lints: ^0.1.0
+  test: ^1.26.2 # resolves to a version compatible with the test_api pinned by flutter_test

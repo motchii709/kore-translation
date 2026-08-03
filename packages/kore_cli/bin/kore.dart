@@ -3,12 +3,14 @@ import 'dart:io';
 import 'package:args/args.dart';
 import 'package:dio/dio.dart';
 import 'package:json_rpc_2/json_rpc_2.dart';
+import 'package:kore_backends/kore_backends.dart';
 import 'package:kore_cli/src/config_file.dart';
 import 'package:kore_cli/src/interactive.dart';
 import 'package:kore_cli/src/output.dart';
 import 'package:kore_cli/src/prompt.dart';
 import 'package:kore_client/kore_client.dart';
-import 'package:llm_clients/llm_clients.dart';
+import 'package:kore_config/kore_config.dart';
+import 'package:llm_sdk_core/llm_sdk_core.dart';
 
 Future<void> main(List<String> arguments) async {
   final parser = ArgParser()
@@ -94,52 +96,25 @@ llm のフィールドはプロバイダごとに api_key / base_url / model / c
   // built-in translator instruction.
   final customPrompt = llm.systemPrompt;
 
-  // One Dio for the HTTP providers, closed in the finally below: without
-  // the close, keep-alive sockets hold the one-shot process open for the
-  // idle timeout (~15s) after the result has printed.
-  final dio = Dio(
-    BaseOptions(
-      connectTimeout: const Duration(seconds: 10),
-      receiveTimeout: const Duration(seconds: 120),
-    ),
-  );
-  final TranslationClient client;
-  StdioAgentProcess? agent;
-  switch (llm) {
-    case final OpenAiConfig config:
-      client = OpenAiTranslationClient(
-        llm: OpenAiLlmClient(config: config, dio: dio),
-      );
-    case final OpenAiCompatibleConfig config:
-      client = OpenAiCompatibleTranslationClient(
-        llm: OpenAiCompatibleLlmClient(config: config, dio: dio),
-      );
-    case final AnthropicConfig config:
-      client = AnthropicTranslationClient(
-        llm: AnthropicLlmClient(config: config, dio: dio),
-      );
-    case final GeminiConfig config:
-      client = GeminiTranslationClient(
-        llm: GeminiLlmClient(config: config, dio: dio),
-      );
-    case final DeepSeekConfig config:
-      client = DeepSeekTranslationClient(
-        llm: DeepSeekLlmClient(config: config, dio: dio),
-      );
-    case final AcpConfig config:
-      agent = await StdioAgentProcess.start(config.command);
-      client = AcpTranslationClient(llm: AcpLlmClient(channel: agent.channel));
-    case final CodexConfig config:
-      agent = await StdioAgentProcess.start(config.command);
-      client = CodexTranslationClient(
-        llm: CodexLlmClient(config: config, channel: agent.channel),
-      );
+  final LlmSession session;
+  try {
+    session = await llmClientFrom(llm).open();
+  } on LlmApiException catch (e) {
+    // Agent backends spawn and handshake during open, so a broken setup
+    // (missing command, not an agent) fails here with the process's trail.
+    printer.printError(e.message);
+    exitCode = 1;
+    return;
+  } on RpcException catch (e) {
+    printer.printError('$e\n${e.data ?? ''}');
+    exitCode = 1;
+    return;
   }
 
   try {
     if (args.flag('interactive')) {
       await InteractiveSession(
-        client: client,
+        session: session,
         printer: printer,
         initialTarget: target,
         initialTone: tone,
@@ -156,16 +131,15 @@ llm のフィールドはプロバイダごとに api_key / base_url / model / c
     }
 
     try {
-      final event = await client
-          .streamTranslation(
-            systemPrompt: buildCliSystemPrompt(
-              targetLanguage: target,
-              toneInstruction: tone,
-              customPrompt: customPrompt,
-            ),
-            text: text,
-          )
-          .last;
+      final event = await streamTranslation(
+        session,
+        systemPrompt: buildCliSystemPrompt(
+          targetLanguage: target,
+          toneInstruction: tone,
+          customPrompt: customPrompt,
+        ),
+        text: text,
+      ).last;
       final result = event.result;
       if (result == null) {
         // Unreachable by contract: assembleTranslationEvents either ends
@@ -194,7 +168,6 @@ llm のフィールドはプロバイダごとに api_key / base_url / model / c
       exitCode = 1;
     }
   } finally {
-    dio.close(force: true);
-    agent?.kill();
+    await session.close();
   }
 }

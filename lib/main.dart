@@ -5,6 +5,7 @@ import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:kore_translation/app/i18n/translations.g.dart';
 import 'package:kore_translation/app/models/ui_settings.dart';
+import 'package:kore_translation/app/providers/llm_session_provider.dart';
 import 'package:kore_translation/app/providers/ui_settings_provider.dart';
 import 'package:kore_translation/app/router/app_router.dart';
 import 'package:kore_translation/app/ui/theme/app_theme.dart';
@@ -30,6 +31,11 @@ class KoreApp extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    // Warm-up: activating the session provider opens the backend (agent
+    // spawn + handshake) at launch and right after a settings change,
+    // instead of inside the first translation. A failed open stays in the
+    // provider and surfaces when translating.
+    ref.listen(llmSessionProvider, (_, _) {});
     final uiSettings = switch (ref.watch(uiSettingsStorageProvider)) {
       AsyncData(:final value) => value,
       // Loading or failed: keep rendering with the defaults. This fallback

@@ -22,54 +22,67 @@ pub workspace によるモノレポ構成です。
 │       ├── router/          # go_router (typed routes)
 │       └── ui/              # テーマ・共通コンポーネント
 └── packages/
-    ├── kore_client/         # 翻訳クライアント (llm_clients の上の翻訳層、Flutter 非依存)
+    ├── kore_client/         # 翻訳ドメイン (llm_sdk_core の上、Flutter 非依存)
     ├── kore_cli/            # CLI / 対話 TUI
+    ├── kore_config/         # LLM 接続設定の sealed union (永続化スキーマ)
+    ├── kore_backends/       # composition root (config バリアント → llm_sdk クライアント)
+    ├── llm_sdk_core/        # プロバイダ非依存の LLM 抽象 (ai-sdk 相当の spec、依存ゼロ)
+    ├── llm_sdk_openai/      # プロバイダ実装 (ワイヤ + アダプタ)。ほか openai_compatible /
+    │                        #   anthropic / google / deep_seek / acp / codex の計 7 パッケージ
+    ├── stdio_agent/         # エージェントサブプロセスのトランスポート (プロバイダ知識ゼロ)
+    ├── sse/                 # SSE 行パース (プロバイダ知識ゼロ)
     ├── kore_lints/          # 共有 lint 設定 (yumemi_lints ベース)
-    ├── llm_clients/         # 各社 LLM API / エージェント (ACP, Codex) の薄い型付きストリーミングクライアント (kore 非依存)
     └── partial_json/        # 生成途中で切れた JSON を補完する汎用ユーティリティ
 ```
 
 ### アーキテクチャ
 
-翻訳は 2 層 = 2 パッケージ構成です。継承階層は持たず、共有処理は関数合成で行います。
+ai-sdk 型のレイヤリングです。層の境界は pub workspace のパッケージ依存で機械的に
+強制され、プロバイダ実装は互いの存在を知らず (他プロバイダを import すると
+コンパイル不能)、実装間の共通化もしません。
 
 ```
-TranslationClient (抽象、kore_client)     # UI (Flutter / CLI / TUI) が依存する唯一の抽象
-├── OpenAiTranslationClient               # 各社オブジェクト → thinking/text デルタ抽出
-├── AnthropicTranslationClient            #   + assembleTranslationEvents (共通組み立て)
-├── GeminiTranslationClient               #   → TranslationEvent {thinking, result}
-├── AcpTranslationClient
-└── CodexTranslationClient
+app / kore_cli                # UI + 入口。設定を読み llmClientFrom(config).open() で束ねる
+└─ kore_client                # 翻訳ドメイン。プロバイダ知識ゼロ・実装 1 本:
+   │                          #   streamTranslation(session, ...) → TranslationEvent {thinking, result}
+   └─ llm_sdk_core            # 統一抽象 (依存ゼロ): LlmClient.open() → LlmSession.streamText()
+      │                       #   → LlmStreamEvent (text / thinking デルタ)、isAlive / close()
+      ├─ llm_sdk_openai ほか計 7  # プロバイダ実装 (ワイヤ + アダプタ)。依存は core とトランスポートのみ
+      └─ stdio_agent / sse    # プロバイダ知識ゼロのトランスポート
 
-LlmClient 群 (llm_clients、抽象なし・各社独立の薄いラッパー)
-├── OpenAiLlmClient.streamChatCompletions()  → Stream<OpenAiChatChunk>
-├── AnthropicLlmClient.streamMessages()      → Stream<AnthropicStreamEvent>
-├── GeminiLlmClient.streamGenerateContent()  → Stream<GeminiStreamChunk>
-├── AcpLlmClient.streamPrompt()              → Stream<AcpSessionUpdate>
-└── CodexLlmClient.streamTurn()              → Stream<CodexTurnEvent>
+kore_config                   # sealed union LlmClientConfig = 永続化スキーマ (LLM 層とは独立)
+kore_backends                 # composition root: config バリアント → プロバイダクライアント (網羅 switch)
 ```
 
-- 薄いラッパーは各社 API の型付きオブジェクト (freezed / discriminated union)
-  をそのまま流します。翻訳の知識は持たず、ユースケース側の決定
-  (`response_format` / `max_tokens` / レスポンス MIME) はパススルー引数で
-  翻訳層が渡します
-- `TranslationClient` 実装が各社オブジェクトから思考/本文デルタを取り出し、
+- プロバイダパッケージは各社 API の型付きオブジェクト (freezed) を内部で流し、
+  統一イベント (`LlmStreamEvent`) へ写像します。`jsonOutput` のような統一
+  オプションを自社パラメータ (`response_format` / レスポンス MIME) に写す判断、
+  Anthropic の `max_tokens` 既定値、ACP の「system スロットが無いので本文へ
+  前置」といったプロバイダ知識はすべて各パッケージに閉じます
+- `streamTranslation` (kore_client) が唯一の翻訳実装で、統一イベントから
   生成途中 JSON の補完 (`partial_json` パッケージ、未完文字列と閉じ括弧を
   閉じて再パース) による逐次スナップショット + ストリーム完了後の厳密パースで
   `TranslationEvent {thinking, result}` を流します
 - システムプロンプトはフロントエンド (llm 設定の `system_prompt`) が組み立て、
   ユーザーが自由に調整できます。kore_client が持つプロンプト知識は、パーサーと
   対になるレスポンススキーマ指示 (`translationSchemaPrompt`) のみです
-- 設定は sealed な `LlmClientConfig` (プロバイダ毎のバリアント、実デフォルト
-  値付き)。union はそのまま永続化スキーマでもあり (`provider` を判別子に
-  JSON/YAML と相互変換)、アプリの secure storage も CLI の設定ファイルも
-  これを直書きします。クライアントの構築 (DI) は composition root —
-  アプリの provider と CLI の main — が config バリアントの switch で行います
+- 設定は sealed な `LlmClientConfig` (kore_config、プロバイダ毎のバリアント、
+  実デフォルト値付き)。union はそのまま永続化スキーマでもあり (`provider` を
+  判別子に JSON/YAML と相互変換)、アプリの secure storage も CLI の設定ファイルも
+  これを直書きします。LLM 層は永続化を知りません。構築 (DI) は kore_backends の
+  `llmClientFrom` が sealed 網羅 switch で行い、資源 (Dio / サブプロセス) は
+  `open()` で生まれて `LlmSession` が所有し、`close()` (HTTP は graceful、
+  エージェントは EOF → 猶予 → kill) で解放されます。共有・キャッシュは利用側の
+  仕事 — アプリは keepAlive provider が 1 セッションを温存し (起動時にウォーム
+  アップ)、起動失敗や死んだ接続は次の翻訳操作が張り直します。CLI は 1 実行 1
+  セッションです
 - トランスポートエラー (`DioException`) は変換せず生のまま UI へ届きます
   (ストリーミングのエラーボディのみ読み取って例外に残します)
 - エージェントバックエンド (ACP / Codex app-server) は stdio の JSON-RPC
   ([`json_rpc_2`](https://pub.dev/packages/json_rpc_2)) でサブプロセスと話します。
-  サブプロセスの起動 (`StdioAgentProcess`) と破棄は composition root が行い、
+  サブプロセスの起動 (`StdioAgentProcess`) とプロトコルハンドシェイクは `open()`
+  が完了まで待つので、壊れた設定は翻訳時ではなく起動時に表面化し、翻訳は常に
+  温まった接続で走ります。
   翻訳 1 回 = ACP は 1 セッション (`session/new` + `session/prompt`)、Codex は
   1 ephemeral スレッド (`thread/start` + `turn/start`、履歴に残らない) です。
   翻訳にツールは不要なので、ACP は権限要求をすべて拒否し、Codex は
@@ -84,9 +97,9 @@ LlmClient 群 (llm_clients、抽象なし・各社独立の薄いラッパー)
 ```sh
 mise install
 flutter pub get
-dart run build_runner build                            # アプリのコード生成
-(cd packages/kore_client && dart run build_runner build)  # 翻訳層のコード生成
-(cd packages/llm_clients && dart run build_runner build)  # LLMクライアントのコード生成
+dart run build_runner build   # アプリのコード生成
+# freezed / json_serializable を使うパッケージ (kore_client / kore_config /
+# llm_sdk_*) も、生成対象を変更した場合は同様に各ディレクトリで実行します
 ```
 
 > Windows デスクトップで実行する場合は、プラグインの symlink 作成のため
@@ -156,7 +169,7 @@ AI エージェント (Claude Code / Codex 等) 向けの運用手順は [AGENTS
 flutter analyze                          # 静的解析 (yumemi_lints)
 flutter test                             # アプリのウィジェットテスト
 (cd packages/kore_client && dart test)   # 翻訳層のユニットテスト
-(cd packages/llm_clients && dart test)   # LLMクライアントのユニットテスト
+(cd packages/llm_sdk_openai && dart test)  # プロバイダのユニットテスト (他の llm_sdk_* / stdio_agent も同様)
 (cd packages/partial_json && dart test)  # JSON 補完のユニットテスト
 ```
 

@@ -8,7 +8,7 @@ import 'package:kore_translation/app/pages/translate/sections/history_result_sec
 import 'package:kore_translation/app/providers/history_provider.dart';
 import 'package:kore_translation/app/providers/translation_controller.dart';
 import 'package:kore_translation/app/ui/components/app_section_header.dart';
-import 'package:llm_clients/llm_clients.dart';
+import 'package:llm_sdk_core/llm_sdk_core.dart';
 
 /// The result pane: a selected history entry, or the state of the latest
 /// translation request. Watches its own providers, so streaming deltas

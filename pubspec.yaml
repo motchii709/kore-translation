@@ -8,11 +8,22 @@ environment:
   flutter: ^3.44.8
 
 workspace:
+  - packages/kore_backends
   - packages/kore_cli
   - packages/kore_client
+  - packages/kore_config
   - packages/kore_lints
-  - packages/llm_clients
+  - packages/llm_sdk_acp
+  - packages/llm_sdk_anthropic
+  - packages/llm_sdk_codex
+  - packages/llm_sdk_core
+  - packages/llm_sdk_deep_seek
+  - packages/llm_sdk_google
+  - packages/llm_sdk_openai
+  - packages/llm_sdk_openai_compatible
   - packages/partial_json
+  - packages/sse
+  - packages/stdio_agent
 
 dependencies:
   dio: ^5.11.0
@@ -28,8 +39,10 @@ dependencies:
   go_router: ^17.3.0
   hooks_riverpod: ^3.3.2 # riverpod_annotation 4.0.3 pins riverpod 3.3.2
   intl: ^0.20.2
+  kore_backends: ^0.1.0
   kore_client: ^0.1.0
-  llm_clients: ^0.1.0
+  kore_config: ^0.1.0
+  llm_sdk_core: ^0.1.0
   path_provider: ^2.1.6
   riverpod_annotation: ^4.0.3 # riverpod_generator 4.0.5 pins 4.0.3
   silky_scroll: ^2.6.4

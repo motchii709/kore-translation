@@ -5,10 +5,10 @@ import 'package:flutter_secure_storage_platform_interface/flutter_secure_storage
 import 'package:flutter_test/flutter_test.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:json_annotation/json_annotation.dart';
+import 'package:kore_config/kore_config.dart';
 import 'package:kore_translation/app/constants/translation_prompt.dart';
 import 'package:kore_translation/app/providers/llm_config_provider.dart';
 import 'package:kore_translation/main.dart';
-import 'package:llm_clients/llm_clients.dart';
 
 void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
