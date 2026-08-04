@@ -59,11 +59,11 @@ void main() {
     expect(scope.read(llmConfigStorageProvider).value, isNull);
   });
 
-  test('save round-trips thinking and system prompt inside the union JSON', () async {
+  test('save round-trips the system prompt inside the union JSON', () async {
     const config = LlmClientConfig.anthropic(
       apiKey: 'sk-ant',
-      thinking: false,
       systemPrompt: 'custom prompt',
+      proofreadPrompt: 'custom proofread prompt',
     );
     final data = useStorage({});
     final scope = container();
@@ -75,8 +75,8 @@ void main() {
       'api_key': 'sk-ant',
       'base_url': 'https://api.anthropic.com',
       'model': 'claude-sonnet-5',
-      'thinking': false,
       'system_prompt': 'custom prompt',
+      'proofread_prompt': 'custom proofread prompt',
     });
     expect(await scope.read(llmConfigStorageProvider.future), config);
 

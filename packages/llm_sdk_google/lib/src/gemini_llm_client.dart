@@ -19,14 +19,14 @@ final class GeminiLlmClient {
 
   /// Streams the chunks of one generateContent call.
   ///
-  /// [responseMimeType] and [thinkingConfig] are passed through inside
-  /// `generationConfig` (e.g. `"application/json"`,
-  /// `{"includeThoughts": true}`); null omits them.
+  /// [responseMimeType] is passed through inside `generationConfig` (e.g.
+  /// `"application/json"`); null omits it. [thinking] requests the model's
+  /// thoughts in the response.
   Stream<GeminiStreamChunk> streamGenerateContent({
     required String systemPrompt,
     required String userText,
+    required bool thinking,
     String? responseMimeType,
-    Map<String, Object?>? thinkingConfig,
   }) async* {
     try {
       final response = await dio.post<ResponseBody>(
@@ -52,7 +52,8 @@ final class GeminiLlmClient {
           ],
           'generationConfig': {
             'responseMimeType': ?responseMimeType,
-            'thinkingConfig': ?thinkingConfig,
+            // Thoughts are only included in the response when explicitly requested.
+            if (thinking) 'thinkingConfig': {'includeThoughts': true},
           },
         },
       );

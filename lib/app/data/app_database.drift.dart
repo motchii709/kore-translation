@@ -221,6 +221,7 @@ typedef $$UiSettingsRowsTableCreateCompanionBuilder =
       i0.Value<int> id,
       required i3.ThemeMode themeMode,
       required i4.SubmitShortcut submitShortcut,
+      required i4.SubmitAction submitAction,
       required i4.AppLanguage appLanguage,
     });
 typedef $$UiSettingsRowsTableUpdateCompanionBuilder =
@@ -228,6 +229,7 @@ typedef $$UiSettingsRowsTableUpdateCompanionBuilder =
       i0.Value<int> id,
       i0.Value<i3.ThemeMode> themeMode,
       i0.Value<i4.SubmitShortcut> submitShortcut,
+      i0.Value<i4.SubmitAction> submitAction,
       i0.Value<i4.AppLanguage> appLanguage,
     });
 
@@ -258,6 +260,12 @@ class $$UiSettingsRowsTableFilterComposer
   >
   get submitShortcut => $composableBuilder(
     column: $table.submitShortcut,
+    builder: (column) => i0.ColumnWithTypeConverterFilters(column),
+  );
+
+  i0.ColumnWithTypeConverterFilters<i4.SubmitAction, i4.SubmitAction, String>
+  get submitAction => $composableBuilder(
+    column: $table.submitAction,
     builder: (column) => i0.ColumnWithTypeConverterFilters(column),
   );
 
@@ -292,6 +300,11 @@ class $$UiSettingsRowsTableOrderingComposer
     builder: (column) => i0.ColumnOrderings(column),
   );
 
+  i0.ColumnOrderings<String> get submitAction => $composableBuilder(
+    column: $table.submitAction,
+    builder: (column) => i0.ColumnOrderings(column),
+  );
+
   i0.ColumnOrderings<String> get appLanguage => $composableBuilder(
     column: $table.appLanguage,
     builder: (column) => i0.ColumnOrderings(column),
@@ -316,6 +329,12 @@ class $$UiSettingsRowsTableAnnotationComposer
   i0.GeneratedColumnWithTypeConverter<i4.SubmitShortcut, String>
   get submitShortcut => $composableBuilder(
     column: $table.submitShortcut,
+    builder: (column) => column,
+  );
+
+  i0.GeneratedColumnWithTypeConverter<i4.SubmitAction, String>
+  get submitAction => $composableBuilder(
+    column: $table.submitAction,
     builder: (column) => column,
   );
 
@@ -367,11 +386,14 @@ class $$UiSettingsRowsTableTableManager
                 i0.Value<i3.ThemeMode> themeMode = const i0.Value.absent(),
                 i0.Value<i4.SubmitShortcut> submitShortcut =
                     const i0.Value.absent(),
+                i0.Value<i4.SubmitAction> submitAction =
+                    const i0.Value.absent(),
                 i0.Value<i4.AppLanguage> appLanguage = const i0.Value.absent(),
               }) => i1.UiSettingsRowsCompanion(
                 id: id,
                 themeMode: themeMode,
                 submitShortcut: submitShortcut,
+                submitAction: submitAction,
                 appLanguage: appLanguage,
               ),
           createCompanionCallback:
@@ -379,11 +401,13 @@ class $$UiSettingsRowsTableTableManager
                 i0.Value<int> id = const i0.Value.absent(),
                 required i3.ThemeMode themeMode,
                 required i4.SubmitShortcut submitShortcut,
+                required i4.SubmitAction submitAction,
                 required i4.AppLanguage appLanguage,
               }) => i1.UiSettingsRowsCompanion.insert(
                 id: id,
                 themeMode: themeMode,
                 submitShortcut: submitShortcut,
+                submitAction: submitAction,
                 appLanguage: appLanguage,
               ),
           withReferenceMapper: (p0) => p0
@@ -846,6 +870,18 @@ class $UiSettingsRowsTable extends i2.UiSettingsRows
         i1.$UiSettingsRowsTable.$convertersubmitShortcut,
       );
   @override
+  late final i0.GeneratedColumnWithTypeConverter<i4.SubmitAction, String>
+  submitAction =
+      i0.GeneratedColumn<String>(
+        'submit_action',
+        aliasedName,
+        false,
+        type: i0.DriftSqlType.string,
+        requiredDuringInsert: true,
+      ).withConverter<i4.SubmitAction>(
+        i1.$UiSettingsRowsTable.$convertersubmitAction,
+      );
+  @override
   late final i0.GeneratedColumnWithTypeConverter<i4.AppLanguage, String>
   appLanguage =
       i0.GeneratedColumn<String>(
@@ -862,6 +898,7 @@ class $UiSettingsRowsTable extends i2.UiSettingsRows
     id,
     themeMode,
     submitShortcut,
+    submitAction,
     appLanguage,
   ];
   @override
@@ -904,6 +941,12 @@ class $UiSettingsRowsTable extends i2.UiSettingsRows
           data['${effectivePrefix}submit_shortcut'],
         )!,
       ),
+      submitAction: i1.$UiSettingsRowsTable.$convertersubmitAction.fromSql(
+        attachedDatabase.typeMapping.read(
+          i0.DriftSqlType.string,
+          data['${effectivePrefix}submit_action'],
+        )!,
+      ),
       appLanguage: i1.$UiSettingsRowsTable.$converterappLanguage.fromSql(
         attachedDatabase.typeMapping.read(
           i0.DriftSqlType.string,
@@ -926,6 +969,10 @@ class $UiSettingsRowsTable extends i2.UiSettingsRows
   $convertersubmitShortcut = const i0.EnumNameConverter<i4.SubmitShortcut>(
     i4.SubmitShortcut.values,
   );
+  static i0.JsonTypeConverter2<i4.SubmitAction, String, String>
+  $convertersubmitAction = const i0.EnumNameConverter<i4.SubmitAction>(
+    i4.SubmitAction.values,
+  );
   static i0.JsonTypeConverter2<i4.AppLanguage, String, String>
   $converterappLanguage = const i0.EnumNameConverter<i4.AppLanguage>(
     i4.AppLanguage.values,
@@ -937,11 +984,13 @@ class UiSettingsRow extends i0.DataClass
   final int id;
   final i3.ThemeMode themeMode;
   final i4.SubmitShortcut submitShortcut;
+  final i4.SubmitAction submitAction;
   final i4.AppLanguage appLanguage;
   const UiSettingsRow({
     required this.id,
     required this.themeMode,
     required this.submitShortcut,
+    required this.submitAction,
     required this.appLanguage,
   });
   @override
@@ -959,6 +1008,11 @@ class UiSettingsRow extends i0.DataClass
       );
     }
     {
+      map['submit_action'] = i0.Variable<String>(
+        i1.$UiSettingsRowsTable.$convertersubmitAction.toSql(submitAction),
+      );
+    }
+    {
       map['app_language'] = i0.Variable<String>(
         i1.$UiSettingsRowsTable.$converterappLanguage.toSql(appLanguage),
       );
@@ -971,6 +1025,7 @@ class UiSettingsRow extends i0.DataClass
       id: i0.Value(id),
       themeMode: i0.Value(themeMode),
       submitShortcut: i0.Value(submitShortcut),
+      submitAction: i0.Value(submitAction),
       appLanguage: i0.Value(appLanguage),
     );
   }
@@ -988,6 +1043,9 @@ class UiSettingsRow extends i0.DataClass
       submitShortcut: i1.$UiSettingsRowsTable.$convertersubmitShortcut.fromJson(
         serializer.fromJson<String>(json['submitShortcut']),
       ),
+      submitAction: i1.$UiSettingsRowsTable.$convertersubmitAction.fromJson(
+        serializer.fromJson<String>(json['submitAction']),
+      ),
       appLanguage: i1.$UiSettingsRowsTable.$converterappLanguage.fromJson(
         serializer.fromJson<String>(json['appLanguage']),
       ),
@@ -1004,6 +1062,9 @@ class UiSettingsRow extends i0.DataClass
       'submitShortcut': serializer.toJson<String>(
         i1.$UiSettingsRowsTable.$convertersubmitShortcut.toJson(submitShortcut),
       ),
+      'submitAction': serializer.toJson<String>(
+        i1.$UiSettingsRowsTable.$convertersubmitAction.toJson(submitAction),
+      ),
       'appLanguage': serializer.toJson<String>(
         i1.$UiSettingsRowsTable.$converterappLanguage.toJson(appLanguage),
       ),
@@ -1014,11 +1075,13 @@ class UiSettingsRow extends i0.DataClass
     int? id,
     i3.ThemeMode? themeMode,
     i4.SubmitShortcut? submitShortcut,
+    i4.SubmitAction? submitAction,
     i4.AppLanguage? appLanguage,
   }) => i1.UiSettingsRow(
     id: id ?? this.id,
     themeMode: themeMode ?? this.themeMode,
     submitShortcut: submitShortcut ?? this.submitShortcut,
+    submitAction: submitAction ?? this.submitAction,
     appLanguage: appLanguage ?? this.appLanguage,
   );
   UiSettingsRow copyWithCompanion(i1.UiSettingsRowsCompanion data) {
@@ -1028,6 +1091,9 @@ class UiSettingsRow extends i0.DataClass
       submitShortcut: data.submitShortcut.present
           ? data.submitShortcut.value
           : this.submitShortcut,
+      submitAction: data.submitAction.present
+          ? data.submitAction.value
+          : this.submitAction,
       appLanguage: data.appLanguage.present
           ? data.appLanguage.value
           : this.appLanguage,
@@ -1040,13 +1106,15 @@ class UiSettingsRow extends i0.DataClass
           ..write('id: $id, ')
           ..write('themeMode: $themeMode, ')
           ..write('submitShortcut: $submitShortcut, ')
+          ..write('submitAction: $submitAction, ')
           ..write('appLanguage: $appLanguage')
           ..write(')'))
         .toString();
   }
 
   @override
-  int get hashCode => Object.hash(id, themeMode, submitShortcut, appLanguage);
+  int get hashCode =>
+      Object.hash(id, themeMode, submitShortcut, submitAction, appLanguage);
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
@@ -1054,6 +1122,7 @@ class UiSettingsRow extends i0.DataClass
           other.id == this.id &&
           other.themeMode == this.themeMode &&
           other.submitShortcut == this.submitShortcut &&
+          other.submitAction == this.submitAction &&
           other.appLanguage == this.appLanguage);
 }
 
@@ -1061,31 +1130,37 @@ class UiSettingsRowsCompanion extends i0.UpdateCompanion<i1.UiSettingsRow> {
   final i0.Value<int> id;
   final i0.Value<i3.ThemeMode> themeMode;
   final i0.Value<i4.SubmitShortcut> submitShortcut;
+  final i0.Value<i4.SubmitAction> submitAction;
   final i0.Value<i4.AppLanguage> appLanguage;
   const UiSettingsRowsCompanion({
     this.id = const i0.Value.absent(),
     this.themeMode = const i0.Value.absent(),
     this.submitShortcut = const i0.Value.absent(),
+    this.submitAction = const i0.Value.absent(),
     this.appLanguage = const i0.Value.absent(),
   });
   UiSettingsRowsCompanion.insert({
     this.id = const i0.Value.absent(),
     required i3.ThemeMode themeMode,
     required i4.SubmitShortcut submitShortcut,
+    required i4.SubmitAction submitAction,
     required i4.AppLanguage appLanguage,
   }) : themeMode = i0.Value(themeMode),
        submitShortcut = i0.Value(submitShortcut),
+       submitAction = i0.Value(submitAction),
        appLanguage = i0.Value(appLanguage);
   static i0.Insertable<i1.UiSettingsRow> custom({
     i0.Expression<int>? id,
     i0.Expression<String>? themeMode,
     i0.Expression<String>? submitShortcut,
+    i0.Expression<String>? submitAction,
     i0.Expression<String>? appLanguage,
   }) {
     return i0.RawValuesInsertable({
       if (id != null) 'id': id,
       if (themeMode != null) 'theme_mode': themeMode,
       if (submitShortcut != null) 'submit_shortcut': submitShortcut,
+      if (submitAction != null) 'submit_action': submitAction,
       if (appLanguage != null) 'app_language': appLanguage,
     });
   }
@@ -1094,12 +1169,14 @@ class UiSettingsRowsCompanion extends i0.UpdateCompanion<i1.UiSettingsRow> {
     i0.Value<int>? id,
     i0.Value<i3.ThemeMode>? themeMode,
     i0.Value<i4.SubmitShortcut>? submitShortcut,
+    i0.Value<i4.SubmitAction>? submitAction,
     i0.Value<i4.AppLanguage>? appLanguage,
   }) {
     return i1.UiSettingsRowsCompanion(
       id: id ?? this.id,
       themeMode: themeMode ?? this.themeMode,
       submitShortcut: submitShortcut ?? this.submitShortcut,
+      submitAction: submitAction ?? this.submitAction,
       appLanguage: appLanguage ?? this.appLanguage,
     );
   }
@@ -1122,6 +1199,13 @@ class UiSettingsRowsCompanion extends i0.UpdateCompanion<i1.UiSettingsRow> {
         ),
       );
     }
+    if (submitAction.present) {
+      map['submit_action'] = i0.Variable<String>(
+        i1.$UiSettingsRowsTable.$convertersubmitAction.toSql(
+          submitAction.value,
+        ),
+      );
+    }
     if (appLanguage.present) {
       map['app_language'] = i0.Variable<String>(
         i1.$UiSettingsRowsTable.$converterappLanguage.toSql(appLanguage.value),
@@ -1136,6 +1220,7 @@ class UiSettingsRowsCompanion extends i0.UpdateCompanion<i1.UiSettingsRow> {
           ..write('id: $id, ')
           ..write('themeMode: $themeMode, ')
           ..write('submitShortcut: $submitShortcut, ')
+          ..write('submitAction: $submitAction, ')
           ..write('appLanguage: $appLanguage')
           ..write(')'))
         .toString();

@@ -5,21 +5,17 @@ import 'package:llm_sdk_google/src/gemini_stream_models.dart';
 
 /// [LlmClient] backed by the Google AI (Gemini) API.
 final class GeminiClient implements LlmClient {
-  GeminiClient({required this.apiKey, required this.baseUrl, required this.model, required this.thinking});
+  GeminiClient({required this.apiKey, required this.baseUrl, required this.model});
 
   final String apiKey;
   final String baseUrl;
   final String model;
-
-  /// Whether to request the model's thoughts in the response.
-  final bool thinking;
 
   @override
   Future<LlmSession> open() async => GeminiSession(
     apiKey: apiKey,
     baseUrl: baseUrl,
     model: model,
-    thinking: thinking,
     dio: Dio(
       BaseOptions(
         connectTimeout: const Duration(seconds: 10),
@@ -35,14 +31,12 @@ final class GeminiSession implements LlmSession {
     required String apiKey,
     required String baseUrl,
     required String model,
-    required this._thinking,
     required this.dio,
   }) : _llm = GeminiLlmClient(apiKey: apiKey, baseUrl: baseUrl, model: model, dio: dio);
 
   /// The HTTP transport the session owns, from [GeminiClient.open] to [close].
   final Dio dio;
 
-  final bool _thinking;
   final GeminiLlmClient _llm;
 
   @override
@@ -52,15 +46,19 @@ final class GeminiSession implements LlmSession {
   Future<void> close() async => dio.close(); // Graceful: in-flight requests finish.
 
   @override
-  Stream<LlmStreamEvent> streamText({required String system, required String user, bool jsonOutput = false}) {
+  Stream<T> streamObject<T>({
+    required String system,
+    required String user,
+    required bool thinking,
+    required T Function(String? thinking, Map<String, dynamic>? reply) decoder,
+  }) {
     final chunks = _llm.streamGenerateContent(
       systemPrompt: system,
       userText: user,
-      responseMimeType: jsonOutput ? 'application/json' : null,
-      // Thoughts are only included in the response when explicitly requested.
-      thinkingConfig: _thinking ? const {'includeThoughts': true} : null,
+      responseMimeType: 'application/json',
+      thinking: thinking,
     );
-    return chunks.expand(_eventsOf);
+    return chunks.expand(_eventsOf).decodeSnapshots(decoder);
   }
 
   Iterable<LlmStreamEvent> _eventsOf(GeminiStreamChunk chunk) sync* {

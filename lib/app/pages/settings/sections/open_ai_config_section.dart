@@ -7,6 +7,7 @@ import 'package:kore_translation/app/i18n/translations.g.dart';
 import 'package:kore_translation/app/pages/settings/widgets/api_key_field.dart';
 import 'package:kore_translation/app/pages/settings/widgets/save_settings_button.dart';
 import 'package:kore_translation/app/providers/llm_config_provider.dart';
+import 'package:kore_translation/app/ui/scroll/use_animated_scroll_controller.dart';
 
 /// The whole API settings form for the OpenAI API: connection fields, the
 /// system prompt and save. Values are trimmed on save to shed clipboard
@@ -19,11 +20,18 @@ class OpenAiConfigSection extends HookConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     // Fresh install or another provider: start from this provider's defaults.
-    final config = initial ?? const OpenAiConfig(apiKey: '', systemPrompt: defaultTranslationPromptTemplate);
+    final config =
+        initial ??
+        const OpenAiConfig(
+          apiKey: '',
+          systemPrompt: defaultTranslationPromptTemplate,
+          proofreadPrompt: defaultProofreadingPromptTemplate,
+        );
     final baseUrl = useTextEditingController(text: config.baseUrl);
     final apiKey = useTextEditingController(text: config.apiKey);
     final model = useTextEditingController(text: config.model);
     final systemPrompt = useTextEditingController(text: config.systemPrompt);
+    final proofreadPrompt = useTextEditingController(text: config.proofreadPrompt);
 
     Future<void> save() async {
       FocusScope.of(context).unfocus();
@@ -35,6 +43,7 @@ class OpenAiConfigSection extends HookConsumerWidget {
               baseUrl: baseUrl.text.trim(),
               model: model.text.trim(),
               systemPrompt: systemPrompt.text.trim(),
+              proofreadPrompt: proofreadPrompt.text.trim(),
             ),
           );
       if (context.mounted) {
@@ -57,15 +66,27 @@ class OpenAiConfigSection extends HookConsumerWidget {
           controller: model,
           decoration: InputDecoration(labelText: context.t.settings.api.model),
         ),
-        // No thinking toggle: OpenAiConfig carries no thinking field — the client does not map reasoning parameters.
         const SizedBox(height: 16),
         TextField(
           controller: systemPrompt,
+          scrollController: useAnimatedScrollController(),
           minLines: 3,
           maxLines: 16,
           decoration: InputDecoration(
             labelText: context.t.settings.api.systemPrompt,
             helperText: context.t.settings.api.systemPromptHelper,
+            helperMaxLines: 3,
+          ),
+        ),
+        const SizedBox(height: 16),
+        TextField(
+          controller: proofreadPrompt,
+          scrollController: useAnimatedScrollController(),
+          minLines: 3,
+          maxLines: 16,
+          decoration: InputDecoration(
+            labelText: context.t.settings.api.proofreadPrompt,
+            helperText: context.t.settings.api.proofreadPromptHelper,
             helperMaxLines: 3,
           ),
         ),

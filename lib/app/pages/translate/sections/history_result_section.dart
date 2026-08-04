@@ -3,12 +3,10 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:kore_client/kore_client.dart';
 import 'package:kore_translation/app/data/app_database.dart';
-import 'package:kore_translation/app/i18n/translations.g.dart';
 import 'package:kore_translation/app/pages/translate/sections/translation_result_section.dart';
-import 'package:kore_translation/app/ui/components/app_section_header.dart';
 
 /// Renders a stored history entry in the result pane: the original text and
-/// the saved result.
+/// the saved result, mirroring the live view.
 class HistoryResultSection extends StatelessWidget {
   const HistoryResultSection({required this.entry, super.key});
 
@@ -16,7 +14,6 @@ class HistoryResultSection extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
     // Stored JSON that no longer matches this build's TranslationResult
     // surfaces raw right here (beta policy: no migrations); the user
     // recovers by deleting the database from the advanced settings.
@@ -24,16 +21,7 @@ class HistoryResultSection extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
-        AppSectionHeader(title: context.t.history.title),
-        Card(
-          child: Padding(
-            padding: const EdgeInsets.all(16),
-            child: SelectableText(
-              entry.sourceText,
-              style: theme.textTheme.bodyMedium?.copyWith(color: theme.colorScheme.outline),
-            ),
-          ),
-        ),
+        SourceTextView(entry.sourceText),
         const SizedBox(height: 16),
         TranslationResultView(result),
       ],

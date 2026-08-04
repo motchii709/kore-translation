@@ -22,32 +22,31 @@ class ResultPrinter {
       stdout.writeln(encoder.convert(result.toJson()));
       return;
     }
-    if (result.detectedLanguage.isNotEmpty) {
+    if (result.detectedLanguage case final detected?) {
       // The output language is the model's decision, so it is shown too
-      // (mirrors the app); empty means the model did not provide it.
+      // (mirrors the app); null means the model did not provide it.
       stdout.writeln(
-        dim(
-          result.targetLanguage.isEmpty
-              ? '検出言語: ${result.detectedLanguage}'
-              : '${result.detectedLanguage} → ${result.targetLanguage}',
-        ),
+        dim(switch (result.targetLanguage) {
+          final target? => '$detected → $target',
+          null => '検出言語: $detected',
+        }),
       );
     }
-    stdout.writeln(bold(result.translation));
+    stdout.writeln(bold(result.translation ?? ''));
     // The explanation belongs right under the result it explains (mirrors
     // the app and the schema order).
-    if (result.explanation.isNotEmpty) {
+    if (result.explanation case final explanation?) {
       stdout.writeln();
       stdout.writeln(yellow('解説:'));
-      stdout.writeln(result.explanation);
+      stdout.writeln(explanation);
     }
-    if (result.alternatives.isNotEmpty) {
+    if (result.alternatives case final alternatives?) {
       stdout.writeln();
       stdout.writeln(cyan('別の言い方:'));
-      for (final alt in result.alternatives) {
-        stdout.writeln('  • ${alt.text}');
-        if (alt.nuance.isNotEmpty) {
-          stdout.writeln(dim('    ${alt.nuance}'));
+      for (final alt in alternatives) {
+        stdout.writeln('  • ${alt.text ?? ''}');
+        if (alt.nuance case final nuance?) {
+          stdout.writeln(dim('    $nuance'));
         }
       }
     }

@@ -43,6 +43,7 @@ class TranslationsEn extends Translations with BaseTranslations<AppLocale, Trans
 	@override late final _Translations$history$en history = _Translations$history$en._(_root);
 	@override late final _Translations$tone$en tone = _Translations$tone$en._(_root);
 	@override late final _Translations$settings$en settings = _Translations$settings$en._(_root);
+	@override late final _Translations$error$en error = _Translations$error$en._(_root);
 }
 
 // Path: translate
@@ -58,7 +59,11 @@ class _Translations$translate$en extends Translations$translate$ja {
 	@override String get language => 'Language';
 	@override late final _Translations$translate$style$en style = _Translations$translate$style$en._(_root);
 	@override String get tones => 'Tone (multi-select)';
+	@override String get thinking => 'Thinking';
+	@override String get thinkingOff => 'Off';
+	@override String get thinkingOn => 'On';
 	@override String get action => 'Translate';
+	@override String get proofreadAction => 'Proofread';
 	@override String get inProgress => 'Translating...';
 	@override late final _Translations$translate$result$en result = _Translations$translate$result$en._(_root);
 }
@@ -116,6 +121,17 @@ class _Translations$settings$en extends Translations$settings$ja {
 	@override late final _Translations$settings$advanced$en advanced = _Translations$settings$advanced$en._(_root);
 }
 
+// Path: error
+class _Translations$error$en extends Translations$error$ja {
+	_Translations$error$en._(TranslationsEn root) : this._root = root, super.internal(root);
+
+	final TranslationsEn _root; // ignore: unused_field
+
+	// Translations
+	@override String get sessionOpenFailed => 'Failed to open the LLM session';
+	@override String get sessionNotConfigured => 'No model is configured';
+}
+
 // Path: translate.style
 class _Translations$translate$style$en extends Translations$translate$style$ja {
 	_Translations$translate$style$en._(TranslationsEn root) : this._root = root, super.internal(root);
@@ -138,6 +154,7 @@ class _Translations$translate$result$en extends Translations$translate$result$ja
 	@override String get placeholder => 'The translation will appear here';
 	@override String get thinking => 'Thinking';
 	@override String get title => 'Translation';
+	@override String get proofreadTitle => 'Proofread result';
 	@override String detectedLanguage({required Object language}) => 'Detected language: ${language}';
 	@override String languagePair({required Object source, required Object target}) => '${source} → ${target}';
 	@override String get copy => 'Copy';
@@ -176,10 +193,10 @@ class _Translations$settings$api$en extends Translations$settings$api$ja {
 	@override String get showApiKey => 'Show';
 	@override String get hideApiKey => 'Hide';
 	@override String get model => 'Model';
-	@override String get thinking => 'Thinking';
-	@override String get thinkingSubtitle => 'Enable the model\'s thinking and stream it live';
 	@override String get systemPrompt => 'System prompt';
 	@override String get systemPromptHelper => '{{language}} (selected), {{app}} (app language) and {{tone}} are substituted at translation time.\nThis is the entire prompt — changing the response-format part can break parsing';
+	@override String get proofreadPrompt => 'Proofread prompt';
+	@override String get proofreadPromptHelper => '{{app}} (app language) and {{tone}} are substituted at proofread time.\nThis is the entire prompt — changing the response-format part can break parsing';
 }
 
 // Path: settings.openAiCompatible
@@ -235,6 +252,8 @@ class _Translations$settings$advanced$en extends Translations$settings$advanced$
 	@override String get submit => 'Send shortcut';
 	@override String get submitEnter => 'Enter to send';
 	@override String get submitShiftEnter => 'Shift+Enter to send';
+	@override String get submitAction => 'Submit shortcut action';
+	@override String get submitActionHelper => 'Ctrl+Enter runs the other action';
 	@override String get dangerTitle => 'Delete data';
 	@override String get delete => 'Delete';
 	@override String get deleteDatabase => 'Delete the database';
@@ -261,11 +280,16 @@ extension on TranslationsEn {
 			'translate.style.natural' => 'Natural',
 			'translate.style.literal' => 'Literal',
 			'translate.tones' => 'Tone (multi-select)',
+			'translate.thinking' => 'Thinking',
+			'translate.thinkingOff' => 'Off',
+			'translate.thinkingOn' => 'On',
 			'translate.action' => 'Translate',
+			'translate.proofreadAction' => 'Proofread',
 			'translate.inProgress' => 'Translating...',
 			'translate.result.placeholder' => 'The translation will appear here',
 			'translate.result.thinking' => 'Thinking',
 			'translate.result.title' => 'Translation',
+			'translate.result.proofreadTitle' => 'Proofread result',
 			'translate.result.detectedLanguage' => ({required Object language}) => 'Detected language: ${language}',
 			'translate.result.languagePair' => ({required Object source, required Object target}) => '${source} → ${target}',
 			'translate.result.copy' => 'Copy',
@@ -304,10 +328,10 @@ extension on TranslationsEn {
 			'settings.api.showApiKey' => 'Show',
 			'settings.api.hideApiKey' => 'Hide',
 			'settings.api.model' => 'Model',
-			'settings.api.thinking' => 'Thinking',
-			'settings.api.thinkingSubtitle' => 'Enable the model\'s thinking and stream it live',
 			'settings.api.systemPrompt' => 'System prompt',
 			'settings.api.systemPromptHelper' => '{{language}} (selected), {{app}} (app language) and {{tone}} are substituted at translation time.\nThis is the entire prompt — changing the response-format part can break parsing',
+			'settings.api.proofreadPrompt' => 'Proofread prompt',
+			'settings.api.proofreadPromptHelper' => '{{app}} (app language) and {{tone}} are substituted at proofread time.\nThis is the entire prompt — changing the response-format part can break parsing',
 			'settings.openAiCompatible.requiredMark' => 'Required',
 			'settings.openAiCompatible.apiKeyHelper' => 'Optional for local servers',
 			'settings.acp.command' => 'ACP command',
@@ -329,6 +353,8 @@ extension on TranslationsEn {
 			'settings.advanced.submit' => 'Send shortcut',
 			'settings.advanced.submitEnter' => 'Enter to send',
 			'settings.advanced.submitShiftEnter' => 'Shift+Enter to send',
+			'settings.advanced.submitAction' => 'Submit shortcut action',
+			'settings.advanced.submitActionHelper' => 'Ctrl+Enter runs the other action',
 			'settings.advanced.dangerTitle' => 'Delete data',
 			'settings.advanced.delete' => 'Delete',
 			'settings.advanced.deleteDatabase' => 'Delete the database',
@@ -337,6 +363,8 @@ extension on TranslationsEn {
 			'settings.advanced.deleteModelConfirm' => 'Delete the model settings (including the API key)?',
 			'settings.advanced.deleted' => 'Deleted',
 			'settings.advanced.cancel' => 'Cancel',
+			'error.sessionOpenFailed' => 'Failed to open the LLM session',
+			'error.sessionNotConfigured' => 'No model is configured',
 			_ => null,
 		};
 	}

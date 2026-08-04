@@ -58,7 +58,7 @@ LlmClientConfig _$LlmClientConfigFromJson(
 /// @nodoc
 mixin _$LlmClientConfig {
 
-@JsonKey(name: 'system_prompt') String get systemPrompt;
+@JsonKey(name: 'system_prompt') String get systemPrompt;@JsonKey(name: 'proofread_prompt') String get proofreadPrompt;
 /// Create a copy of LlmClientConfig
 /// with the given fields replaced by the non-null parameter values.
 @JsonKey(includeFromJson: false, includeToJson: false)
@@ -71,16 +71,16 @@ $LlmClientConfigCopyWith<LlmClientConfig> get copyWith => _$LlmClientConfigCopyW
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is LlmClientConfig&&(identical(other.systemPrompt, systemPrompt) || other.systemPrompt == systemPrompt));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is LlmClientConfig&&(identical(other.systemPrompt, systemPrompt) || other.systemPrompt == systemPrompt)&&(identical(other.proofreadPrompt, proofreadPrompt) || other.proofreadPrompt == proofreadPrompt));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,systemPrompt);
+int get hashCode => Object.hash(runtimeType,systemPrompt,proofreadPrompt);
 
 @override
 String toString() {
-  return 'LlmClientConfig(systemPrompt: $systemPrompt)';
+  return 'LlmClientConfig(systemPrompt: $systemPrompt, proofreadPrompt: $proofreadPrompt)';
 }
 
 
@@ -91,7 +91,7 @@ abstract mixin class $LlmClientConfigCopyWith<$Res>  {
   factory $LlmClientConfigCopyWith(LlmClientConfig value, $Res Function(LlmClientConfig) _then) = _$LlmClientConfigCopyWithImpl;
 @useResult
 $Res call({
-@JsonKey(name: 'system_prompt') String systemPrompt
+@JsonKey(name: 'system_prompt') String systemPrompt,@JsonKey(name: 'proofread_prompt') String proofreadPrompt
 });
 
 
@@ -108,9 +108,10 @@ class _$LlmClientConfigCopyWithImpl<$Res>
 
 /// Create a copy of LlmClientConfig
 /// with the given fields replaced by the non-null parameter values.
-@pragma('vm:prefer-inline') @override $Res call({Object? systemPrompt = null,}) {
+@pragma('vm:prefer-inline') @override $Res call({Object? systemPrompt = null,Object? proofreadPrompt = null,}) {
   return _then(_self.copyWith(
 systemPrompt: null == systemPrompt ? _self.systemPrompt : systemPrompt // ignore: cast_nullable_to_non_nullable
+as String,proofreadPrompt: null == proofreadPrompt ? _self.proofreadPrompt : proofreadPrompt // ignore: cast_nullable_to_non_nullable
 as String,
   ));
 }
@@ -211,16 +212,16 @@ return codex(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeWhen<TResult extends Object?>({TResult Function(@JsonKey(name: 'api_key')  String apiKey, @JsonKey(name: 'base_url')  String baseUrl,  String model, @JsonKey(name: 'system_prompt')  String systemPrompt)?  openAi,TResult Function(@JsonKey(name: 'api_key')  String apiKey, @JsonKey(name: 'base_url')  String baseUrl,  String model, @JsonKey(name: 'system_prompt')  String systemPrompt)?  openAiCompatible,TResult Function(@JsonKey(name: 'api_key')  String apiKey, @JsonKey(name: 'base_url')  String baseUrl,  String model,  bool thinking, @JsonKey(name: 'system_prompt')  String systemPrompt)?  anthropic,TResult Function(@JsonKey(name: 'api_key')  String apiKey, @JsonKey(name: 'base_url')  String baseUrl,  String model,  bool thinking, @JsonKey(name: 'system_prompt')  String systemPrompt)?  google,TResult Function(@JsonKey(name: 'api_key')  String apiKey, @JsonKey(name: 'base_url')  String baseUrl,  String model,  bool thinking, @JsonKey(name: 'system_prompt')  String systemPrompt)?  deepSeek,TResult Function( String command, @JsonKey(name: 'system_prompt')  String systemPrompt)?  acp,TResult Function( String command,  String model,  bool thinking, @JsonKey(name: 'system_prompt')  String systemPrompt)?  codex,required TResult orElse(),}) {final _that = this;
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>({TResult Function(@JsonKey(name: 'api_key')  String apiKey, @JsonKey(name: 'base_url')  String baseUrl,  String model, @JsonKey(name: 'system_prompt')  String systemPrompt, @JsonKey(name: 'proofread_prompt')  String proofreadPrompt)?  openAi,TResult Function(@JsonKey(name: 'api_key')  String apiKey, @JsonKey(name: 'base_url')  String baseUrl,  String model, @JsonKey(name: 'system_prompt')  String systemPrompt, @JsonKey(name: 'proofread_prompt')  String proofreadPrompt)?  openAiCompatible,TResult Function(@JsonKey(name: 'api_key')  String apiKey, @JsonKey(name: 'base_url')  String baseUrl,  String model, @JsonKey(name: 'system_prompt')  String systemPrompt, @JsonKey(name: 'proofread_prompt')  String proofreadPrompt)?  anthropic,TResult Function(@JsonKey(name: 'api_key')  String apiKey, @JsonKey(name: 'base_url')  String baseUrl,  String model, @JsonKey(name: 'system_prompt')  String systemPrompt, @JsonKey(name: 'proofread_prompt')  String proofreadPrompt)?  google,TResult Function(@JsonKey(name: 'api_key')  String apiKey, @JsonKey(name: 'base_url')  String baseUrl,  String model, @JsonKey(name: 'system_prompt')  String systemPrompt, @JsonKey(name: 'proofread_prompt')  String proofreadPrompt)?  deepSeek,TResult Function( String command, @JsonKey(name: 'system_prompt')  String systemPrompt, @JsonKey(name: 'proofread_prompt')  String proofreadPrompt)?  acp,TResult Function( String command,  String model, @JsonKey(name: 'system_prompt')  String systemPrompt, @JsonKey(name: 'proofread_prompt')  String proofreadPrompt)?  codex,required TResult orElse(),}) {final _that = this;
 switch (_that) {
 case OpenAiConfig() when openAi != null:
-return openAi(_that.apiKey,_that.baseUrl,_that.model,_that.systemPrompt);case OpenAiCompatibleConfig() when openAiCompatible != null:
-return openAiCompatible(_that.apiKey,_that.baseUrl,_that.model,_that.systemPrompt);case AnthropicConfig() when anthropic != null:
-return anthropic(_that.apiKey,_that.baseUrl,_that.model,_that.thinking,_that.systemPrompt);case GeminiConfig() when google != null:
-return google(_that.apiKey,_that.baseUrl,_that.model,_that.thinking,_that.systemPrompt);case DeepSeekConfig() when deepSeek != null:
-return deepSeek(_that.apiKey,_that.baseUrl,_that.model,_that.thinking,_that.systemPrompt);case AcpConfig() when acp != null:
-return acp(_that.command,_that.systemPrompt);case CodexConfig() when codex != null:
-return codex(_that.command,_that.model,_that.thinking,_that.systemPrompt);case _:
+return openAi(_that.apiKey,_that.baseUrl,_that.model,_that.systemPrompt,_that.proofreadPrompt);case OpenAiCompatibleConfig() when openAiCompatible != null:
+return openAiCompatible(_that.apiKey,_that.baseUrl,_that.model,_that.systemPrompt,_that.proofreadPrompt);case AnthropicConfig() when anthropic != null:
+return anthropic(_that.apiKey,_that.baseUrl,_that.model,_that.systemPrompt,_that.proofreadPrompt);case GeminiConfig() when google != null:
+return google(_that.apiKey,_that.baseUrl,_that.model,_that.systemPrompt,_that.proofreadPrompt);case DeepSeekConfig() when deepSeek != null:
+return deepSeek(_that.apiKey,_that.baseUrl,_that.model,_that.systemPrompt,_that.proofreadPrompt);case AcpConfig() when acp != null:
+return acp(_that.command,_that.systemPrompt,_that.proofreadPrompt);case CodexConfig() when codex != null:
+return codex(_that.command,_that.model,_that.systemPrompt,_that.proofreadPrompt);case _:
   return orElse();
 
 }
@@ -238,16 +239,16 @@ return codex(_that.command,_that.model,_that.thinking,_that.systemPrompt);case _
 /// }
 /// ```
 
-@optionalTypeArgs TResult when<TResult extends Object?>({required TResult Function(@JsonKey(name: 'api_key')  String apiKey, @JsonKey(name: 'base_url')  String baseUrl,  String model, @JsonKey(name: 'system_prompt')  String systemPrompt)  openAi,required TResult Function(@JsonKey(name: 'api_key')  String apiKey, @JsonKey(name: 'base_url')  String baseUrl,  String model, @JsonKey(name: 'system_prompt')  String systemPrompt)  openAiCompatible,required TResult Function(@JsonKey(name: 'api_key')  String apiKey, @JsonKey(name: 'base_url')  String baseUrl,  String model,  bool thinking, @JsonKey(name: 'system_prompt')  String systemPrompt)  anthropic,required TResult Function(@JsonKey(name: 'api_key')  String apiKey, @JsonKey(name: 'base_url')  String baseUrl,  String model,  bool thinking, @JsonKey(name: 'system_prompt')  String systemPrompt)  google,required TResult Function(@JsonKey(name: 'api_key')  String apiKey, @JsonKey(name: 'base_url')  String baseUrl,  String model,  bool thinking, @JsonKey(name: 'system_prompt')  String systemPrompt)  deepSeek,required TResult Function( String command, @JsonKey(name: 'system_prompt')  String systemPrompt)  acp,required TResult Function( String command,  String model,  bool thinking, @JsonKey(name: 'system_prompt')  String systemPrompt)  codex,}) {final _that = this;
+@optionalTypeArgs TResult when<TResult extends Object?>({required TResult Function(@JsonKey(name: 'api_key')  String apiKey, @JsonKey(name: 'base_url')  String baseUrl,  String model, @JsonKey(name: 'system_prompt')  String systemPrompt, @JsonKey(name: 'proofread_prompt')  String proofreadPrompt)  openAi,required TResult Function(@JsonKey(name: 'api_key')  String apiKey, @JsonKey(name: 'base_url')  String baseUrl,  String model, @JsonKey(name: 'system_prompt')  String systemPrompt, @JsonKey(name: 'proofread_prompt')  String proofreadPrompt)  openAiCompatible,required TResult Function(@JsonKey(name: 'api_key')  String apiKey, @JsonKey(name: 'base_url')  String baseUrl,  String model, @JsonKey(name: 'system_prompt')  String systemPrompt, @JsonKey(name: 'proofread_prompt')  String proofreadPrompt)  anthropic,required TResult Function(@JsonKey(name: 'api_key')  String apiKey, @JsonKey(name: 'base_url')  String baseUrl,  String model, @JsonKey(name: 'system_prompt')  String systemPrompt, @JsonKey(name: 'proofread_prompt')  String proofreadPrompt)  google,required TResult Function(@JsonKey(name: 'api_key')  String apiKey, @JsonKey(name: 'base_url')  String baseUrl,  String model, @JsonKey(name: 'system_prompt')  String systemPrompt, @JsonKey(name: 'proofread_prompt')  String proofreadPrompt)  deepSeek,required TResult Function( String command, @JsonKey(name: 'system_prompt')  String systemPrompt, @JsonKey(name: 'proofread_prompt')  String proofreadPrompt)  acp,required TResult Function( String command,  String model, @JsonKey(name: 'system_prompt')  String systemPrompt, @JsonKey(name: 'proofread_prompt')  String proofreadPrompt)  codex,}) {final _that = this;
 switch (_that) {
 case OpenAiConfig():
-return openAi(_that.apiKey,_that.baseUrl,_that.model,_that.systemPrompt);case OpenAiCompatibleConfig():
-return openAiCompatible(_that.apiKey,_that.baseUrl,_that.model,_that.systemPrompt);case AnthropicConfig():
-return anthropic(_that.apiKey,_that.baseUrl,_that.model,_that.thinking,_that.systemPrompt);case GeminiConfig():
-return google(_that.apiKey,_that.baseUrl,_that.model,_that.thinking,_that.systemPrompt);case DeepSeekConfig():
-return deepSeek(_that.apiKey,_that.baseUrl,_that.model,_that.thinking,_that.systemPrompt);case AcpConfig():
-return acp(_that.command,_that.systemPrompt);case CodexConfig():
-return codex(_that.command,_that.model,_that.thinking,_that.systemPrompt);}
+return openAi(_that.apiKey,_that.baseUrl,_that.model,_that.systemPrompt,_that.proofreadPrompt);case OpenAiCompatibleConfig():
+return openAiCompatible(_that.apiKey,_that.baseUrl,_that.model,_that.systemPrompt,_that.proofreadPrompt);case AnthropicConfig():
+return anthropic(_that.apiKey,_that.baseUrl,_that.model,_that.systemPrompt,_that.proofreadPrompt);case GeminiConfig():
+return google(_that.apiKey,_that.baseUrl,_that.model,_that.systemPrompt,_that.proofreadPrompt);case DeepSeekConfig():
+return deepSeek(_that.apiKey,_that.baseUrl,_that.model,_that.systemPrompt,_that.proofreadPrompt);case AcpConfig():
+return acp(_that.command,_that.systemPrompt,_that.proofreadPrompt);case CodexConfig():
+return codex(_that.command,_that.model,_that.systemPrompt,_that.proofreadPrompt);}
 }
 /// A variant of `when` that fallback to returning `null`
 ///
@@ -261,16 +262,16 @@ return codex(_that.command,_that.model,_that.thinking,_that.systemPrompt);}
 /// }
 /// ```
 
-@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>({TResult? Function(@JsonKey(name: 'api_key')  String apiKey, @JsonKey(name: 'base_url')  String baseUrl,  String model, @JsonKey(name: 'system_prompt')  String systemPrompt)?  openAi,TResult? Function(@JsonKey(name: 'api_key')  String apiKey, @JsonKey(name: 'base_url')  String baseUrl,  String model, @JsonKey(name: 'system_prompt')  String systemPrompt)?  openAiCompatible,TResult? Function(@JsonKey(name: 'api_key')  String apiKey, @JsonKey(name: 'base_url')  String baseUrl,  String model,  bool thinking, @JsonKey(name: 'system_prompt')  String systemPrompt)?  anthropic,TResult? Function(@JsonKey(name: 'api_key')  String apiKey, @JsonKey(name: 'base_url')  String baseUrl,  String model,  bool thinking, @JsonKey(name: 'system_prompt')  String systemPrompt)?  google,TResult? Function(@JsonKey(name: 'api_key')  String apiKey, @JsonKey(name: 'base_url')  String baseUrl,  String model,  bool thinking, @JsonKey(name: 'system_prompt')  String systemPrompt)?  deepSeek,TResult? Function( String command, @JsonKey(name: 'system_prompt')  String systemPrompt)?  acp,TResult? Function( String command,  String model,  bool thinking, @JsonKey(name: 'system_prompt')  String systemPrompt)?  codex,}) {final _that = this;
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>({TResult? Function(@JsonKey(name: 'api_key')  String apiKey, @JsonKey(name: 'base_url')  String baseUrl,  String model, @JsonKey(name: 'system_prompt')  String systemPrompt, @JsonKey(name: 'proofread_prompt')  String proofreadPrompt)?  openAi,TResult? Function(@JsonKey(name: 'api_key')  String apiKey, @JsonKey(name: 'base_url')  String baseUrl,  String model, @JsonKey(name: 'system_prompt')  String systemPrompt, @JsonKey(name: 'proofread_prompt')  String proofreadPrompt)?  openAiCompatible,TResult? Function(@JsonKey(name: 'api_key')  String apiKey, @JsonKey(name: 'base_url')  String baseUrl,  String model, @JsonKey(name: 'system_prompt')  String systemPrompt, @JsonKey(name: 'proofread_prompt')  String proofreadPrompt)?  anthropic,TResult? Function(@JsonKey(name: 'api_key')  String apiKey, @JsonKey(name: 'base_url')  String baseUrl,  String model, @JsonKey(name: 'system_prompt')  String systemPrompt, @JsonKey(name: 'proofread_prompt')  String proofreadPrompt)?  google,TResult? Function(@JsonKey(name: 'api_key')  String apiKey, @JsonKey(name: 'base_url')  String baseUrl,  String model, @JsonKey(name: 'system_prompt')  String systemPrompt, @JsonKey(name: 'proofread_prompt')  String proofreadPrompt)?  deepSeek,TResult? Function( String command, @JsonKey(name: 'system_prompt')  String systemPrompt, @JsonKey(name: 'proofread_prompt')  String proofreadPrompt)?  acp,TResult? Function( String command,  String model, @JsonKey(name: 'system_prompt')  String systemPrompt, @JsonKey(name: 'proofread_prompt')  String proofreadPrompt)?  codex,}) {final _that = this;
 switch (_that) {
 case OpenAiConfig() when openAi != null:
-return openAi(_that.apiKey,_that.baseUrl,_that.model,_that.systemPrompt);case OpenAiCompatibleConfig() when openAiCompatible != null:
-return openAiCompatible(_that.apiKey,_that.baseUrl,_that.model,_that.systemPrompt);case AnthropicConfig() when anthropic != null:
-return anthropic(_that.apiKey,_that.baseUrl,_that.model,_that.thinking,_that.systemPrompt);case GeminiConfig() when google != null:
-return google(_that.apiKey,_that.baseUrl,_that.model,_that.thinking,_that.systemPrompt);case DeepSeekConfig() when deepSeek != null:
-return deepSeek(_that.apiKey,_that.baseUrl,_that.model,_that.thinking,_that.systemPrompt);case AcpConfig() when acp != null:
-return acp(_that.command,_that.systemPrompt);case CodexConfig() when codex != null:
-return codex(_that.command,_that.model,_that.thinking,_that.systemPrompt);case _:
+return openAi(_that.apiKey,_that.baseUrl,_that.model,_that.systemPrompt,_that.proofreadPrompt);case OpenAiCompatibleConfig() when openAiCompatible != null:
+return openAiCompatible(_that.apiKey,_that.baseUrl,_that.model,_that.systemPrompt,_that.proofreadPrompt);case AnthropicConfig() when anthropic != null:
+return anthropic(_that.apiKey,_that.baseUrl,_that.model,_that.systemPrompt,_that.proofreadPrompt);case GeminiConfig() when google != null:
+return google(_that.apiKey,_that.baseUrl,_that.model,_that.systemPrompt,_that.proofreadPrompt);case DeepSeekConfig() when deepSeek != null:
+return deepSeek(_that.apiKey,_that.baseUrl,_that.model,_that.systemPrompt,_that.proofreadPrompt);case AcpConfig() when acp != null:
+return acp(_that.command,_that.systemPrompt,_that.proofreadPrompt);case CodexConfig() when codex != null:
+return codex(_that.command,_that.model,_that.systemPrompt,_that.proofreadPrompt);case _:
   return null;
 
 }
@@ -282,13 +283,14 @@ return codex(_that.command,_that.model,_that.thinking,_that.systemPrompt);case _
 @JsonSerializable()
 
 class OpenAiConfig extends LlmClientConfig {
-  const OpenAiConfig({@JsonKey(name: 'api_key') required this.apiKey, @JsonKey(name: 'base_url') this.baseUrl = 'https://api.openai.com/v1', this.model = 'gpt-5-mini', @JsonKey(name: 'system_prompt') this.systemPrompt = '', final  String? $type}): $type = $type ?? 'openai',super._();
+  const OpenAiConfig({@JsonKey(name: 'api_key') required this.apiKey, @JsonKey(name: 'base_url') this.baseUrl = 'https://api.openai.com/v1', this.model = 'gpt-5-mini', @JsonKey(name: 'system_prompt') this.systemPrompt = '', @JsonKey(name: 'proofread_prompt') this.proofreadPrompt = '', final  String? $type}): $type = $type ?? 'openai',super._();
   factory OpenAiConfig.fromJson(Map<String, dynamic> json) => _$OpenAiConfigFromJson(json);
 
 @JsonKey(name: 'api_key') final  String apiKey;
 @JsonKey(name: 'base_url') final  String baseUrl;
 @JsonKey() final  String model;
 @override@JsonKey(name: 'system_prompt') final  String systemPrompt;
+@override@JsonKey(name: 'proofread_prompt') final  String proofreadPrompt;
 
 @JsonKey(name: 'provider')
 final String $type;
@@ -307,16 +309,16 @@ Map<String, dynamic> toJson() {
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is OpenAiConfig&&(identical(other.apiKey, apiKey) || other.apiKey == apiKey)&&(identical(other.baseUrl, baseUrl) || other.baseUrl == baseUrl)&&(identical(other.model, model) || other.model == model)&&(identical(other.systemPrompt, systemPrompt) || other.systemPrompt == systemPrompt));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is OpenAiConfig&&(identical(other.apiKey, apiKey) || other.apiKey == apiKey)&&(identical(other.baseUrl, baseUrl) || other.baseUrl == baseUrl)&&(identical(other.model, model) || other.model == model)&&(identical(other.systemPrompt, systemPrompt) || other.systemPrompt == systemPrompt)&&(identical(other.proofreadPrompt, proofreadPrompt) || other.proofreadPrompt == proofreadPrompt));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,apiKey,baseUrl,model,systemPrompt);
+int get hashCode => Object.hash(runtimeType,apiKey,baseUrl,model,systemPrompt,proofreadPrompt);
 
 @override
 String toString() {
-  return 'LlmClientConfig.openAi(apiKey: $apiKey, baseUrl: $baseUrl, model: $model, systemPrompt: $systemPrompt)';
+  return 'LlmClientConfig.openAi(apiKey: $apiKey, baseUrl: $baseUrl, model: $model, systemPrompt: $systemPrompt, proofreadPrompt: $proofreadPrompt)';
 }
 
 
@@ -327,7 +329,7 @@ abstract mixin class $OpenAiConfigCopyWith<$Res> implements $LlmClientConfigCopy
   factory $OpenAiConfigCopyWith(OpenAiConfig value, $Res Function(OpenAiConfig) _then) = _$OpenAiConfigCopyWithImpl;
 @override @useResult
 $Res call({
-@JsonKey(name: 'api_key') String apiKey,@JsonKey(name: 'base_url') String baseUrl, String model,@JsonKey(name: 'system_prompt') String systemPrompt
+@JsonKey(name: 'api_key') String apiKey,@JsonKey(name: 'base_url') String baseUrl, String model,@JsonKey(name: 'system_prompt') String systemPrompt,@JsonKey(name: 'proofread_prompt') String proofreadPrompt
 });
 
 
@@ -344,12 +346,13 @@ class _$OpenAiConfigCopyWithImpl<$Res>
 
 /// Create a copy of LlmClientConfig
 /// with the given fields replaced by the non-null parameter values.
-@override @pragma('vm:prefer-inline') $Res call({Object? apiKey = null,Object? baseUrl = null,Object? model = null,Object? systemPrompt = null,}) {
+@override @pragma('vm:prefer-inline') $Res call({Object? apiKey = null,Object? baseUrl = null,Object? model = null,Object? systemPrompt = null,Object? proofreadPrompt = null,}) {
   return _then(OpenAiConfig(
 apiKey: null == apiKey ? _self.apiKey : apiKey // ignore: cast_nullable_to_non_nullable
 as String,baseUrl: null == baseUrl ? _self.baseUrl : baseUrl // ignore: cast_nullable_to_non_nullable
 as String,model: null == model ? _self.model : model // ignore: cast_nullable_to_non_nullable
 as String,systemPrompt: null == systemPrompt ? _self.systemPrompt : systemPrompt // ignore: cast_nullable_to_non_nullable
+as String,proofreadPrompt: null == proofreadPrompt ? _self.proofreadPrompt : proofreadPrompt // ignore: cast_nullable_to_non_nullable
 as String,
   ));
 }
@@ -361,13 +364,14 @@ as String,
 @JsonSerializable()
 
 class OpenAiCompatibleConfig extends LlmClientConfig {
-  const OpenAiCompatibleConfig({@JsonKey(name: 'api_key') this.apiKey = '', @JsonKey(name: 'base_url') this.baseUrl = '', this.model = '', @JsonKey(name: 'system_prompt') this.systemPrompt = '', final  String? $type}): $type = $type ?? 'openai-compatible',super._();
+  const OpenAiCompatibleConfig({@JsonKey(name: 'api_key') this.apiKey = '', @JsonKey(name: 'base_url') this.baseUrl = '', this.model = '', @JsonKey(name: 'system_prompt') this.systemPrompt = '', @JsonKey(name: 'proofread_prompt') this.proofreadPrompt = '', final  String? $type}): $type = $type ?? 'openai-compatible',super._();
   factory OpenAiCompatibleConfig.fromJson(Map<String, dynamic> json) => _$OpenAiCompatibleConfigFromJson(json);
 
 @JsonKey(name: 'api_key') final  String apiKey;
 @JsonKey(name: 'base_url') final  String baseUrl;
 @JsonKey() final  String model;
 @override@JsonKey(name: 'system_prompt') final  String systemPrompt;
+@override@JsonKey(name: 'proofread_prompt') final  String proofreadPrompt;
 
 @JsonKey(name: 'provider')
 final String $type;
@@ -386,16 +390,16 @@ Map<String, dynamic> toJson() {
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is OpenAiCompatibleConfig&&(identical(other.apiKey, apiKey) || other.apiKey == apiKey)&&(identical(other.baseUrl, baseUrl) || other.baseUrl == baseUrl)&&(identical(other.model, model) || other.model == model)&&(identical(other.systemPrompt, systemPrompt) || other.systemPrompt == systemPrompt));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is OpenAiCompatibleConfig&&(identical(other.apiKey, apiKey) || other.apiKey == apiKey)&&(identical(other.baseUrl, baseUrl) || other.baseUrl == baseUrl)&&(identical(other.model, model) || other.model == model)&&(identical(other.systemPrompt, systemPrompt) || other.systemPrompt == systemPrompt)&&(identical(other.proofreadPrompt, proofreadPrompt) || other.proofreadPrompt == proofreadPrompt));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,apiKey,baseUrl,model,systemPrompt);
+int get hashCode => Object.hash(runtimeType,apiKey,baseUrl,model,systemPrompt,proofreadPrompt);
 
 @override
 String toString() {
-  return 'LlmClientConfig.openAiCompatible(apiKey: $apiKey, baseUrl: $baseUrl, model: $model, systemPrompt: $systemPrompt)';
+  return 'LlmClientConfig.openAiCompatible(apiKey: $apiKey, baseUrl: $baseUrl, model: $model, systemPrompt: $systemPrompt, proofreadPrompt: $proofreadPrompt)';
 }
 
 
@@ -406,7 +410,7 @@ abstract mixin class $OpenAiCompatibleConfigCopyWith<$Res> implements $LlmClient
   factory $OpenAiCompatibleConfigCopyWith(OpenAiCompatibleConfig value, $Res Function(OpenAiCompatibleConfig) _then) = _$OpenAiCompatibleConfigCopyWithImpl;
 @override @useResult
 $Res call({
-@JsonKey(name: 'api_key') String apiKey,@JsonKey(name: 'base_url') String baseUrl, String model,@JsonKey(name: 'system_prompt') String systemPrompt
+@JsonKey(name: 'api_key') String apiKey,@JsonKey(name: 'base_url') String baseUrl, String model,@JsonKey(name: 'system_prompt') String systemPrompt,@JsonKey(name: 'proofread_prompt') String proofreadPrompt
 });
 
 
@@ -423,12 +427,13 @@ class _$OpenAiCompatibleConfigCopyWithImpl<$Res>
 
 /// Create a copy of LlmClientConfig
 /// with the given fields replaced by the non-null parameter values.
-@override @pragma('vm:prefer-inline') $Res call({Object? apiKey = null,Object? baseUrl = null,Object? model = null,Object? systemPrompt = null,}) {
+@override @pragma('vm:prefer-inline') $Res call({Object? apiKey = null,Object? baseUrl = null,Object? model = null,Object? systemPrompt = null,Object? proofreadPrompt = null,}) {
   return _then(OpenAiCompatibleConfig(
 apiKey: null == apiKey ? _self.apiKey : apiKey // ignore: cast_nullable_to_non_nullable
 as String,baseUrl: null == baseUrl ? _self.baseUrl : baseUrl // ignore: cast_nullable_to_non_nullable
 as String,model: null == model ? _self.model : model // ignore: cast_nullable_to_non_nullable
 as String,systemPrompt: null == systemPrompt ? _self.systemPrompt : systemPrompt // ignore: cast_nullable_to_non_nullable
+as String,proofreadPrompt: null == proofreadPrompt ? _self.proofreadPrompt : proofreadPrompt // ignore: cast_nullable_to_non_nullable
 as String,
   ));
 }
@@ -440,15 +445,14 @@ as String,
 @JsonSerializable()
 
 class AnthropicConfig extends LlmClientConfig {
-  const AnthropicConfig({@JsonKey(name: 'api_key') required this.apiKey, @JsonKey(name: 'base_url') this.baseUrl = 'https://api.anthropic.com', this.model = 'claude-sonnet-5', this.thinking = true, @JsonKey(name: 'system_prompt') this.systemPrompt = '', final  String? $type}): $type = $type ?? 'anthropic',super._();
+  const AnthropicConfig({@JsonKey(name: 'api_key') required this.apiKey, @JsonKey(name: 'base_url') this.baseUrl = 'https://api.anthropic.com', this.model = 'claude-sonnet-5', @JsonKey(name: 'system_prompt') this.systemPrompt = '', @JsonKey(name: 'proofread_prompt') this.proofreadPrompt = '', final  String? $type}): $type = $type ?? 'anthropic',super._();
   factory AnthropicConfig.fromJson(Map<String, dynamic> json) => _$AnthropicConfigFromJson(json);
 
 @JsonKey(name: 'api_key') final  String apiKey;
 @JsonKey(name: 'base_url') final  String baseUrl;
 @JsonKey() final  String model;
-/// Whether to request thinking and stream it back.
-@JsonKey() final  bool thinking;
 @override@JsonKey(name: 'system_prompt') final  String systemPrompt;
+@override@JsonKey(name: 'proofread_prompt') final  String proofreadPrompt;
 
 @JsonKey(name: 'provider')
 final String $type;
@@ -467,16 +471,16 @@ Map<String, dynamic> toJson() {
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is AnthropicConfig&&(identical(other.apiKey, apiKey) || other.apiKey == apiKey)&&(identical(other.baseUrl, baseUrl) || other.baseUrl == baseUrl)&&(identical(other.model, model) || other.model == model)&&(identical(other.thinking, thinking) || other.thinking == thinking)&&(identical(other.systemPrompt, systemPrompt) || other.systemPrompt == systemPrompt));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is AnthropicConfig&&(identical(other.apiKey, apiKey) || other.apiKey == apiKey)&&(identical(other.baseUrl, baseUrl) || other.baseUrl == baseUrl)&&(identical(other.model, model) || other.model == model)&&(identical(other.systemPrompt, systemPrompt) || other.systemPrompt == systemPrompt)&&(identical(other.proofreadPrompt, proofreadPrompt) || other.proofreadPrompt == proofreadPrompt));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,apiKey,baseUrl,model,thinking,systemPrompt);
+int get hashCode => Object.hash(runtimeType,apiKey,baseUrl,model,systemPrompt,proofreadPrompt);
 
 @override
 String toString() {
-  return 'LlmClientConfig.anthropic(apiKey: $apiKey, baseUrl: $baseUrl, model: $model, thinking: $thinking, systemPrompt: $systemPrompt)';
+  return 'LlmClientConfig.anthropic(apiKey: $apiKey, baseUrl: $baseUrl, model: $model, systemPrompt: $systemPrompt, proofreadPrompt: $proofreadPrompt)';
 }
 
 
@@ -487,7 +491,7 @@ abstract mixin class $AnthropicConfigCopyWith<$Res> implements $LlmClientConfigC
   factory $AnthropicConfigCopyWith(AnthropicConfig value, $Res Function(AnthropicConfig) _then) = _$AnthropicConfigCopyWithImpl;
 @override @useResult
 $Res call({
-@JsonKey(name: 'api_key') String apiKey,@JsonKey(name: 'base_url') String baseUrl, String model, bool thinking,@JsonKey(name: 'system_prompt') String systemPrompt
+@JsonKey(name: 'api_key') String apiKey,@JsonKey(name: 'base_url') String baseUrl, String model,@JsonKey(name: 'system_prompt') String systemPrompt,@JsonKey(name: 'proofread_prompt') String proofreadPrompt
 });
 
 
@@ -504,13 +508,13 @@ class _$AnthropicConfigCopyWithImpl<$Res>
 
 /// Create a copy of LlmClientConfig
 /// with the given fields replaced by the non-null parameter values.
-@override @pragma('vm:prefer-inline') $Res call({Object? apiKey = null,Object? baseUrl = null,Object? model = null,Object? thinking = null,Object? systemPrompt = null,}) {
+@override @pragma('vm:prefer-inline') $Res call({Object? apiKey = null,Object? baseUrl = null,Object? model = null,Object? systemPrompt = null,Object? proofreadPrompt = null,}) {
   return _then(AnthropicConfig(
 apiKey: null == apiKey ? _self.apiKey : apiKey // ignore: cast_nullable_to_non_nullable
 as String,baseUrl: null == baseUrl ? _self.baseUrl : baseUrl // ignore: cast_nullable_to_non_nullable
 as String,model: null == model ? _self.model : model // ignore: cast_nullable_to_non_nullable
-as String,thinking: null == thinking ? _self.thinking : thinking // ignore: cast_nullable_to_non_nullable
-as bool,systemPrompt: null == systemPrompt ? _self.systemPrompt : systemPrompt // ignore: cast_nullable_to_non_nullable
+as String,systemPrompt: null == systemPrompt ? _self.systemPrompt : systemPrompt // ignore: cast_nullable_to_non_nullable
+as String,proofreadPrompt: null == proofreadPrompt ? _self.proofreadPrompt : proofreadPrompt // ignore: cast_nullable_to_non_nullable
 as String,
   ));
 }
@@ -522,15 +526,14 @@ as String,
 @JsonSerializable()
 
 class GeminiConfig extends LlmClientConfig {
-  const GeminiConfig({@JsonKey(name: 'api_key') required this.apiKey, @JsonKey(name: 'base_url') this.baseUrl = 'https://generativelanguage.googleapis.com', this.model = 'gemini-2.5-flash', this.thinking = true, @JsonKey(name: 'system_prompt') this.systemPrompt = '', final  String? $type}): $type = $type ?? 'google',super._();
+  const GeminiConfig({@JsonKey(name: 'api_key') required this.apiKey, @JsonKey(name: 'base_url') this.baseUrl = 'https://generativelanguage.googleapis.com', this.model = 'gemini-2.5-flash', @JsonKey(name: 'system_prompt') this.systemPrompt = '', @JsonKey(name: 'proofread_prompt') this.proofreadPrompt = '', final  String? $type}): $type = $type ?? 'google',super._();
   factory GeminiConfig.fromJson(Map<String, dynamic> json) => _$GeminiConfigFromJson(json);
 
 @JsonKey(name: 'api_key') final  String apiKey;
 @JsonKey(name: 'base_url') final  String baseUrl;
 @JsonKey() final  String model;
-/// Whether to request the model's thoughts in the response.
-@JsonKey() final  bool thinking;
 @override@JsonKey(name: 'system_prompt') final  String systemPrompt;
+@override@JsonKey(name: 'proofread_prompt') final  String proofreadPrompt;
 
 @JsonKey(name: 'provider')
 final String $type;
@@ -549,16 +552,16 @@ Map<String, dynamic> toJson() {
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is GeminiConfig&&(identical(other.apiKey, apiKey) || other.apiKey == apiKey)&&(identical(other.baseUrl, baseUrl) || other.baseUrl == baseUrl)&&(identical(other.model, model) || other.model == model)&&(identical(other.thinking, thinking) || other.thinking == thinking)&&(identical(other.systemPrompt, systemPrompt) || other.systemPrompt == systemPrompt));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is GeminiConfig&&(identical(other.apiKey, apiKey) || other.apiKey == apiKey)&&(identical(other.baseUrl, baseUrl) || other.baseUrl == baseUrl)&&(identical(other.model, model) || other.model == model)&&(identical(other.systemPrompt, systemPrompt) || other.systemPrompt == systemPrompt)&&(identical(other.proofreadPrompt, proofreadPrompt) || other.proofreadPrompt == proofreadPrompt));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,apiKey,baseUrl,model,thinking,systemPrompt);
+int get hashCode => Object.hash(runtimeType,apiKey,baseUrl,model,systemPrompt,proofreadPrompt);
 
 @override
 String toString() {
-  return 'LlmClientConfig.google(apiKey: $apiKey, baseUrl: $baseUrl, model: $model, thinking: $thinking, systemPrompt: $systemPrompt)';
+  return 'LlmClientConfig.google(apiKey: $apiKey, baseUrl: $baseUrl, model: $model, systemPrompt: $systemPrompt, proofreadPrompt: $proofreadPrompt)';
 }
 
 
@@ -569,7 +572,7 @@ abstract mixin class $GeminiConfigCopyWith<$Res> implements $LlmClientConfigCopy
   factory $GeminiConfigCopyWith(GeminiConfig value, $Res Function(GeminiConfig) _then) = _$GeminiConfigCopyWithImpl;
 @override @useResult
 $Res call({
-@JsonKey(name: 'api_key') String apiKey,@JsonKey(name: 'base_url') String baseUrl, String model, bool thinking,@JsonKey(name: 'system_prompt') String systemPrompt
+@JsonKey(name: 'api_key') String apiKey,@JsonKey(name: 'base_url') String baseUrl, String model,@JsonKey(name: 'system_prompt') String systemPrompt,@JsonKey(name: 'proofread_prompt') String proofreadPrompt
 });
 
 
@@ -586,13 +589,13 @@ class _$GeminiConfigCopyWithImpl<$Res>
 
 /// Create a copy of LlmClientConfig
 /// with the given fields replaced by the non-null parameter values.
-@override @pragma('vm:prefer-inline') $Res call({Object? apiKey = null,Object? baseUrl = null,Object? model = null,Object? thinking = null,Object? systemPrompt = null,}) {
+@override @pragma('vm:prefer-inline') $Res call({Object? apiKey = null,Object? baseUrl = null,Object? model = null,Object? systemPrompt = null,Object? proofreadPrompt = null,}) {
   return _then(GeminiConfig(
 apiKey: null == apiKey ? _self.apiKey : apiKey // ignore: cast_nullable_to_non_nullable
 as String,baseUrl: null == baseUrl ? _self.baseUrl : baseUrl // ignore: cast_nullable_to_non_nullable
 as String,model: null == model ? _self.model : model // ignore: cast_nullable_to_non_nullable
-as String,thinking: null == thinking ? _self.thinking : thinking // ignore: cast_nullable_to_non_nullable
-as bool,systemPrompt: null == systemPrompt ? _self.systemPrompt : systemPrompt // ignore: cast_nullable_to_non_nullable
+as String,systemPrompt: null == systemPrompt ? _self.systemPrompt : systemPrompt // ignore: cast_nullable_to_non_nullable
+as String,proofreadPrompt: null == proofreadPrompt ? _self.proofreadPrompt : proofreadPrompt // ignore: cast_nullable_to_non_nullable
 as String,
   ));
 }
@@ -604,16 +607,14 @@ as String,
 @JsonSerializable()
 
 class DeepSeekConfig extends LlmClientConfig {
-  const DeepSeekConfig({@JsonKey(name: 'api_key') required this.apiKey, @JsonKey(name: 'base_url') this.baseUrl = 'https://api.deepseek.com', this.model = 'deepseek-chat', this.thinking = true, @JsonKey(name: 'system_prompt') this.systemPrompt = '', final  String? $type}): $type = $type ?? 'deepseek',super._();
+  const DeepSeekConfig({@JsonKey(name: 'api_key') required this.apiKey, @JsonKey(name: 'base_url') this.baseUrl = 'https://api.deepseek.com', this.model = 'deepseek-chat', @JsonKey(name: 'system_prompt') this.systemPrompt = '', @JsonKey(name: 'proofread_prompt') this.proofreadPrompt = '', final  String? $type}): $type = $type ?? 'deepseek',super._();
   factory DeepSeekConfig.fromJson(Map<String, dynamic> json) => _$DeepSeekConfigFromJson(json);
 
 @JsonKey(name: 'api_key') final  String apiKey;
 @JsonKey(name: 'base_url') final  String baseUrl;
 @JsonKey() final  String model;
-/// Whether to surface `reasoning_content` (reasoning models only; the
-/// API has no request parameter, so this filters the response stream).
-@JsonKey() final  bool thinking;
 @override@JsonKey(name: 'system_prompt') final  String systemPrompt;
+@override@JsonKey(name: 'proofread_prompt') final  String proofreadPrompt;
 
 @JsonKey(name: 'provider')
 final String $type;
@@ -632,16 +633,16 @@ Map<String, dynamic> toJson() {
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is DeepSeekConfig&&(identical(other.apiKey, apiKey) || other.apiKey == apiKey)&&(identical(other.baseUrl, baseUrl) || other.baseUrl == baseUrl)&&(identical(other.model, model) || other.model == model)&&(identical(other.thinking, thinking) || other.thinking == thinking)&&(identical(other.systemPrompt, systemPrompt) || other.systemPrompt == systemPrompt));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is DeepSeekConfig&&(identical(other.apiKey, apiKey) || other.apiKey == apiKey)&&(identical(other.baseUrl, baseUrl) || other.baseUrl == baseUrl)&&(identical(other.model, model) || other.model == model)&&(identical(other.systemPrompt, systemPrompt) || other.systemPrompt == systemPrompt)&&(identical(other.proofreadPrompt, proofreadPrompt) || other.proofreadPrompt == proofreadPrompt));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,apiKey,baseUrl,model,thinking,systemPrompt);
+int get hashCode => Object.hash(runtimeType,apiKey,baseUrl,model,systemPrompt,proofreadPrompt);
 
 @override
 String toString() {
-  return 'LlmClientConfig.deepSeek(apiKey: $apiKey, baseUrl: $baseUrl, model: $model, thinking: $thinking, systemPrompt: $systemPrompt)';
+  return 'LlmClientConfig.deepSeek(apiKey: $apiKey, baseUrl: $baseUrl, model: $model, systemPrompt: $systemPrompt, proofreadPrompt: $proofreadPrompt)';
 }
 
 
@@ -652,7 +653,7 @@ abstract mixin class $DeepSeekConfigCopyWith<$Res> implements $LlmClientConfigCo
   factory $DeepSeekConfigCopyWith(DeepSeekConfig value, $Res Function(DeepSeekConfig) _then) = _$DeepSeekConfigCopyWithImpl;
 @override @useResult
 $Res call({
-@JsonKey(name: 'api_key') String apiKey,@JsonKey(name: 'base_url') String baseUrl, String model, bool thinking,@JsonKey(name: 'system_prompt') String systemPrompt
+@JsonKey(name: 'api_key') String apiKey,@JsonKey(name: 'base_url') String baseUrl, String model,@JsonKey(name: 'system_prompt') String systemPrompt,@JsonKey(name: 'proofread_prompt') String proofreadPrompt
 });
 
 
@@ -669,13 +670,13 @@ class _$DeepSeekConfigCopyWithImpl<$Res>
 
 /// Create a copy of LlmClientConfig
 /// with the given fields replaced by the non-null parameter values.
-@override @pragma('vm:prefer-inline') $Res call({Object? apiKey = null,Object? baseUrl = null,Object? model = null,Object? thinking = null,Object? systemPrompt = null,}) {
+@override @pragma('vm:prefer-inline') $Res call({Object? apiKey = null,Object? baseUrl = null,Object? model = null,Object? systemPrompt = null,Object? proofreadPrompt = null,}) {
   return _then(DeepSeekConfig(
 apiKey: null == apiKey ? _self.apiKey : apiKey // ignore: cast_nullable_to_non_nullable
 as String,baseUrl: null == baseUrl ? _self.baseUrl : baseUrl // ignore: cast_nullable_to_non_nullable
 as String,model: null == model ? _self.model : model // ignore: cast_nullable_to_non_nullable
-as String,thinking: null == thinking ? _self.thinking : thinking // ignore: cast_nullable_to_non_nullable
-as bool,systemPrompt: null == systemPrompt ? _self.systemPrompt : systemPrompt // ignore: cast_nullable_to_non_nullable
+as String,systemPrompt: null == systemPrompt ? _self.systemPrompt : systemPrompt // ignore: cast_nullable_to_non_nullable
+as String,proofreadPrompt: null == proofreadPrompt ? _self.proofreadPrompt : proofreadPrompt // ignore: cast_nullable_to_non_nullable
 as String,
   ));
 }
@@ -687,11 +688,12 @@ as String,
 @JsonSerializable()
 
 class AcpConfig extends LlmClientConfig {
-  const AcpConfig({this.command = '', @JsonKey(name: 'system_prompt') this.systemPrompt = '', final  String? $type}): $type = $type ?? 'acp',super._();
+  const AcpConfig({this.command = '', @JsonKey(name: 'system_prompt') this.systemPrompt = '', @JsonKey(name: 'proofread_prompt') this.proofreadPrompt = '', final  String? $type}): $type = $type ?? 'acp',super._();
   factory AcpConfig.fromJson(Map<String, dynamic> json) => _$AcpConfigFromJson(json);
 
 @JsonKey() final  String command;
 @override@JsonKey(name: 'system_prompt') final  String systemPrompt;
+@override@JsonKey(name: 'proofread_prompt') final  String proofreadPrompt;
 
 @JsonKey(name: 'provider')
 final String $type;
@@ -710,16 +712,16 @@ Map<String, dynamic> toJson() {
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is AcpConfig&&(identical(other.command, command) || other.command == command)&&(identical(other.systemPrompt, systemPrompt) || other.systemPrompt == systemPrompt));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is AcpConfig&&(identical(other.command, command) || other.command == command)&&(identical(other.systemPrompt, systemPrompt) || other.systemPrompt == systemPrompt)&&(identical(other.proofreadPrompt, proofreadPrompt) || other.proofreadPrompt == proofreadPrompt));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,command,systemPrompt);
+int get hashCode => Object.hash(runtimeType,command,systemPrompt,proofreadPrompt);
 
 @override
 String toString() {
-  return 'LlmClientConfig.acp(command: $command, systemPrompt: $systemPrompt)';
+  return 'LlmClientConfig.acp(command: $command, systemPrompt: $systemPrompt, proofreadPrompt: $proofreadPrompt)';
 }
 
 
@@ -730,7 +732,7 @@ abstract mixin class $AcpConfigCopyWith<$Res> implements $LlmClientConfigCopyWit
   factory $AcpConfigCopyWith(AcpConfig value, $Res Function(AcpConfig) _then) = _$AcpConfigCopyWithImpl;
 @override @useResult
 $Res call({
- String command,@JsonKey(name: 'system_prompt') String systemPrompt
+ String command,@JsonKey(name: 'system_prompt') String systemPrompt,@JsonKey(name: 'proofread_prompt') String proofreadPrompt
 });
 
 
@@ -747,10 +749,11 @@ class _$AcpConfigCopyWithImpl<$Res>
 
 /// Create a copy of LlmClientConfig
 /// with the given fields replaced by the non-null parameter values.
-@override @pragma('vm:prefer-inline') $Res call({Object? command = null,Object? systemPrompt = null,}) {
+@override @pragma('vm:prefer-inline') $Res call({Object? command = null,Object? systemPrompt = null,Object? proofreadPrompt = null,}) {
   return _then(AcpConfig(
 command: null == command ? _self.command : command // ignore: cast_nullable_to_non_nullable
 as String,systemPrompt: null == systemPrompt ? _self.systemPrompt : systemPrompt // ignore: cast_nullable_to_non_nullable
+as String,proofreadPrompt: null == proofreadPrompt ? _self.proofreadPrompt : proofreadPrompt // ignore: cast_nullable_to_non_nullable
 as String,
   ));
 }
@@ -762,15 +765,13 @@ as String,
 @JsonSerializable()
 
 class CodexConfig extends LlmClientConfig {
-  const CodexConfig({this.command = 'codex app-server', this.model = '', this.thinking = true, @JsonKey(name: 'system_prompt') this.systemPrompt = '', final  String? $type}): $type = $type ?? 'codex',super._();
+  const CodexConfig({this.command = 'codex app-server', this.model = '', @JsonKey(name: 'system_prompt') this.systemPrompt = '', @JsonKey(name: 'proofread_prompt') this.proofreadPrompt = '', final  String? $type}): $type = $type ?? 'codex',super._();
   factory CodexConfig.fromJson(Map<String, dynamic> json) => _$CodexConfigFromJson(json);
 
 @JsonKey() final  String command;
 @JsonKey() final  String model;
-/// Whether to stream reasoning summaries back (Codex models always
-/// reason; this only controls whether the reasoning is shown).
-@JsonKey() final  bool thinking;
 @override@JsonKey(name: 'system_prompt') final  String systemPrompt;
+@override@JsonKey(name: 'proofread_prompt') final  String proofreadPrompt;
 
 @JsonKey(name: 'provider')
 final String $type;
@@ -789,16 +790,16 @@ Map<String, dynamic> toJson() {
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is CodexConfig&&(identical(other.command, command) || other.command == command)&&(identical(other.model, model) || other.model == model)&&(identical(other.thinking, thinking) || other.thinking == thinking)&&(identical(other.systemPrompt, systemPrompt) || other.systemPrompt == systemPrompt));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is CodexConfig&&(identical(other.command, command) || other.command == command)&&(identical(other.model, model) || other.model == model)&&(identical(other.systemPrompt, systemPrompt) || other.systemPrompt == systemPrompt)&&(identical(other.proofreadPrompt, proofreadPrompt) || other.proofreadPrompt == proofreadPrompt));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,command,model,thinking,systemPrompt);
+int get hashCode => Object.hash(runtimeType,command,model,systemPrompt,proofreadPrompt);
 
 @override
 String toString() {
-  return 'LlmClientConfig.codex(command: $command, model: $model, thinking: $thinking, systemPrompt: $systemPrompt)';
+  return 'LlmClientConfig.codex(command: $command, model: $model, systemPrompt: $systemPrompt, proofreadPrompt: $proofreadPrompt)';
 }
 
 
@@ -809,7 +810,7 @@ abstract mixin class $CodexConfigCopyWith<$Res> implements $LlmClientConfigCopyW
   factory $CodexConfigCopyWith(CodexConfig value, $Res Function(CodexConfig) _then) = _$CodexConfigCopyWithImpl;
 @override @useResult
 $Res call({
- String command, String model, bool thinking,@JsonKey(name: 'system_prompt') String systemPrompt
+ String command, String model,@JsonKey(name: 'system_prompt') String systemPrompt,@JsonKey(name: 'proofread_prompt') String proofreadPrompt
 });
 
 
@@ -826,12 +827,12 @@ class _$CodexConfigCopyWithImpl<$Res>
 
 /// Create a copy of LlmClientConfig
 /// with the given fields replaced by the non-null parameter values.
-@override @pragma('vm:prefer-inline') $Res call({Object? command = null,Object? model = null,Object? thinking = null,Object? systemPrompt = null,}) {
+@override @pragma('vm:prefer-inline') $Res call({Object? command = null,Object? model = null,Object? systemPrompt = null,Object? proofreadPrompt = null,}) {
   return _then(CodexConfig(
 command: null == command ? _self.command : command // ignore: cast_nullable_to_non_nullable
 as String,model: null == model ? _self.model : model // ignore: cast_nullable_to_non_nullable
-as String,thinking: null == thinking ? _self.thinking : thinking // ignore: cast_nullable_to_non_nullable
-as bool,systemPrompt: null == systemPrompt ? _self.systemPrompt : systemPrompt // ignore: cast_nullable_to_non_nullable
+as String,systemPrompt: null == systemPrompt ? _self.systemPrompt : systemPrompt // ignore: cast_nullable_to_non_nullable
+as String,proofreadPrompt: null == proofreadPrompt ? _self.proofreadPrompt : proofreadPrompt // ignore: cast_nullable_to_non_nullable
 as String,
   ));
 }

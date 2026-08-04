@@ -18,7 +18,8 @@ final uiSettingsStorageProvider = UiSettingsStorageProvider._();
 /// App-wide UI preferences, stored in the app database. Loading and saving
 /// also apply the language choice to slang (theme needs no side effect —
 /// `MaterialApp.themeMode` watches this provider).
-final class UiSettingsStorageProvider extends $AsyncNotifierProvider<UiSettingsStorage, UiSettings> {
+final class UiSettingsStorageProvider
+    extends $AsyncNotifierProvider<UiSettingsStorage, UiSettings> {
   /// App-wide UI preferences, stored in the app database. Loading and saving
   /// also apply the language choice to slang (theme needs no side effect —
   /// `MaterialApp.themeMode` watches this provider).

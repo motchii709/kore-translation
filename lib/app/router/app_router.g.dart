@@ -23,11 +23,17 @@ RouteBase get $translateRoute => GoRouteData.$route(
       hasOverriddenOnExit: false,
       factory: $AdvancedSettingsRoute._fromState,
     ),
+    GoRouteData.$route(
+      path: 'entries/:id',
+      hasOverriddenOnExit: false,
+      factory: $HistoryEntryRoute._fromState,
+    ),
   ],
 );
 
 mixin $TranslateRoute on GoRouteData {
-  static TranslateRoute _fromState(GoRouterState state) => const TranslateRoute();
+  static TranslateRoute _fromState(GoRouterState state) =>
+      const TranslateRoute();
 
   @override
   String get location => GoRouteData.$location('/');
@@ -39,14 +45,16 @@ mixin $TranslateRoute on GoRouteData {
   Future<T?> push<T>(BuildContext context) => context.push<T>(location);
 
   @override
-  void pushReplacement(BuildContext context) => context.pushReplacement(location);
+  void pushReplacement(BuildContext context) =>
+      context.pushReplacement(location);
 
   @override
   void replace(BuildContext context) => context.replace(location);
 }
 
 mixin $ModelSettingsRoute on GoRouteData {
-  static ModelSettingsRoute _fromState(GoRouterState state) => const ModelSettingsRoute();
+  static ModelSettingsRoute _fromState(GoRouterState state) =>
+      const ModelSettingsRoute();
 
   @override
   String get location => GoRouteData.$location('/settings/model');
@@ -58,14 +66,16 @@ mixin $ModelSettingsRoute on GoRouteData {
   Future<T?> push<T>(BuildContext context) => context.push<T>(location);
 
   @override
-  void pushReplacement(BuildContext context) => context.pushReplacement(location);
+  void pushReplacement(BuildContext context) =>
+      context.pushReplacement(location);
 
   @override
   void replace(BuildContext context) => context.replace(location);
 }
 
 mixin $AdvancedSettingsRoute on GoRouteData {
-  static AdvancedSettingsRoute _fromState(GoRouterState state) => const AdvancedSettingsRoute();
+  static AdvancedSettingsRoute _fromState(GoRouterState state) =>
+      const AdvancedSettingsRoute();
 
   @override
   String get location => GoRouteData.$location('/settings/advanced');
@@ -77,7 +87,33 @@ mixin $AdvancedSettingsRoute on GoRouteData {
   Future<T?> push<T>(BuildContext context) => context.push<T>(location);
 
   @override
-  void pushReplacement(BuildContext context) => context.pushReplacement(location);
+  void pushReplacement(BuildContext context) =>
+      context.pushReplacement(location);
+
+  @override
+  void replace(BuildContext context) => context.replace(location);
+}
+
+mixin $HistoryEntryRoute on GoRouteData {
+  static HistoryEntryRoute _fromState(GoRouterState state) =>
+      HistoryEntryRoute(id: int.parse(state.pathParameters['id']!));
+
+  HistoryEntryRoute get _self => this as HistoryEntryRoute;
+
+  @override
+  String get location => GoRouteData.$location(
+    '/entries/${Uri.encodeComponent(_self.id.toString())}',
+  );
+
+  @override
+  void go(BuildContext context) => context.go(location);
+
+  @override
+  Future<T?> push<T>(BuildContext context) => context.push<T>(location);
+
+  @override
+  void pushReplacement(BuildContext context) =>
+      context.pushReplacement(location);
 
   @override
   void replace(BuildContext context) => context.replace(location);
@@ -102,7 +138,8 @@ mixin $SetupRoute on GoRouteData {
   Future<T?> push<T>(BuildContext context) => context.push<T>(location);
 
   @override
-  void pushReplacement(BuildContext context) => context.pushReplacement(location);
+  void pushReplacement(BuildContext context) =>
+      context.pushReplacement(location);
 
   @override
   void replace(BuildContext context) => context.replace(location);
@@ -123,7 +160,9 @@ final llmConfiguredProvider = LlmConfiguredProvider._();
 /// Whether an LLM profile is stored; null while still loading. A load
 /// error counts as unconfigured: the setup page renders it raw.
 
-final class LlmConfiguredProvider extends $FunctionalProvider<bool?, bool?, bool?> with $Provider<bool?> {
+final class LlmConfiguredProvider
+    extends $FunctionalProvider<bool?, bool?, bool?>
+    with $Provider<bool?> {
   /// Whether an LLM profile is stored; null while still loading. A load
   /// error counts as unconfigured: the setup page renders it raw.
   LlmConfiguredProvider._()
@@ -142,7 +181,8 @@ final class LlmConfiguredProvider extends $FunctionalProvider<bool?, bool?, bool
 
   @$internal
   @override
-  $ProviderElement<bool?> $createElement($ProviderPointer pointer) => $ProviderElement(pointer);
+  $ProviderElement<bool?> $createElement($ProviderPointer pointer) =>
+      $ProviderElement(pointer);
 
   @override
   bool? create(Ref ref) {
@@ -163,7 +203,9 @@ String _$llmConfiguredHash() => r'205e1dafca110e3ce18e52e21fbee5d1e98de62c';
 @ProviderFor(appRouter)
 final appRouterProvider = AppRouterProvider._();
 
-final class AppRouterProvider extends $FunctionalProvider<GoRouter, GoRouter, GoRouter> with $Provider<GoRouter> {
+final class AppRouterProvider
+    extends $FunctionalProvider<GoRouter, GoRouter, GoRouter>
+    with $Provider<GoRouter> {
   AppRouterProvider._()
     : super(
         from: null,
@@ -180,7 +222,8 @@ final class AppRouterProvider extends $FunctionalProvider<GoRouter, GoRouter, Go
 
   @$internal
   @override
-  $ProviderElement<GoRouter> $createElement($ProviderPointer pointer) => $ProviderElement(pointer);
+  $ProviderElement<GoRouter> $createElement($ProviderPointer pointer) =>
+      $ProviderElement(pointer);
 
   @override
   GoRouter create(Ref ref) {
@@ -196,4 +239,4 @@ final class AppRouterProvider extends $FunctionalProvider<GoRouter, GoRouter, Go
   }
 }
 
-String _$appRouterHash() => r'7b1e784369a02f38000f65840b4760f4ff6127ba';
+String _$appRouterHash() => r'566c1e8cf1f89a743208fc3fd2611338ae00f3ab';

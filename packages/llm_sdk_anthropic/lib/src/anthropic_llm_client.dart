@@ -21,14 +21,13 @@ final class AnthropicLlmClient {
 
   /// Streams the events of one message.
   ///
-  /// [maxTokens] is mandatory on this API. [thinking] is passed through as
-  /// the API's `thinking` parameter (e.g. `{"type": "adaptive", "display":
-  /// "summarized"}`); null omits it.
+  /// [maxTokens] is mandatory on this API. [thinking] turns thinking on
+  /// (adaptive, with the text streamed back) or off.
   Stream<AnthropicStreamEvent> streamMessages({
     required String systemPrompt,
     required String userText,
     required int maxTokens,
-    Map<String, Object?>? thinking,
+    required bool thinking,
   }) async* {
     try {
       final response = await dio.post<ResponseBody>(
@@ -44,7 +43,10 @@ final class AnthropicLlmClient {
           'model': model,
           'max_tokens': maxTokens,
           'stream': true,
-          'thinking': ?thinking,
+          // Claude 5 models only accept adaptive thinking, and their `display`
+          // defaults to "omitted" (empty thinking blocks) — "summarized" opts
+          // in to receiving the thinking text.
+          'thinking': thinking ? {'type': 'adaptive', 'display': 'summarized'} : {'type': 'disabled'},
           'system': systemPrompt,
           'messages': [
             {'role': 'user', 'content': userText},

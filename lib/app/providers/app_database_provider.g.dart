@@ -17,7 +17,8 @@ final appDatabaseProvider = AppDatabaseProvider._();
 /// The app's local store. Kept alive: one database connection for the
 /// whole session.
 
-final class AppDatabaseProvider extends $FunctionalProvider<AppDatabase, AppDatabase, AppDatabase>
+final class AppDatabaseProvider
+    extends $FunctionalProvider<AppDatabase, AppDatabase, AppDatabase>
     with $Provider<AppDatabase> {
   /// The app's local store. Kept alive: one database connection for the
   /// whole session.
@@ -37,7 +38,8 @@ final class AppDatabaseProvider extends $FunctionalProvider<AppDatabase, AppData
 
   @$internal
   @override
-  $ProviderElement<AppDatabase> $createElement($ProviderPointer pointer) => $ProviderElement(pointer);
+  $ProviderElement<AppDatabase> $createElement($ProviderPointer pointer) =>
+      $ProviderElement(pointer);
 
   @override
   AppDatabase create(Ref ref) {

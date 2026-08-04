@@ -26,24 +26,20 @@ LlmClient llmClientFrom(LlmClientConfig config) => switch (config) {
     apiKey: config.apiKey,
     baseUrl: config.baseUrl,
     model: config.model,
-    thinking: config.thinking,
   ),
   final GeminiConfig config => GeminiClient(
     apiKey: config.apiKey,
     baseUrl: config.baseUrl,
     model: config.model,
-    thinking: config.thinking,
   ),
   final DeepSeekConfig config => DeepSeekClient(
     apiKey: config.apiKey,
     baseUrl: config.baseUrl,
     model: config.model,
-    thinking: config.thinking,
   ),
   final AcpConfig config => AcpClient(command: config.command),
   final CodexConfig config => CodexClient(
     command: config.command,
     model: config.model,
-    thinking: config.thinking,
   ),
 };

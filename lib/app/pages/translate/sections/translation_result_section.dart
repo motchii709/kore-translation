@@ -3,36 +3,64 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:kore_client/kore_client.dart';
+import 'package:kore_translation/app/data/app_database.dart';
 import 'package:kore_translation/app/i18n/translations.g.dart';
 import 'package:kore_translation/app/pages/translate/sections/history_result_section.dart';
 import 'package:kore_translation/app/providers/history_provider.dart';
-import 'package:kore_translation/app/providers/translation_controller.dart';
+import 'package:kore_translation/app/providers/translation_jobs_provider.dart';
 import 'package:kore_translation/app/ui/components/app_section_header.dart';
 import 'package:llm_sdk_core/llm_sdk_core.dart';
 
-/// The result pane: a selected history entry, or the state of the latest
-/// translation request. Watches its own providers, so streaming deltas
-/// rebuild only this pane.
+/// The result pane: the selected history entry — live translations are
+/// history entries from the moment they start, so selecting one switches
+/// between streams. Watches its own providers, so streaming deltas rebuild
+/// only this pane.
 class TranslationResultSection extends ConsumerWidget {
   const TranslationResultSection({super.key});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    // A selected history entry takes over the pane; a new translation
-    // clears the selection again.
-    final selectedEntry = ref.watch(selectedHistoryEntryProvider);
-    if (selectedEntry != null) {
-      return HistoryResultSection(entry: selectedEntry);
+    final selectedId = ref.watch(selectedHistoryEntryIdProvider);
+    if (selectedId == null) {
+      return const _EmptyHint();
     }
-    return switch (ref.watch(translationControllerProvider)) {
-      AsyncData(value: null) => const _EmptyHint(),
-      AsyncData(value: final update?) => _UpdateView(update),
-      AsyncError(:final error) => _ErrorCard(error),
-      _ => const Padding(
-        padding: EdgeInsets.symmetric(vertical: 32),
-        child: Center(child: CircularProgressIndicator()),
-      ),
-    };
+    return EntryResultView(id: selectedId);
+  }
+}
+
+/// One history entry by id, shared by the result pane and the narrow
+/// layout's entry page: this session's job wins over the stored row — it
+/// has the streaming progress, the thinking text and any error.
+class EntryResultView extends ConsumerWidget {
+  const EntryResultView({required this.id, super.key});
+
+  final int id;
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final job = ref.watch(translationJobsProvider.select((jobs) => jobs[id]));
+    if (job != null) {
+      return switch (job) {
+        AsyncData(:final value) => _UpdateView(value),
+        AsyncError(:final error) => _ErrorCard(error),
+        _ => const Padding(
+          padding: EdgeInsets.symmetric(vertical: 32),
+          child: Center(child: CircularProgressIndicator()),
+        ),
+      };
+    }
+    // No job (an entry from an earlier session): the stored row.
+    final entry = ref.watch(
+      historyEntriesProvider.select((entries) {
+        for (final entry in entries.value ?? const <HistoryEntry>[]) {
+          if (entry.id == id) {
+            return entry;
+          }
+        }
+        return null;
+      }),
+    );
+    return entry == null ? const _EmptyHint() : HistoryResultSection(entry: entry);
   }
 }
 
@@ -67,17 +95,49 @@ class _UpdateView extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
-        if (update.thinking.isNotEmpty) ...[
-          _ThinkingView(update.thinking),
+        if (update.sourceText case final sourceText?) ...[
+          SourceTextView(sourceText),
           const SizedBox(height: 16),
         ],
-        if (result != null)
+        if (update.thinking case final thinking?) ...[
+          _ThinkingView(thinking),
+          const SizedBox(height: 16),
+        ],
+        if (result != null && result.translation != null)
           TranslationResultView(result)
-        else if (update.thinking.isEmpty)
+        else if (update.thinking == null)
           const Padding(
             padding: EdgeInsets.symmetric(vertical: 32),
             child: Center(child: CircularProgressIndicator()),
           ),
+      ],
+    );
+  }
+}
+
+/// The request's source text, as shown for both live translations and
+/// stored history entries.
+class SourceTextView extends StatelessWidget {
+  const SourceTextView(this.text, {super.key});
+
+  final String text;
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        AppSectionHeader(title: context.t.translate.sourceText),
+        Card(
+          child: Padding(
+            padding: const EdgeInsets.all(16),
+            child: SelectableText(
+              text,
+              style: theme.textTheme.bodyMedium?.copyWith(color: theme.colorScheme.outline),
+            ),
+          ),
+        ),
       ],
     );
   }
@@ -123,26 +183,31 @@ class TranslationResultView extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
-        AppSectionHeader(title: context.t.translate.result.title),
+        // A proofread result announces itself by its `proofread` notes
+        // (translations carry `explanation` instead), so the header can
+        // label it without the job being threaded through storage.
+        AppSectionHeader(
+          title: translation.proofread != null
+              ? context.t.translate.result.proofreadTitle
+              : context.t.translate.result.title,
+        ),
         Card(
           child: Padding(
             padding: const EdgeInsets.all(16),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                if (translation.detectedLanguage.isNotEmpty) ...[
+                if (translation.detectedLanguage case final detected?) ...[
                   Text(
                     // The output language is the model's decision (language
                     // pairing), so it is shown too. Like every meta field,
-                    // empty means the model did not provide it (see
+                    // null means the model has not provided it (see
                     // TranslationResult) — then only the detected language
                     // is worth a line.
-                    translation.targetLanguage.isEmpty
-                        ? context.t.translate.result.detectedLanguage(language: translation.detectedLanguage)
-                        : context.t.translate.result.languagePair(
-                            source: translation.detectedLanguage,
-                            target: translation.targetLanguage,
-                          ),
+                    switch (translation.targetLanguage) {
+                      final target? => context.t.translate.result.languagePair(source: detected, target: target),
+                      null => context.t.translate.result.detectedLanguage(language: detected),
+                    },
                     style: theme.textTheme.bodySmall?.copyWith(
                       color: theme.colorScheme.outline,
                     ),
@@ -154,7 +219,7 @@ class TranslationResultView extends StatelessWidget {
                   children: [
                     Expanded(
                       child: SelectableText(
-                        translation.translation,
+                        translation.translation ?? '',
                         style: theme.textTheme.titleMedium,
                       ),
                     ),
@@ -163,7 +228,7 @@ class TranslationResultView extends StatelessWidget {
                       icon: const Icon(Icons.copy_outlined, size: 20),
                       onPressed: () async {
                         await Clipboard.setData(
-                          ClipboardData(text: translation.translation),
+                          ClipboardData(text: translation.translation ?? ''),
                         );
                         if (context.mounted) {
                           ScaffoldMessenger.of(context).showSnackBar(
@@ -181,24 +246,27 @@ class TranslationResultView extends StatelessWidget {
         // The explanation belongs right under the result it explains; the
         // alternatives come after. The schema requests the same order so
         // streaming reveals the sections top to bottom.
-        if (translation.explanation.isNotEmpty) ...[
+        if (translation.explanation ?? translation.proofread case final notes?) ...[
           const SizedBox(height: 16),
           AppSectionHeader(title: context.t.translate.result.explanation),
           Card(
             child: Padding(
               padding: const EdgeInsets.all(16),
-              child: SelectableText(translation.explanation),
+              child: SelectableText(notes),
             ),
           ),
         ],
-        if (translation.alternatives.isNotEmpty) ...[
+        if (translation.alternatives case final alternatives?) ...[
           const SizedBox(height: 16),
           AppSectionHeader(title: context.t.translate.result.alternatives),
-          for (final alternative in translation.alternatives)
+          for (final alternative in alternatives)
             Card(
               child: ListTile(
-                title: SelectableText(alternative.text),
-                subtitle: alternative.nuance.isEmpty ? null : Text(alternative.nuance),
+                title: SelectableText(alternative.text ?? ''),
+                subtitle: switch (alternative.nuance) {
+                  final nuance? => Text(nuance),
+                  null => null,
+                },
               ),
             ),
         ],

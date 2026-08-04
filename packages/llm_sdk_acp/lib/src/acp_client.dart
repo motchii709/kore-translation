@@ -39,16 +39,21 @@ final class AcpSession implements LlmSession {
   @override
   Future<void> close() => process.shutdown();
 
-  // ACP has no thinking switch — agents reason at their own discretion, and
-  // thought chunks stream whenever the agent emits them. [jsonOutput] is
-  // ignored too: the protocol has no response-format control, so JSON-only
-  // replies rest on the prompt.
+  // [thinking] is ignored — ACP has no thinking switch: agents reason at
+  // their own discretion, and thought chunks stream whenever the agent
+  // emits them. It has no response-format control either, so the JSON-only
+  // reply rests on the prompt.
   @override
-  Stream<LlmStreamEvent> streamText({required String system, required String user, bool jsonOutput = false}) {
+  Stream<T> streamObject<T>({
+    required String system,
+    required String user,
+    required bool thinking,
+    required T Function(String? thinking, Map<String, dynamic>? reply) decoder,
+  }) {
     // ACP has no system-prompt slot: the instruction is prepended to the
     // turn's single text block here, where that provider knowledge belongs.
     final updates = _llm.streamPrompt(text: '$system\n\n$user');
-    return updates.expand(_eventsOf);
+    return updates.expand(_eventsOf).decodeSnapshots(decoder);
   }
 
   Iterable<LlmStreamEvent> _eventsOf(AcpSessionUpdate update) sync* {

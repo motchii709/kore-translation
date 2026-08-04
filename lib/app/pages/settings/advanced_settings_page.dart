@@ -62,6 +62,7 @@ class _PreferencesForm extends HookConsumerWidget {
     final language = useState(initial.language);
     final themeMode = useState(initial.themeMode);
     final submitShortcut = useState(initial.submitShortcut);
+    final submitAction = useState(initial.submitAction);
     final theme = Theme.of(context);
 
     Future<void> save() async {
@@ -71,6 +72,7 @@ class _PreferencesForm extends HookConsumerWidget {
             UiSettings(
               themeMode: themeMode.value,
               submitShortcut: submitShortcut.value,
+              submitAction: submitAction.value,
               language: language.value,
             ),
           );
@@ -130,6 +132,22 @@ class _PreferencesForm extends HookConsumerWidget {
           selected: {submitShortcut.value},
           onSelectionChanged: (selection) => submitShortcut.value = selection.single,
         ),
+        const SizedBox(height: 16),
+        Text(context.t.settings.advanced.submitAction, style: theme.textTheme.labelLarge),
+        const SizedBox(height: 8),
+        // Segment labels reuse the translate page's button labels, so the
+        // setting reads as "which button the shortcut presses".
+        SegmentedButton<SubmitAction>(
+          showSelectedIcon: false,
+          segments: [
+            ButtonSegment(value: SubmitAction.proofread, label: Text(context.t.translate.proofreadAction)),
+            ButtonSegment(value: SubmitAction.translate, label: Text(context.t.translate.action)),
+          ],
+          selected: {submitAction.value},
+          onSelectionChanged: (selection) => submitAction.value = selection.single,
+        ),
+        const SizedBox(height: 4),
+        Text(context.t.settings.advanced.submitActionHelper, style: theme.textTheme.bodySmall),
         const SizedBox(height: 24),
         SaveSettingsButton(onPressed: save),
       ],
@@ -151,7 +169,7 @@ class _DangerZone extends ConsumerWidget {
         return;
       }
       // The result pane must not keep showing a deleted entry.
-      ref.read(selectedHistoryEntryProvider.notifier).select(null);
+      ref.read(selectedHistoryEntryIdProvider.notifier).select(null);
       await ref.read(appDatabaseProvider).close();
       await deleteAppDatabaseFiles();
       // Recreated lazily as a fresh, empty database.

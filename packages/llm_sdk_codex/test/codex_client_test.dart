@@ -1,5 +1,4 @@
 import 'package:llm_sdk_codex/llm_sdk_codex.dart';
-import 'package:llm_sdk_core/llm_sdk_core.dart';
 import 'package:test/test.dart';
 
 void main() {
@@ -7,16 +6,22 @@ void main() {
     final session = await CodexClient(
       command: 'dart test/fixtures/fake_codex_app_server.dart',
       model: '',
-      thinking: true,
     ).open();
     addTearDown(session.close);
 
-    final events = await session.streamText(system: 'Translate.', user: 'hello').toList();
+    final snapshots = await session
+        .streamObject(
+          system: 'Translate.',
+          user: 'hello',
+          thinking: true,
+          decoder: (thinking, reply) => (thinking, reply?['translation']),
+        )
+        .toList();
 
     expect(session.isAlive, isTrue);
-    expect(events, [
-      isA<LlmThinkingDelta>().having((e) => e.text, 'text', 'considering'),
-      isA<LlmTextDelta>().having((e) => e.text, 'text', '{"translation": "Hello"}'),
+    expect(snapshots, [
+      ('considering', null),
+      ('considering', 'Hello'),
     ]);
   });
 }

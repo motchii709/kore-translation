@@ -19,12 +19,12 @@ final class OpenAiLlmClient {
 
   /// Streams the chunks of one chat completion.
   ///
-  /// [responseFormat] is passed through as the API's `response_format`
-  /// parameter (e.g. `{"type": "json_object"}`); null omits it.
+  /// [jsonOutput] requests a JSON-only reply via the API's `response_format`
+  /// parameter; false omits it.
   Stream<OpenAiChatChunk> streamChatCompletions({
     required String systemPrompt,
     required String userText,
-    Map<String, Object?>? responseFormat,
+    required bool jsonOutput,
   }) async* {
     try {
       final response = await dio.post<ResponseBody>(
@@ -36,7 +36,7 @@ final class OpenAiLlmClient {
         data: {
           'model': model,
           'stream': true,
-          'response_format': ?responseFormat,
+          if (jsonOutput) 'response_format': {'type': 'json_object'},
           'messages': [
             {'role': 'system', 'content': systemPrompt},
             {'role': 'user', 'content': userText},

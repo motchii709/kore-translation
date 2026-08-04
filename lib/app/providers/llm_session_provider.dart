@@ -14,12 +14,12 @@ part 'llm_session_provider.g.dart';
 /// dead session is replaced per user action — see
 /// `TranslationController.translate`.
 @Riverpod(keepAlive: true)
-Future<LlmSession> llmSession(Ref ref) async {
+Future<LlmSession?> llmSession(Ref ref) async {
   final llmConfig = await ref.watch(llmConfigStorageProvider.future);
   // Unconfigured: nothing to open yet, so the warm-up listen just leaves
   // this loading; saving a profile rebuilds it through the watch above.
   if (llmConfig == null) {
-    return Completer<LlmSession>().future;
+    return null;
   }
   final session = await llmClientFrom(llmConfig).open();
   // Rebuilt (e.g. by a settings change) while still opening: the losing

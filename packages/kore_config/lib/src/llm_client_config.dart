@@ -11,11 +11,12 @@ part 'llm_client_config.g.dart';
 /// and load it verbatim (`toJson` / `fromJson`, discriminated by `provider`
 /// and with snake_case field keys).
 ///
-/// A variant only carries fields its backend can actually honor — e.g.
-/// [AnthropicConfig.thinking] toggles reasoning, while `OpenAiConfig` and
-/// `AcpConfig` have no such field because their backends cannot control it.
-/// [systemPrompt] (the user's prompt template) is on every variant today;
-/// a future managed backend that owns its prompt would simply omit it.
+/// Variants carry connection settings only — per-turn choices such as
+/// thinking are made at translation time (`LlmSession.streamObject`), not
+/// stored here. [systemPrompt] and [proofreadPrompt] (the user's prompt
+/// templates for the translate and proofread actions) are on every variant
+/// today; a future managed backend that owns its prompts would simply omit
+/// them.
 @Freezed(unionKey: 'provider')
 sealed class LlmClientConfig with _$LlmClientConfig {
   @FreezedUnionValue('openai')
@@ -24,6 +25,7 @@ sealed class LlmClientConfig with _$LlmClientConfig {
     @JsonKey(name: 'base_url') @Default('https://api.openai.com/v1') String baseUrl,
     @Default('gpt-5-mini') String model,
     @JsonKey(name: 'system_prompt') @Default('') String systemPrompt,
+    @JsonKey(name: 'proofread_prompt') @Default('') String proofreadPrompt,
   }) = OpenAiConfig;
 
   /// Generic OpenAI-compatible endpoint (Ollama, LM Studio, Groq,
@@ -36,6 +38,7 @@ sealed class LlmClientConfig with _$LlmClientConfig {
     @JsonKey(name: 'base_url') @Default('') String baseUrl,
     @Default('') String model,
     @JsonKey(name: 'system_prompt') @Default('') String systemPrompt,
+    @JsonKey(name: 'proofread_prompt') @Default('') String proofreadPrompt,
   }) = OpenAiCompatibleConfig;
 
   @FreezedUnionValue('anthropic')
@@ -43,10 +46,8 @@ sealed class LlmClientConfig with _$LlmClientConfig {
     @JsonKey(name: 'api_key') required String apiKey,
     @JsonKey(name: 'base_url') @Default('https://api.anthropic.com') String baseUrl,
     @Default('claude-sonnet-5') String model,
-
-    /// Whether to request thinking and stream it back.
-    @Default(true) bool thinking,
     @JsonKey(name: 'system_prompt') @Default('') String systemPrompt,
+    @JsonKey(name: 'proofread_prompt') @Default('') String proofreadPrompt,
   }) = AnthropicConfig;
 
   @FreezedUnionValue('google')
@@ -54,10 +55,8 @@ sealed class LlmClientConfig with _$LlmClientConfig {
     @JsonKey(name: 'api_key') required String apiKey,
     @JsonKey(name: 'base_url') @Default('https://generativelanguage.googleapis.com') String baseUrl,
     @Default('gemini-2.5-flash') String model,
-
-    /// Whether to request the model's thoughts in the response.
-    @Default(true) bool thinking,
     @JsonKey(name: 'system_prompt') @Default('') String systemPrompt,
+    @JsonKey(name: 'proofread_prompt') @Default('') String proofreadPrompt,
   }) = GeminiConfig;
 
   @FreezedUnionValue('deepseek')
@@ -65,11 +64,8 @@ sealed class LlmClientConfig with _$LlmClientConfig {
     @JsonKey(name: 'api_key') required String apiKey,
     @JsonKey(name: 'base_url') @Default('https://api.deepseek.com') String baseUrl,
     @Default('deepseek-chat') String model,
-
-    /// Whether to surface `reasoning_content` (reasoning models only; the
-    /// API has no request parameter, so this filters the response stream).
-    @Default(true) bool thinking,
     @JsonKey(name: 'system_prompt') @Default('') String systemPrompt,
+    @JsonKey(name: 'proofread_prompt') @Default('') String proofreadPrompt,
   }) = DeepSeekConfig;
 
   /// An Agent Client Protocol agent (https://agentclientprotocol.com) such
@@ -80,6 +76,7 @@ sealed class LlmClientConfig with _$LlmClientConfig {
   const factory LlmClientConfig.acp({
     @Default('') String command,
     @JsonKey(name: 'system_prompt') @Default('') String systemPrompt,
+    @JsonKey(name: 'proofread_prompt') @Default('') String proofreadPrompt,
   }) = AcpConfig;
 
   /// The Codex app-server (Codex's own stdio JSON-RPC protocol, spoken by
@@ -89,16 +86,23 @@ sealed class LlmClientConfig with _$LlmClientConfig {
   const factory LlmClientConfig.codex({
     @Default('codex app-server') String command,
     @Default('') String model,
-
-    /// Whether to stream reasoning summaries back (Codex models always
-    /// reason; this only controls whether the reasoning is shown).
-    @Default(true) bool thinking,
     @JsonKey(name: 'system_prompt') @Default('') String systemPrompt,
+    @JsonKey(name: 'proofread_prompt') @Default('') String proofreadPrompt,
   }) = CodexConfig;
 
   const LlmClientConfig._();
 
   factory LlmClientConfig.fromJson(Map<String, dynamic> json) => _$LlmClientConfigFromJson(json);
+}
+
+extension LlmClientConfigX on LlmClientConfig {
+  /// Whether the backend honors the per-turn thinking flag
+  /// (`LlmSession.streamObject`): frontends hide their thinking toggle when
+  /// it cannot be honored. Backends without the control ignore the flag.
+  bool get canThink => switch (this) {
+    AnthropicConfig() || GeminiConfig() || DeepSeekConfig() || CodexConfig() => true,
+    OpenAiConfig() || OpenAiCompatibleConfig() || AcpConfig() => false,
+  };
 
   LlmProvider get provider => switch (this) {
     OpenAiConfig() => LlmProvider.openAi,

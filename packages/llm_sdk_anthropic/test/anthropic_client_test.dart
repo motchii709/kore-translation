@@ -41,29 +41,33 @@ Map<String, Object> _delta(Map<String, Object> delta) => {
   'delta': delta,
 };
 
-AnthropicSession _session(_FakeAdapter adapter, {bool thinking = true}) => AnthropicSession(
+Stream<(String?, Object?)> _stream(_FakeAdapter adapter, {bool thinking = true}) => AnthropicSession(
   apiKey: 'test-key',
   baseUrl: 'https://api.anthropic.com',
   model: 'claude-sonnet-5',
-  thinking: thinking,
   dio: Dio()..httpClientAdapter = adapter,
+).streamObject(
+  system: 'sys',
+  user: 'こんにちは',
+  thinking: thinking,
+  decoder: (thinking, reply) => (thinking, reply?['translation']),
 );
 
 void main() {
-  test('streams thinking deltas separately from text deltas', () async {
+  test('accumulates thinking and decodes reply-object snapshots', () async {
     final adapter = _FakeAdapter(
       _sse([
         _delta({'type': 'thinking_delta', 'thinking': '考え中'}),
-        _delta({'type': 'text_delta', 'text': 'Hel'}),
-        _delta({'type': 'text_delta', 'text': 'lo'}),
+        _delta({'type': 'text_delta', 'text': '{"translation": "Hel'}),
+        _delta({'type': 'text_delta', 'text': 'lo"}'}),
       ]),
     );
-    final events = await _session(adapter).streamText(system: 'sys', user: 'こんにちは').toList();
+    final snapshots = await _stream(adapter).toList();
 
-    expect(events, [
-      isA<LlmThinkingDelta>().having((e) => e.text, 'text', '考え中'),
-      isA<LlmTextDelta>().having((e) => e.text, 'text', 'Hel'),
-      isA<LlmTextDelta>().having((e) => e.text, 'text', 'lo'),
+    expect(snapshots, [
+      ('考え中', null),
+      ('考え中', 'Hel'),
+      ('考え中', 'Hello'),
     ]);
     expect(adapter.lastRequest?.uri.path, '/v1/messages');
   });
@@ -75,12 +79,12 @@ void main() {
       ]),
     );
 
-    await _session(adapter).streamText(system: 'sys', user: 'u').drain<void>();
+    await _stream(adapter).drain<void>();
     var data = adapter.lastRequest?.data as Map<String, Object?>;
     expect(data['thinking'], {'type': 'adaptive', 'display': 'summarized'});
     expect(data['max_tokens'], 16384);
 
-    await _session(adapter, thinking: false).streamText(system: 'sys', user: 'u').drain<void>();
+    await _stream(adapter, thinking: false).drain<void>();
     data = adapter.lastRequest?.data as Map<String, Object?>;
     expect(data['thinking'], {'type': 'disabled'});
   });
@@ -94,7 +98,7 @@ void main() {
       ]),
     );
     expect(
-      _session(adapter).streamText(system: 'sys', user: 'u').drain<void>(),
+      _stream(adapter).drain<void>(),
       throwsA(
         isA<LlmApiException>().having((e) => e.message, 'message', 'Overloaded'),
       ),

@@ -7,5 +7,8 @@ resolution: workspace
 environment:
   sdk: ^3.12.2
 
+dependencies:
+  partial_json: ^0.1.0
+
 dev_dependencies:
   kore_lints: ^0.1.0

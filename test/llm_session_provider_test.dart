@@ -24,11 +24,11 @@ void main() {
 
   test('the agent session outlives its first read and streams a translation', () async {
     final scope = container();
-    final session = await scope.read(llmSessionProvider.future);
+    final session = (await scope.read(llmSessionProvider.future))!;
 
     // Auto-dispose would kill the agent subprocess right here, before the
     // translation below ever streams.
-    final events = await streamTranslation(session, systemPrompt: 'Translate.', text: 'こんにちは').toList();
+    final events = await streamTranslation(session, systemPrompt: 'Translate.', text: 'こんにちは', thinking: true).toList();
 
     expect(events.last.result?.translation, 'Hello');
     expect(await scope.read(llmSessionProvider.future), same(session));
@@ -39,8 +39,8 @@ void main() {
     final stale = scope.read(llmSessionProvider.future);
     scope.invalidate(llmSessionProvider);
 
-    final session = await scope.read(llmSessionProvider.future);
-    final events = await streamTranslation(session, systemPrompt: 'Translate.', text: 'こんにちは').toList();
+    final session = (await scope.read(llmSessionProvider.future))!;
+    final events = await streamTranslation(session, systemPrompt: 'Translate.', text: 'こんにちは', thinking: true).toList();
 
     expect(events.last.result?.translation, 'Hello');
     // The stale future resolves to the rebuilt provider's value; before the

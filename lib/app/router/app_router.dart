@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:kore_translation/app/pages/settings/advanced_settings_page.dart';
 import 'package:kore_translation/app/pages/settings/model_settings_page.dart';
+import 'package:kore_translation/app/pages/translate/history_entry_page.dart';
 import 'package:kore_translation/app/pages/translate/translate_page.dart';
 import 'package:kore_translation/app/providers/llm_config_provider.dart';
 import 'package:kore_translation/app/router/app_route_paths.dart';
@@ -46,6 +47,7 @@ GoRouter appRouter(Ref ref) {
   routes: <TypedRoute<RouteData>>[
     TypedGoRoute<ModelSettingsRoute>(path: 'settings/model'),
     TypedGoRoute<AdvancedSettingsRoute>(path: 'settings/advanced'),
+    TypedGoRoute<HistoryEntryRoute>(path: 'entries/:id'),
   ],
 )
 class TranslateRoute extends GoRouteData with $TranslateRoute {
@@ -72,6 +74,19 @@ class AdvancedSettingsRoute extends GoRouteData with $AdvancedSettingsRoute {
   @override
   Widget build(BuildContext context, GoRouterState state) {
     return const AdvancedSettingsPage();
+  }
+}
+
+/// One translation, live or stored — the narrow layout's destination after
+/// submitting or picking a history entry; wide layouts use the result pane.
+class HistoryEntryRoute extends GoRouteData with $HistoryEntryRoute {
+  const HistoryEntryRoute({required this.id});
+
+  final int id;
+
+  @override
+  Widget build(BuildContext context, GoRouterState state) {
+    return HistoryEntryPage(id: id);
   }
 }
 

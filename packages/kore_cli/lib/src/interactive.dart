@@ -16,6 +16,7 @@ class InteractiveSession {
     this.initialTarget = 'English',
     this.initialTone = '',
     this.customPrompt = '',
+    this.thinking = false,
   });
 
   final LlmSession session;
@@ -26,6 +27,9 @@ class InteractiveSession {
   /// The llm block's `system_prompt`. When non-empty it replaces the
   /// built-in instruction, and `:to` and `:tone` no longer affect the prompt.
   final String customPrompt;
+
+  /// The profile's thinking flag, passed through to every turn.
+  final bool thinking;
 
   Future<void> run() async {
     var target = initialTarget;
@@ -66,6 +70,7 @@ class InteractiveSession {
 
       stdout.writeln(printer.dim('翻訳中...'));
       try {
+        // fold instead of .last: a turn that streams no events must not crash.
         final event = await streamTranslation(
           session,
           systemPrompt: buildCliSystemPrompt(
@@ -74,11 +79,12 @@ class InteractiveSession {
             customPrompt: customPrompt,
           ),
           text: input,
-        ).last;
-        final result = event.result;
-        if (result == null) {
-          // Unreachable by contract: assembleTranslationEvents either ends
-          // with a validated result or throws. Forced by the nullable field.
+          thinking: thinking,
+        ).fold<TranslationEvent?>(null, (_, event) => event);
+        final result = event?.result;
+        if (result == null || result.translation == null) {
+          // The turn completed without delivering a translation (an empty
+          // or schema-less reply).
           printer.printError('翻訳結果を取得できませんでした');
         } else {
           printer.printResult(result);

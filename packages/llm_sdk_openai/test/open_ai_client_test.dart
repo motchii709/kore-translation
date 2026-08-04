@@ -2,7 +2,6 @@ import 'dart:convert';
 import 'dart:typed_data';
 
 import 'package:dio/dio.dart';
-import 'package:llm_sdk_core/llm_sdk_core.dart';
 import 'package:llm_sdk_openai/src/open_ai_client.dart';
 import 'package:test/test.dart';
 
@@ -45,28 +44,31 @@ Map<String, Object> _delta(Map<String, Object> delta) => {
   ],
 };
 
-Matcher _text(String text) => isA<LlmTextDelta>().having((e) => e.text, 'text', text);
-
-OpenAiSession _session(_FakeAdapter adapter) => OpenAiSession(
+Stream<(String?, Object?)> _stream(_FakeAdapter adapter) => OpenAiSession(
   apiKey: 'test-key',
   baseUrl: 'https://api.openai.com/v1',
   model: 'gpt-5-mini',
   dio: Dio()..httpClientAdapter = adapter,
+).streamObject(
+  system: 'sys',
+  user: 'こんにちは',
+  thinking: false,
+  decoder: (thinking, reply) => (thinking, reply?['translation']),
 );
 
 void main() {
-  test('streams text deltas, dropping empty ones, and maps jsonOutput to response_format', () async {
+  test('decodes reply-object snapshots, dropping empty deltas, and always requests JSON via response_format', () async {
     final adapter = _FakeAdapter(
       _sse([
         _delta({'content': ''}),
-        _delta({'content': 'Hel'}),
-        _delta({'content': 'lo'}),
+        _delta({'content': '{"translation": "Hel'}),
+        _delta({'content': 'lo"}'}),
         '[DONE]',
       ]),
     );
-    final events = await _session(adapter).streamText(system: 'sys', user: 'こんにちは', jsonOutput: true).toList();
+    final snapshots = await _stream(adapter).toList();
 
-    expect(events, [_text('Hel'), _text('lo')]);
+    expect(snapshots, [(null, 'Hel'), (null, 'Hello')]);
     expect(adapter.lastRequest?.uri.path, '/v1/chat/completions');
     expect(adapter.lastRequest?.headers['Authorization'], 'Bearer test-key');
     final data = adapter.lastRequest?.data as Map<String, Object?>;
@@ -79,7 +81,7 @@ void main() {
       statusCode: 401,
     );
     expect(
-      _session(adapter).streamText(system: 'sys', user: 'u').last,
+      _stream(adapter).last,
       throwsA(
         isA<DioException>()
             .having((e) => e.response?.statusCode, 'statusCode', 401)

@@ -72,7 +72,8 @@ class TranslatePage extends StatelessWidget {
 enum _SettingsDestination { model, advanced }
 
 /// Narrow-width history access. Selecting an entry closes the drawer and
-/// leaves the entry showing in the result pane.
+/// shows it in the result pane — or, in the single-column layout that has
+/// no pane, pushes the entry's page.
 class _HistoryDrawer extends StatelessWidget {
   const _HistoryDrawer();
 
@@ -87,7 +88,16 @@ class _HistoryDrawer extends StatelessWidget {
               padding: const EdgeInsets.fromLTRB(16, 16, 16, 8),
               child: Text(context.t.history.title, style: Theme.of(context).textTheme.titleMedium),
             ),
-            Expanded(child: HistoryList(onSelected: () => Navigator.of(context).pop())),
+            Expanded(
+              child: HistoryList(
+                onSelected: (id) {
+                  Navigator.of(context).pop();
+                  if (MediaQuery.sizeOf(context).width < AppBreakpoints.twoPane) {
+                    unawaited(HistoryEntryRoute(id: id).push<void>(context));
+                  }
+                },
+              ),
+            ),
           ],
         ),
       ),
@@ -136,9 +146,10 @@ class _Pane extends HookWidget {
   }
 }
 
-/// Phone and small windows: one scrollable column. The scroll view spans
-/// the full window so the scrollbar sits at the window edge; only the
-/// content is width-constrained.
+/// Phone and small windows: the input form alone — submitting (and picking
+/// a history entry) navigates to the entry's page instead of a side pane.
+/// The scroll view spans the full window so the scrollbar sits at the
+/// window edge; only the content is width-constrained.
 class _SingleColumnLayout extends HookWidget {
   const _SingleColumnLayout();
 
@@ -150,13 +161,7 @@ class _SingleColumnLayout extends HookWidget {
       child: Center(
         child: ConstrainedBox(
           constraints: const BoxConstraints(maxWidth: AppBreakpoints.maxSingleColumnWidth),
-          child: const Column(
-            children: [
-              TranslateInputSection(),
-              SizedBox(height: 24),
-              TranslationResultSection(),
-            ],
-          ),
+          child: const TranslateInputSection(navigateToResult: true),
         ),
       ),
     );

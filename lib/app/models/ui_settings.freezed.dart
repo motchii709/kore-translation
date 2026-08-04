@@ -14,7 +14,7 @@ T _$identity<T>(T value) => value;
 /// @nodoc
 mixin _$UiSettings {
 
- ThemeMode get themeMode; SubmitShortcut get submitShortcut; AppLanguage get language;
+ ThemeMode get themeMode; SubmitShortcut get submitShortcut; SubmitAction get submitAction; AppLanguage get language;
 /// Create a copy of UiSettings
 /// with the given fields replaced by the non-null parameter values.
 @JsonKey(includeFromJson: false, includeToJson: false)
@@ -25,16 +25,16 @@ $UiSettingsCopyWith<UiSettings> get copyWith => _$UiSettingsCopyWithImpl<UiSetti
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is UiSettings&&(identical(other.themeMode, themeMode) || other.themeMode == themeMode)&&(identical(other.submitShortcut, submitShortcut) || other.submitShortcut == submitShortcut)&&(identical(other.language, language) || other.language == language));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is UiSettings&&(identical(other.themeMode, themeMode) || other.themeMode == themeMode)&&(identical(other.submitShortcut, submitShortcut) || other.submitShortcut == submitShortcut)&&(identical(other.submitAction, submitAction) || other.submitAction == submitAction)&&(identical(other.language, language) || other.language == language));
 }
 
 
 @override
-int get hashCode => Object.hash(runtimeType,themeMode,submitShortcut,language);
+int get hashCode => Object.hash(runtimeType,themeMode,submitShortcut,submitAction,language);
 
 @override
 String toString() {
-  return 'UiSettings(themeMode: $themeMode, submitShortcut: $submitShortcut, language: $language)';
+  return 'UiSettings(themeMode: $themeMode, submitShortcut: $submitShortcut, submitAction: $submitAction, language: $language)';
 }
 
 
@@ -45,7 +45,7 @@ abstract mixin class $UiSettingsCopyWith<$Res>  {
   factory $UiSettingsCopyWith(UiSettings value, $Res Function(UiSettings) _then) = _$UiSettingsCopyWithImpl;
 @useResult
 $Res call({
- ThemeMode themeMode, SubmitShortcut submitShortcut, AppLanguage language
+ ThemeMode themeMode, SubmitShortcut submitShortcut, SubmitAction submitAction, AppLanguage language
 });
 
 
@@ -62,11 +62,12 @@ class _$UiSettingsCopyWithImpl<$Res>
 
 /// Create a copy of UiSettings
 /// with the given fields replaced by the non-null parameter values.
-@pragma('vm:prefer-inline') @override $Res call({Object? themeMode = null,Object? submitShortcut = null,Object? language = null,}) {
+@pragma('vm:prefer-inline') @override $Res call({Object? themeMode = null,Object? submitShortcut = null,Object? submitAction = null,Object? language = null,}) {
   return _then(_self.copyWith(
 themeMode: null == themeMode ? _self.themeMode : themeMode // ignore: cast_nullable_to_non_nullable
 as ThemeMode,submitShortcut: null == submitShortcut ? _self.submitShortcut : submitShortcut // ignore: cast_nullable_to_non_nullable
-as SubmitShortcut,language: null == language ? _self.language : language // ignore: cast_nullable_to_non_nullable
+as SubmitShortcut,submitAction: null == submitAction ? _self.submitAction : submitAction // ignore: cast_nullable_to_non_nullable
+as SubmitAction,language: null == language ? _self.language : language // ignore: cast_nullable_to_non_nullable
 as AppLanguage,
   ));
 }
@@ -152,10 +153,10 @@ return $default(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( ThemeMode themeMode,  SubmitShortcut submitShortcut,  AppLanguage language)?  $default,{required TResult orElse(),}) {final _that = this;
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( ThemeMode themeMode,  SubmitShortcut submitShortcut,  SubmitAction submitAction,  AppLanguage language)?  $default,{required TResult orElse(),}) {final _that = this;
 switch (_that) {
 case _UiSettings() when $default != null:
-return $default(_that.themeMode,_that.submitShortcut,_that.language);case _:
+return $default(_that.themeMode,_that.submitShortcut,_that.submitAction,_that.language);case _:
   return orElse();
 
 }
@@ -173,10 +174,10 @@ return $default(_that.themeMode,_that.submitShortcut,_that.language);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( ThemeMode themeMode,  SubmitShortcut submitShortcut,  AppLanguage language)  $default,) {final _that = this;
+@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( ThemeMode themeMode,  SubmitShortcut submitShortcut,  SubmitAction submitAction,  AppLanguage language)  $default,) {final _that = this;
 switch (_that) {
 case _UiSettings():
-return $default(_that.themeMode,_that.submitShortcut,_that.language);case _:
+return $default(_that.themeMode,_that.submitShortcut,_that.submitAction,_that.language);case _:
   throw StateError('Unexpected subclass');
 
 }
@@ -193,10 +194,10 @@ return $default(_that.themeMode,_that.submitShortcut,_that.language);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( ThemeMode themeMode,  SubmitShortcut submitShortcut,  AppLanguage language)?  $default,) {final _that = this;
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( ThemeMode themeMode,  SubmitShortcut submitShortcut,  SubmitAction submitAction,  AppLanguage language)?  $default,) {final _that = this;
 switch (_that) {
 case _UiSettings() when $default != null:
-return $default(_that.themeMode,_that.submitShortcut,_that.language);case _:
+return $default(_that.themeMode,_that.submitShortcut,_that.submitAction,_that.language);case _:
   return null;
 
 }
@@ -208,11 +209,12 @@ return $default(_that.themeMode,_that.submitShortcut,_that.language);case _:
 
 
 class _UiSettings implements UiSettings {
-  const _UiSettings({this.themeMode = ThemeMode.system, this.submitShortcut = SubmitShortcut.enter, this.language = AppLanguage.system});
+  const _UiSettings({this.themeMode = ThemeMode.system, this.submitShortcut = SubmitShortcut.enter, this.submitAction = SubmitAction.translate, this.language = AppLanguage.system});
   
 
 @override@JsonKey() final  ThemeMode themeMode;
 @override@JsonKey() final  SubmitShortcut submitShortcut;
+@override@JsonKey() final  SubmitAction submitAction;
 @override@JsonKey() final  AppLanguage language;
 
 /// Create a copy of UiSettings
@@ -225,16 +227,16 @@ _$UiSettingsCopyWith<_UiSettings> get copyWith => __$UiSettingsCopyWithImpl<_UiS
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is _UiSettings&&(identical(other.themeMode, themeMode) || other.themeMode == themeMode)&&(identical(other.submitShortcut, submitShortcut) || other.submitShortcut == submitShortcut)&&(identical(other.language, language) || other.language == language));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is _UiSettings&&(identical(other.themeMode, themeMode) || other.themeMode == themeMode)&&(identical(other.submitShortcut, submitShortcut) || other.submitShortcut == submitShortcut)&&(identical(other.submitAction, submitAction) || other.submitAction == submitAction)&&(identical(other.language, language) || other.language == language));
 }
 
 
 @override
-int get hashCode => Object.hash(runtimeType,themeMode,submitShortcut,language);
+int get hashCode => Object.hash(runtimeType,themeMode,submitShortcut,submitAction,language);
 
 @override
 String toString() {
-  return 'UiSettings(themeMode: $themeMode, submitShortcut: $submitShortcut, language: $language)';
+  return 'UiSettings(themeMode: $themeMode, submitShortcut: $submitShortcut, submitAction: $submitAction, language: $language)';
 }
 
 
@@ -245,7 +247,7 @@ abstract mixin class _$UiSettingsCopyWith<$Res> implements $UiSettingsCopyWith<$
   factory _$UiSettingsCopyWith(_UiSettings value, $Res Function(_UiSettings) _then) = __$UiSettingsCopyWithImpl;
 @override @useResult
 $Res call({
- ThemeMode themeMode, SubmitShortcut submitShortcut, AppLanguage language
+ ThemeMode themeMode, SubmitShortcut submitShortcut, SubmitAction submitAction, AppLanguage language
 });
 
 
@@ -262,11 +264,12 @@ class __$UiSettingsCopyWithImpl<$Res>
 
 /// Create a copy of UiSettings
 /// with the given fields replaced by the non-null parameter values.
-@override @pragma('vm:prefer-inline') $Res call({Object? themeMode = null,Object? submitShortcut = null,Object? language = null,}) {
+@override @pragma('vm:prefer-inline') $Res call({Object? themeMode = null,Object? submitShortcut = null,Object? submitAction = null,Object? language = null,}) {
   return _then(_UiSettings(
 themeMode: null == themeMode ? _self.themeMode : themeMode // ignore: cast_nullable_to_non_nullable
 as ThemeMode,submitShortcut: null == submitShortcut ? _self.submitShortcut : submitShortcut // ignore: cast_nullable_to_non_nullable
-as SubmitShortcut,language: null == language ? _self.language : language // ignore: cast_nullable_to_non_nullable
+as SubmitShortcut,submitAction: null == submitAction ? _self.submitAction : submitAction // ignore: cast_nullable_to_non_nullable
+as SubmitAction,language: null == language ? _self.language : language // ignore: cast_nullable_to_non_nullable
 as AppLanguage,
   ));
 }

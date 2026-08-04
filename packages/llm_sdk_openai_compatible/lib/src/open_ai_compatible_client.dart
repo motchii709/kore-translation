@@ -41,14 +41,17 @@ final class OpenAiCompatibleSession implements LlmSession {
   @override
   Future<void> close() async => dio.close(); // Graceful: in-flight requests finish.
 
+  // [thinking] is ignored: the Chat Completions surface has no portable
+  // switch for reasoning or for streaming it back.
   @override
-  Stream<LlmStreamEvent> streamText({required String system, required String user, bool jsonOutput = false}) {
-    final chunks = _llm.streamChatCompletions(
-      systemPrompt: system,
-      userText: user,
-      responseFormat: jsonOutput ? const {'type': 'json_object'} : null,
-    );
-    return chunks.expand(_eventsOf);
+  Stream<T> streamObject<T>({
+    required String system,
+    required String user,
+    required bool thinking,
+    required T Function(String? thinking, Map<String, dynamic>? reply) decoder,
+  }) {
+    final chunks = _llm.streamChatCompletions(systemPrompt: system, userText: user, jsonOutput: true);
+    return chunks.expand(_eventsOf).decodeSnapshots(decoder);
   }
 
   Iterable<LlmStreamEvent> _eventsOf(OpenAiCompatibleChatChunk chunk) sync* {

@@ -29,7 +29,6 @@ void main() {
 llm:
   provider: anthropic
   api_key: sk-ant-test
-  thinking: false
   system_prompt: 関西弁に翻訳して
 to: 日本語
 tone: フランクに
@@ -37,7 +36,7 @@ tone: フランクに
       );
       expect(
         config.llm,
-        const LlmClientConfig.anthropic(apiKey: 'sk-ant-test', thinking: false, systemPrompt: '関西弁に翻訳して'),
+        const LlmClientConfig.anthropic(apiKey: 'sk-ant-test', systemPrompt: '関西弁に翻訳して'),
       );
       expect(config.to, '日本語');
       expect(config.tone, 'フランクに');

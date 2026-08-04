@@ -7,6 +7,10 @@ part 'ui_settings.freezed.dart';
 /// chord does the other action (a newline).
 enum SubmitShortcut { enter, shiftEnter }
 
+/// What the submit shortcut submits the translate input as; Ctrl+Enter
+/// always runs the other action, so both stay one keypress away.
+enum SubmitAction { translate, proofread }
+
 /// The app display language: follow the OS, or force a supported locale.
 enum AppLanguage { system, ja, en }
 
@@ -18,6 +22,7 @@ abstract class UiSettings with _$UiSettings {
   const factory UiSettings({
     @Default(ThemeMode.system) ThemeMode themeMode,
     @Default(SubmitShortcut.enter) SubmitShortcut submitShortcut,
+    @Default(SubmitAction.translate) SubmitAction submitAction,
     @Default(AppLanguage.system) AppLanguage language,
   }) = _UiSettings;
 }

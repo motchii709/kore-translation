@@ -44,6 +44,7 @@ class Translations with BaseTranslations<AppLocale, Translations> {
 	late final Translations$history$ja history = Translations$history$ja.internal(_root);
 	late final Translations$tone$ja tone = Translations$tone$ja.internal(_root);
 	late final Translations$settings$ja settings = Translations$settings$ja.internal(_root);
+	late final Translations$error$ja error = Translations$error$ja.internal(_root);
 }
 
 // Path: translate
@@ -71,8 +72,20 @@ class Translations$translate$ja {
 	/// ja: 'トーン (複数選択可)'
 	String get tones => 'トーン (複数選択可)';
 
+	/// ja: '思考'
+	String get thinking => '思考';
+
+	/// ja: 'なし'
+	String get thinkingOff => 'なし';
+
+	/// ja: 'あり'
+	String get thinkingOn => 'あり';
+
 	/// ja: '翻訳する'
 	String get action => '翻訳する';
+
+	/// ja: '添削する'
+	String get proofreadAction => '添削する';
 
 	/// ja: '翻訳中...'
 	String get inProgress => '翻訳中...';
@@ -175,6 +188,21 @@ class Translations$settings$ja {
 	late final Translations$settings$advanced$ja advanced = Translations$settings$advanced$ja.internal(_root);
 }
 
+// Path: error
+class Translations$error$ja {
+	Translations$error$ja.internal(this._root);
+
+	final Translations _root; // ignore: unused_field
+
+	// Translations
+
+	/// ja: 'セッションを開けませんでした'
+	String get sessionOpenFailed => 'セッションを開けませんでした';
+
+	/// ja: 'モデルが未設定です'
+	String get sessionNotConfigured => 'モデルが未設定です';
+}
+
 // Path: translate.style
 class Translations$translate$style$ja {
 	Translations$translate$style$ja.internal(this._root);
@@ -209,6 +237,9 @@ class Translations$translate$result$ja {
 
 	/// ja: '翻訳結果'
 	String get title => '翻訳結果';
+
+	/// ja: '添削結果'
+	String get proofreadTitle => '添削結果';
 
 	/// ja: '検出言語: $language'
 	String detectedLanguage({required Object language}) => '検出言語: ${language}';
@@ -288,17 +319,17 @@ class Translations$settings$api$ja {
 	/// ja: 'モデル'
 	String get model => 'モデル';
 
-	/// ja: '思考 (thinking)'
-	String get thinking => '思考 (thinking)';
-
-	/// ja: 'モデルの思考を有効にし、ストリーミング表示します'
-	String get thinkingSubtitle => 'モデルの思考を有効にし、ストリーミング表示します';
-
 	/// ja: 'システムプロンプト'
 	String get systemPrompt => 'システムプロンプト';
 
 	/// ja: '{{language}} (選択言語)・{{app}} (アプリの言語)・{{tone}} が翻訳時に置換されます。 これがプロンプト全体です。応答フォーマット指示を変えるとパースが壊れることがあります'
 	String get systemPromptHelper => '{{language}} (選択言語)・{{app}} (アプリの言語)・{{tone}} が翻訳時に置換されます。\nこれがプロンプト全体です。応答フォーマット指示を変えるとパースが壊れることがあります';
+
+	/// ja: '添削プロンプト'
+	String get proofreadPrompt => '添削プロンプト';
+
+	/// ja: '{{app}} (アプリの言語)・{{tone}} が添削時に置換されます。 これがプロンプト全体です。応答フォーマット指示を変えるとパースが壊れることがあります'
+	String get proofreadPromptHelper => '{{app}} (アプリの言語)・{{tone}} が添削時に置換されます。\nこれがプロンプト全体です。応答フォーマット指示を変えるとパースが壊れることがあります';
 }
 
 // Path: settings.openAiCompatible
@@ -393,6 +424,12 @@ class Translations$settings$advanced$ja {
 	/// ja: 'Shift+Enterで送信'
 	String get submitShiftEnter => 'Shift+Enterで送信';
 
+	/// ja: '送信ショートカットの動作'
+	String get submitAction => '送信ショートカットの動作';
+
+	/// ja: 'Ctrl+Enterでもう一方の動作を実行します'
+	String get submitActionHelper => 'Ctrl+Enterでもう一方の動作を実行します';
+
 	/// ja: 'データ削除'
 	String get dangerTitle => 'データ削除';
 
@@ -434,11 +471,16 @@ extension on Translations {
 			'translate.style.natural' => '自然',
 			'translate.style.literal' => '直訳',
 			'translate.tones' => 'トーン (複数選択可)',
+			'translate.thinking' => '思考',
+			'translate.thinkingOff' => 'なし',
+			'translate.thinkingOn' => 'あり',
 			'translate.action' => '翻訳する',
+			'translate.proofreadAction' => '添削する',
 			'translate.inProgress' => '翻訳中...',
 			'translate.result.placeholder' => '翻訳結果がここに表示されます',
 			'translate.result.thinking' => '思考',
 			'translate.result.title' => '翻訳結果',
+			'translate.result.proofreadTitle' => '添削結果',
 			'translate.result.detectedLanguage' => ({required Object language}) => '検出言語: ${language}',
 			'translate.result.languagePair' => ({required Object source, required Object target}) => '${source} → ${target}',
 			'translate.result.copy' => 'コピー',
@@ -477,10 +519,10 @@ extension on Translations {
 			'settings.api.showApiKey' => '表示',
 			'settings.api.hideApiKey' => '隠す',
 			'settings.api.model' => 'モデル',
-			'settings.api.thinking' => '思考 (thinking)',
-			'settings.api.thinkingSubtitle' => 'モデルの思考を有効にし、ストリーミング表示します',
 			'settings.api.systemPrompt' => 'システムプロンプト',
 			'settings.api.systemPromptHelper' => '{{language}} (選択言語)・{{app}} (アプリの言語)・{{tone}} が翻訳時に置換されます。\nこれがプロンプト全体です。応答フォーマット指示を変えるとパースが壊れることがあります',
+			'settings.api.proofreadPrompt' => '添削プロンプト',
+			'settings.api.proofreadPromptHelper' => '{{app}} (アプリの言語)・{{tone}} が添削時に置換されます。\nこれがプロンプト全体です。応答フォーマット指示を変えるとパースが壊れることがあります',
 			'settings.openAiCompatible.requiredMark' => '必須',
 			'settings.openAiCompatible.apiKeyHelper' => 'ローカルサーバの場合は空欄可',
 			'settings.acp.command' => 'ACPコマンド',
@@ -502,6 +544,8 @@ extension on Translations {
 			'settings.advanced.submit' => '送信ショートカット',
 			'settings.advanced.submitEnter' => 'Enterで送信',
 			'settings.advanced.submitShiftEnter' => 'Shift+Enterで送信',
+			'settings.advanced.submitAction' => '送信ショートカットの動作',
+			'settings.advanced.submitActionHelper' => 'Ctrl+Enterでもう一方の動作を実行します',
 			'settings.advanced.dangerTitle' => 'データ削除',
 			'settings.advanced.delete' => '削除',
 			'settings.advanced.deleteDatabase' => 'データベースを削除',
@@ -510,6 +554,8 @@ extension on Translations {
 			'settings.advanced.deleteModelConfirm' => 'モデル設定 (APIキーを含む) を削除します。よろしいですか？',
 			'settings.advanced.deleted' => '削除しました',
 			'settings.advanced.cancel' => 'キャンセル',
+			'error.sessionOpenFailed' => 'セッションを開けませんでした',
+			'error.sessionNotConfigured' => 'モデルが未設定です',
 			_ => null,
 		};
 	}

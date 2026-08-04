@@ -2,14 +2,14 @@ import 'package:kore_client/kore_client.dart';
 import 'package:llm_sdk_core/llm_sdk_core.dart';
 import 'package:test/test.dart';
 
-/// Replays a canned event stream and records the request.
+/// Replays a canned fragment stream and records the request.
 final class _FakeSession implements LlmSession {
   _FakeSession(this.events);
 
   final Stream<LlmStreamEvent> events;
   String? system;
   String? user;
-  bool? jsonOutput;
+  bool? thinking;
 
   @override
   bool get isAlive => true;
@@ -18,16 +18,21 @@ final class _FakeSession implements LlmSession {
   Future<void> close() async {}
 
   @override
-  Stream<LlmStreamEvent> streamText({required String system, required String user, bool jsonOutput = false}) {
+  Stream<T> streamObject<T>({
+    required String system,
+    required String user,
+    required bool thinking,
+    required T Function(String? thinking, Map<String, dynamic>? reply) decoder,
+  }) {
     this.system = system;
     this.user = user;
-    this.jsonOutput = jsonOutput;
-    return events;
+    this.thinking = thinking;
+    return events.decodeSnapshots(decoder);
   }
 }
 
 Stream<TranslationEvent> _translate(_FakeSession session) =>
-    streamTranslation(session, systemPrompt: 'Translate.', text: 'こんにちは');
+    streamTranslation(session, systemPrompt: 'Translate.', text: 'こんにちは', thinking: true);
 
 void main() {
   test('accumulates thinking and emits progressively richer results, strictly parsed at the end', () async {
@@ -43,9 +48,9 @@ void main() {
 
     expect(session.system, 'Translate.');
     expect(session.user, 'こんにちは');
-    expect(session.jsonOutput, isTrue);
+    expect(session.thinking, isTrue);
     expect(events.first.thinking, '挨拶の翻訳を');
-    expect(events.first.result, isNull);
+    expect(events.first.result?.translation, isNull);
     expect(events.map((e) => e.thinking), contains('挨拶の翻訳を考える'));
     expect(events.map((e) => e.result?.translation), contains('He'));
     final last = events.last;
@@ -71,15 +76,17 @@ void main() {
     expect(_translate(session).toList(), throwsA(isA<KoreClientException>()));
   });
 
-  test('throws when the reply contains no text at all', () {
+  test('a reply with no fragments completes without events', () async {
     final session = _FakeSession(const Stream.empty());
-    expect(_translate(session).toList(), throwsA(isA<KoreClientException>()));
+    expect(await _translate(session).toList(), isEmpty);
   });
 
-  test('throws when the completed reply does not match the schema', () {
+  test('a reply without a translation leaves the field null for the caller to judge', () async {
     final session = _FakeSession(
       Stream.fromIterable(const [LlmTextDelta('{"detected_language": "日本語"}')]),
     );
-    expect(_translate(session).toList(), throwsA(isA<KoreClientException>()));
+    final events = await _translate(session).toList();
+    expect(events.last.result?.detectedLanguage, '日本語');
+    expect(events.last.result?.translation, isNull);
   });
 }

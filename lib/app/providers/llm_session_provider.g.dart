@@ -25,8 +25,14 @@ final llmSessionProvider = LlmSessionProvider._();
 /// dead session is replaced per user action — see
 /// `TranslationController.translate`.
 
-final class LlmSessionProvider extends $FunctionalProvider<AsyncValue<LlmSession>, LlmSession, FutureOr<LlmSession>>
-    with $FutureModifier<LlmSession>, $FutureProvider<LlmSession> {
+final class LlmSessionProvider
+    extends
+        $FunctionalProvider<
+          AsyncValue<LlmSession?>,
+          LlmSession?,
+          FutureOr<LlmSession?>
+        >
+    with $FutureModifier<LlmSession?>, $FutureProvider<LlmSession?> {
   /// The open LLM session, kept alive so the agent backends (ACP / Codex)
   /// hold one warm subprocess across translations instead of losing it to
   /// auto dispose mid-stream. `KoreApp`'s warm-up listen opens it at startup;
@@ -49,12 +55,14 @@ final class LlmSessionProvider extends $FunctionalProvider<AsyncValue<LlmSession
 
   @$internal
   @override
-  $FutureProviderElement<LlmSession> $createElement($ProviderPointer pointer) => $FutureProviderElement(pointer);
+  $FutureProviderElement<LlmSession?> $createElement(
+    $ProviderPointer pointer,
+  ) => $FutureProviderElement(pointer);
 
   @override
-  FutureOr<LlmSession> create(Ref ref) {
+  FutureOr<LlmSession?> create(Ref ref) {
     return llmSession(ref);
   }
 }
 
-String _$llmSessionHash() => r'0290e4f3da5fe2db41e01a57ef2fbff39a6538e3';
+String _$llmSessionHash() => r'e6c53ca6f905683026f0dcffa0ddc1d5297e4c5c';

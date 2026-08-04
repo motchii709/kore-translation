@@ -15,7 +15,7 @@ T _$identity<T>(T value) => value;
 /// @nodoc
 mixin _$TranslationCandidate {
 
- String get text; String get nuance;
+ String? get text; String? get nuance;
 /// Create a copy of TranslationCandidate
 /// with the given fields replaced by the non-null parameter values.
 @JsonKey(includeFromJson: false, includeToJson: false)
@@ -48,7 +48,7 @@ abstract mixin class $TranslationCandidateCopyWith<$Res>  {
   factory $TranslationCandidateCopyWith(TranslationCandidate value, $Res Function(TranslationCandidate) _then) = _$TranslationCandidateCopyWithImpl;
 @useResult
 $Res call({
- String text, String nuance
+ String? text, String? nuance
 });
 
 
@@ -65,11 +65,11 @@ class _$TranslationCandidateCopyWithImpl<$Res>
 
 /// Create a copy of TranslationCandidate
 /// with the given fields replaced by the non-null parameter values.
-@pragma('vm:prefer-inline') @override $Res call({Object? text = null,Object? nuance = null,}) {
+@pragma('vm:prefer-inline') @override $Res call({Object? text = freezed,Object? nuance = freezed,}) {
   return _then(_self.copyWith(
-text: null == text ? _self.text : text // ignore: cast_nullable_to_non_nullable
-as String,nuance: null == nuance ? _self.nuance : nuance // ignore: cast_nullable_to_non_nullable
-as String,
+text: freezed == text ? _self.text : text // ignore: cast_nullable_to_non_nullable
+as String?,nuance: freezed == nuance ? _self.nuance : nuance // ignore: cast_nullable_to_non_nullable
+as String?,
   ));
 }
 
@@ -154,7 +154,7 @@ return $default(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( String text,  String nuance)?  $default,{required TResult orElse(),}) {final _that = this;
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( String? text,  String? nuance)?  $default,{required TResult orElse(),}) {final _that = this;
 switch (_that) {
 case _TranslationCandidate() when $default != null:
 return $default(_that.text,_that.nuance);case _:
@@ -175,7 +175,7 @@ return $default(_that.text,_that.nuance);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( String text,  String nuance)  $default,) {final _that = this;
+@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( String? text,  String? nuance)  $default,) {final _that = this;
 switch (_that) {
 case _TranslationCandidate():
 return $default(_that.text,_that.nuance);case _:
@@ -195,7 +195,7 @@ return $default(_that.text,_that.nuance);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( String text,  String nuance)?  $default,) {final _that = this;
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( String? text,  String? nuance)?  $default,) {final _that = this;
 switch (_that) {
 case _TranslationCandidate() when $default != null:
 return $default(_that.text,_that.nuance);case _:
@@ -210,11 +210,11 @@ return $default(_that.text,_that.nuance);case _:
 @JsonSerializable()
 
 class _TranslationCandidate implements TranslationCandidate {
-  const _TranslationCandidate({required this.text, this.nuance = ''});
+  const _TranslationCandidate({this.text, this.nuance});
   factory _TranslationCandidate.fromJson(Map<String, dynamic> json) => _$TranslationCandidateFromJson(json);
 
-@override final  String text;
-@override@JsonKey() final  String nuance;
+@override final  String? text;
+@override final  String? nuance;
 
 /// Create a copy of TranslationCandidate
 /// with the given fields replaced by the non-null parameter values.
@@ -249,7 +249,7 @@ abstract mixin class _$TranslationCandidateCopyWith<$Res> implements $Translatio
   factory _$TranslationCandidateCopyWith(_TranslationCandidate value, $Res Function(_TranslationCandidate) _then) = __$TranslationCandidateCopyWithImpl;
 @override @useResult
 $Res call({
- String text, String nuance
+ String? text, String? nuance
 });
 
 
@@ -266,11 +266,11 @@ class __$TranslationCandidateCopyWithImpl<$Res>
 
 /// Create a copy of TranslationCandidate
 /// with the given fields replaced by the non-null parameter values.
-@override @pragma('vm:prefer-inline') $Res call({Object? text = null,Object? nuance = null,}) {
+@override @pragma('vm:prefer-inline') $Res call({Object? text = freezed,Object? nuance = freezed,}) {
   return _then(_TranslationCandidate(
-text: null == text ? _self.text : text // ignore: cast_nullable_to_non_nullable
-as String,nuance: null == nuance ? _self.nuance : nuance // ignore: cast_nullable_to_non_nullable
-as String,
+text: freezed == text ? _self.text : text // ignore: cast_nullable_to_non_nullable
+as String?,nuance: freezed == nuance ? _self.nuance : nuance // ignore: cast_nullable_to_non_nullable
+as String?,
   ));
 }
 
@@ -280,7 +280,9 @@ as String,
 /// @nodoc
 mixin _$TranslationEvent {
 
- String get thinking; TranslationResult? get result;
+/// The source text of the request this event belongs to, so consumers
+/// can keep showing it after the input moved on.
+ String? get sourceText; String? get thinking; TranslationResult? get result;
 /// Create a copy of TranslationEvent
 /// with the given fields replaced by the non-null parameter values.
 @JsonKey(includeFromJson: false, includeToJson: false)
@@ -291,16 +293,16 @@ $TranslationEventCopyWith<TranslationEvent> get copyWith => _$TranslationEventCo
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is TranslationEvent&&(identical(other.thinking, thinking) || other.thinking == thinking)&&(identical(other.result, result) || other.result == result));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is TranslationEvent&&(identical(other.sourceText, sourceText) || other.sourceText == sourceText)&&(identical(other.thinking, thinking) || other.thinking == thinking)&&(identical(other.result, result) || other.result == result));
 }
 
 
 @override
-int get hashCode => Object.hash(runtimeType,thinking,result);
+int get hashCode => Object.hash(runtimeType,sourceText,thinking,result);
 
 @override
 String toString() {
-  return 'TranslationEvent(thinking: $thinking, result: $result)';
+  return 'TranslationEvent(sourceText: $sourceText, thinking: $thinking, result: $result)';
 }
 
 
@@ -311,7 +313,7 @@ abstract mixin class $TranslationEventCopyWith<$Res>  {
   factory $TranslationEventCopyWith(TranslationEvent value, $Res Function(TranslationEvent) _then) = _$TranslationEventCopyWithImpl;
 @useResult
 $Res call({
- String thinking, TranslationResult? result
+ String? sourceText, String? thinking, TranslationResult? result
 });
 
 
@@ -328,10 +330,11 @@ class _$TranslationEventCopyWithImpl<$Res>
 
 /// Create a copy of TranslationEvent
 /// with the given fields replaced by the non-null parameter values.
-@pragma('vm:prefer-inline') @override $Res call({Object? thinking = null,Object? result = freezed,}) {
+@pragma('vm:prefer-inline') @override $Res call({Object? sourceText = freezed,Object? thinking = freezed,Object? result = freezed,}) {
   return _then(_self.copyWith(
-thinking: null == thinking ? _self.thinking : thinking // ignore: cast_nullable_to_non_nullable
-as String,result: freezed == result ? _self.result : result // ignore: cast_nullable_to_non_nullable
+sourceText: freezed == sourceText ? _self.sourceText : sourceText // ignore: cast_nullable_to_non_nullable
+as String?,thinking: freezed == thinking ? _self.thinking : thinking // ignore: cast_nullable_to_non_nullable
+as String?,result: freezed == result ? _self.result : result // ignore: cast_nullable_to_non_nullable
 as TranslationResult?,
   ));
 }
@@ -429,10 +432,10 @@ return $default(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( String thinking,  TranslationResult? result)?  $default,{required TResult orElse(),}) {final _that = this;
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( String? sourceText,  String? thinking,  TranslationResult? result)?  $default,{required TResult orElse(),}) {final _that = this;
 switch (_that) {
 case _TranslationEvent() when $default != null:
-return $default(_that.thinking,_that.result);case _:
+return $default(_that.sourceText,_that.thinking,_that.result);case _:
   return orElse();
 
 }
@@ -450,10 +453,10 @@ return $default(_that.thinking,_that.result);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( String thinking,  TranslationResult? result)  $default,) {final _that = this;
+@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( String? sourceText,  String? thinking,  TranslationResult? result)  $default,) {final _that = this;
 switch (_that) {
 case _TranslationEvent():
-return $default(_that.thinking,_that.result);case _:
+return $default(_that.sourceText,_that.thinking,_that.result);case _:
   throw StateError('Unexpected subclass');
 
 }
@@ -470,10 +473,10 @@ return $default(_that.thinking,_that.result);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( String thinking,  TranslationResult? result)?  $default,) {final _that = this;
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( String? sourceText,  String? thinking,  TranslationResult? result)?  $default,) {final _that = this;
 switch (_that) {
 case _TranslationEvent() when $default != null:
-return $default(_that.thinking,_that.result);case _:
+return $default(_that.sourceText,_that.thinking,_that.result);case _:
   return null;
 
 }
@@ -485,10 +488,13 @@ return $default(_that.thinking,_that.result);case _:
 
 
 class _TranslationEvent implements TranslationEvent {
-  const _TranslationEvent({this.thinking = '', this.result});
+  const _TranslationEvent({this.sourceText, this.thinking, this.result});
   
 
-@override@JsonKey() final  String thinking;
+/// The source text of the request this event belongs to, so consumers
+/// can keep showing it after the input moved on.
+@override final  String? sourceText;
+@override final  String? thinking;
 @override final  TranslationResult? result;
 
 /// Create a copy of TranslationEvent
@@ -501,16 +507,16 @@ _$TranslationEventCopyWith<_TranslationEvent> get copyWith => __$TranslationEven
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is _TranslationEvent&&(identical(other.thinking, thinking) || other.thinking == thinking)&&(identical(other.result, result) || other.result == result));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is _TranslationEvent&&(identical(other.sourceText, sourceText) || other.sourceText == sourceText)&&(identical(other.thinking, thinking) || other.thinking == thinking)&&(identical(other.result, result) || other.result == result));
 }
 
 
 @override
-int get hashCode => Object.hash(runtimeType,thinking,result);
+int get hashCode => Object.hash(runtimeType,sourceText,thinking,result);
 
 @override
 String toString() {
-  return 'TranslationEvent(thinking: $thinking, result: $result)';
+  return 'TranslationEvent(sourceText: $sourceText, thinking: $thinking, result: $result)';
 }
 
 
@@ -521,7 +527,7 @@ abstract mixin class _$TranslationEventCopyWith<$Res> implements $TranslationEve
   factory _$TranslationEventCopyWith(_TranslationEvent value, $Res Function(_TranslationEvent) _then) = __$TranslationEventCopyWithImpl;
 @override @useResult
 $Res call({
- String thinking, TranslationResult? result
+ String? sourceText, String? thinking, TranslationResult? result
 });
 
 
@@ -538,10 +544,11 @@ class __$TranslationEventCopyWithImpl<$Res>
 
 /// Create a copy of TranslationEvent
 /// with the given fields replaced by the non-null parameter values.
-@override @pragma('vm:prefer-inline') $Res call({Object? thinking = null,Object? result = freezed,}) {
+@override @pragma('vm:prefer-inline') $Res call({Object? sourceText = freezed,Object? thinking = freezed,Object? result = freezed,}) {
   return _then(_TranslationEvent(
-thinking: null == thinking ? _self.thinking : thinking // ignore: cast_nullable_to_non_nullable
-as String,result: freezed == result ? _self.result : result // ignore: cast_nullable_to_non_nullable
+sourceText: freezed == sourceText ? _self.sourceText : sourceText // ignore: cast_nullable_to_non_nullable
+as String?,thinking: freezed == thinking ? _self.thinking : thinking // ignore: cast_nullable_to_non_nullable
+as String?,result: freezed == result ? _self.result : result // ignore: cast_nullable_to_non_nullable
 as TranslationResult?,
   ));
 }
@@ -565,9 +572,11 @@ $TranslationResultCopyWith<$Res>? get result {
 /// @nodoc
 mixin _$TranslationResult {
 
- String get translation;@JsonKey(name: 'detected_language') String get detectedLanguage;/// The language the model translated into — its own decision whenever
+ String? get translation;@JsonKey(name: 'detected_language') String? get detectedLanguage;/// The language the model translated into — its own decision whenever
 /// the request leaves the choice to it (language pairing).
-@JsonKey(name: 'target_language') String get targetLanguage; String get explanation; List<TranslationCandidate> get alternatives;
+@JsonKey(name: 'target_language') String? get targetLanguage; String? get explanation;/// Correction notes from a proofread request. Its presence is what marks
+/// a result as a proofread — translations carry [explanation] instead.
+ String? get proofread; List<TranslationCandidate>? get alternatives;
 /// Create a copy of TranslationResult
 /// with the given fields replaced by the non-null parameter values.
 @JsonKey(includeFromJson: false, includeToJson: false)
@@ -580,16 +589,16 @@ $TranslationResultCopyWith<TranslationResult> get copyWith => _$TranslationResul
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is TranslationResult&&(identical(other.translation, translation) || other.translation == translation)&&(identical(other.detectedLanguage, detectedLanguage) || other.detectedLanguage == detectedLanguage)&&(identical(other.targetLanguage, targetLanguage) || other.targetLanguage == targetLanguage)&&(identical(other.explanation, explanation) || other.explanation == explanation)&&const DeepCollectionEquality().equals(other.alternatives, alternatives));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is TranslationResult&&(identical(other.translation, translation) || other.translation == translation)&&(identical(other.detectedLanguage, detectedLanguage) || other.detectedLanguage == detectedLanguage)&&(identical(other.targetLanguage, targetLanguage) || other.targetLanguage == targetLanguage)&&(identical(other.explanation, explanation) || other.explanation == explanation)&&(identical(other.proofread, proofread) || other.proofread == proofread)&&const DeepCollectionEquality().equals(other.alternatives, alternatives));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,translation,detectedLanguage,targetLanguage,explanation,const DeepCollectionEquality().hash(alternatives));
+int get hashCode => Object.hash(runtimeType,translation,detectedLanguage,targetLanguage,explanation,proofread,const DeepCollectionEquality().hash(alternatives));
 
 @override
 String toString() {
-  return 'TranslationResult(translation: $translation, detectedLanguage: $detectedLanguage, targetLanguage: $targetLanguage, explanation: $explanation, alternatives: $alternatives)';
+  return 'TranslationResult(translation: $translation, detectedLanguage: $detectedLanguage, targetLanguage: $targetLanguage, explanation: $explanation, proofread: $proofread, alternatives: $alternatives)';
 }
 
 
@@ -600,7 +609,7 @@ abstract mixin class $TranslationResultCopyWith<$Res>  {
   factory $TranslationResultCopyWith(TranslationResult value, $Res Function(TranslationResult) _then) = _$TranslationResultCopyWithImpl;
 @useResult
 $Res call({
- String translation,@JsonKey(name: 'detected_language') String detectedLanguage,@JsonKey(name: 'target_language') String targetLanguage, String explanation, List<TranslationCandidate> alternatives
+ String? translation,@JsonKey(name: 'detected_language') String? detectedLanguage,@JsonKey(name: 'target_language') String? targetLanguage, String? explanation, String? proofread, List<TranslationCandidate>? alternatives
 });
 
 
@@ -617,14 +626,15 @@ class _$TranslationResultCopyWithImpl<$Res>
 
 /// Create a copy of TranslationResult
 /// with the given fields replaced by the non-null parameter values.
-@pragma('vm:prefer-inline') @override $Res call({Object? translation = null,Object? detectedLanguage = null,Object? targetLanguage = null,Object? explanation = null,Object? alternatives = null,}) {
+@pragma('vm:prefer-inline') @override $Res call({Object? translation = freezed,Object? detectedLanguage = freezed,Object? targetLanguage = freezed,Object? explanation = freezed,Object? proofread = freezed,Object? alternatives = freezed,}) {
   return _then(_self.copyWith(
-translation: null == translation ? _self.translation : translation // ignore: cast_nullable_to_non_nullable
-as String,detectedLanguage: null == detectedLanguage ? _self.detectedLanguage : detectedLanguage // ignore: cast_nullable_to_non_nullable
-as String,targetLanguage: null == targetLanguage ? _self.targetLanguage : targetLanguage // ignore: cast_nullable_to_non_nullable
-as String,explanation: null == explanation ? _self.explanation : explanation // ignore: cast_nullable_to_non_nullable
-as String,alternatives: null == alternatives ? _self.alternatives : alternatives // ignore: cast_nullable_to_non_nullable
-as List<TranslationCandidate>,
+translation: freezed == translation ? _self.translation : translation // ignore: cast_nullable_to_non_nullable
+as String?,detectedLanguage: freezed == detectedLanguage ? _self.detectedLanguage : detectedLanguage // ignore: cast_nullable_to_non_nullable
+as String?,targetLanguage: freezed == targetLanguage ? _self.targetLanguage : targetLanguage // ignore: cast_nullable_to_non_nullable
+as String?,explanation: freezed == explanation ? _self.explanation : explanation // ignore: cast_nullable_to_non_nullable
+as String?,proofread: freezed == proofread ? _self.proofread : proofread // ignore: cast_nullable_to_non_nullable
+as String?,alternatives: freezed == alternatives ? _self.alternatives : alternatives // ignore: cast_nullable_to_non_nullable
+as List<TranslationCandidate>?,
   ));
 }
 
@@ -709,10 +719,10 @@ return $default(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( String translation, @JsonKey(name: 'detected_language')  String detectedLanguage, @JsonKey(name: 'target_language')  String targetLanguage,  String explanation,  List<TranslationCandidate> alternatives)?  $default,{required TResult orElse(),}) {final _that = this;
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( String? translation, @JsonKey(name: 'detected_language')  String? detectedLanguage, @JsonKey(name: 'target_language')  String? targetLanguage,  String? explanation,  String? proofread,  List<TranslationCandidate>? alternatives)?  $default,{required TResult orElse(),}) {final _that = this;
 switch (_that) {
 case _TranslationResult() when $default != null:
-return $default(_that.translation,_that.detectedLanguage,_that.targetLanguage,_that.explanation,_that.alternatives);case _:
+return $default(_that.translation,_that.detectedLanguage,_that.targetLanguage,_that.explanation,_that.proofread,_that.alternatives);case _:
   return orElse();
 
 }
@@ -730,10 +740,10 @@ return $default(_that.translation,_that.detectedLanguage,_that.targetLanguage,_t
 /// }
 /// ```
 
-@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( String translation, @JsonKey(name: 'detected_language')  String detectedLanguage, @JsonKey(name: 'target_language')  String targetLanguage,  String explanation,  List<TranslationCandidate> alternatives)  $default,) {final _that = this;
+@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( String? translation, @JsonKey(name: 'detected_language')  String? detectedLanguage, @JsonKey(name: 'target_language')  String? targetLanguage,  String? explanation,  String? proofread,  List<TranslationCandidate>? alternatives)  $default,) {final _that = this;
 switch (_that) {
 case _TranslationResult():
-return $default(_that.translation,_that.detectedLanguage,_that.targetLanguage,_that.explanation,_that.alternatives);case _:
+return $default(_that.translation,_that.detectedLanguage,_that.targetLanguage,_that.explanation,_that.proofread,_that.alternatives);case _:
   throw StateError('Unexpected subclass');
 
 }
@@ -750,10 +760,10 @@ return $default(_that.translation,_that.detectedLanguage,_that.targetLanguage,_t
 /// }
 /// ```
 
-@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( String translation, @JsonKey(name: 'detected_language')  String detectedLanguage, @JsonKey(name: 'target_language')  String targetLanguage,  String explanation,  List<TranslationCandidate> alternatives)?  $default,) {final _that = this;
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( String? translation, @JsonKey(name: 'detected_language')  String? detectedLanguage, @JsonKey(name: 'target_language')  String? targetLanguage,  String? explanation,  String? proofread,  List<TranslationCandidate>? alternatives)?  $default,) {final _that = this;
 switch (_that) {
 case _TranslationResult() when $default != null:
-return $default(_that.translation,_that.detectedLanguage,_that.targetLanguage,_that.explanation,_that.alternatives);case _:
+return $default(_that.translation,_that.detectedLanguage,_that.targetLanguage,_that.explanation,_that.proofread,_that.alternatives);case _:
   return null;
 
 }
@@ -765,20 +775,25 @@ return $default(_that.translation,_that.detectedLanguage,_that.targetLanguage,_t
 @JsonSerializable()
 
 class _TranslationResult implements TranslationResult {
-  const _TranslationResult({required this.translation, @JsonKey(name: 'detected_language') this.detectedLanguage = '', @JsonKey(name: 'target_language') this.targetLanguage = '', this.explanation = '', final  List<TranslationCandidate> alternatives = const []}): _alternatives = alternatives;
+  const _TranslationResult({this.translation, @JsonKey(name: 'detected_language') this.detectedLanguage, @JsonKey(name: 'target_language') this.targetLanguage, this.explanation, this.proofread, final  List<TranslationCandidate>? alternatives}): _alternatives = alternatives;
   factory _TranslationResult.fromJson(Map<String, dynamic> json) => _$TranslationResultFromJson(json);
 
-@override final  String translation;
-@override@JsonKey(name: 'detected_language') final  String detectedLanguage;
+@override final  String? translation;
+@override@JsonKey(name: 'detected_language') final  String? detectedLanguage;
 /// The language the model translated into — its own decision whenever
 /// the request leaves the choice to it (language pairing).
-@override@JsonKey(name: 'target_language') final  String targetLanguage;
-@override@JsonKey() final  String explanation;
- final  List<TranslationCandidate> _alternatives;
-@override@JsonKey() List<TranslationCandidate> get alternatives {
+@override@JsonKey(name: 'target_language') final  String? targetLanguage;
+@override final  String? explanation;
+/// Correction notes from a proofread request. Its presence is what marks
+/// a result as a proofread — translations carry [explanation] instead.
+@override final  String? proofread;
+ final  List<TranslationCandidate>? _alternatives;
+@override List<TranslationCandidate>? get alternatives {
+  final value = _alternatives;
+  if (value == null) return null;
   if (_alternatives is EqualUnmodifiableListView) return _alternatives;
   // ignore: implicit_dynamic_type
-  return EqualUnmodifiableListView(_alternatives);
+  return EqualUnmodifiableListView(value);
 }
 
 
@@ -795,16 +810,16 @@ Map<String, dynamic> toJson() {
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is _TranslationResult&&(identical(other.translation, translation) || other.translation == translation)&&(identical(other.detectedLanguage, detectedLanguage) || other.detectedLanguage == detectedLanguage)&&(identical(other.targetLanguage, targetLanguage) || other.targetLanguage == targetLanguage)&&(identical(other.explanation, explanation) || other.explanation == explanation)&&const DeepCollectionEquality().equals(other._alternatives, _alternatives));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is _TranslationResult&&(identical(other.translation, translation) || other.translation == translation)&&(identical(other.detectedLanguage, detectedLanguage) || other.detectedLanguage == detectedLanguage)&&(identical(other.targetLanguage, targetLanguage) || other.targetLanguage == targetLanguage)&&(identical(other.explanation, explanation) || other.explanation == explanation)&&(identical(other.proofread, proofread) || other.proofread == proofread)&&const DeepCollectionEquality().equals(other._alternatives, _alternatives));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,translation,detectedLanguage,targetLanguage,explanation,const DeepCollectionEquality().hash(_alternatives));
+int get hashCode => Object.hash(runtimeType,translation,detectedLanguage,targetLanguage,explanation,proofread,const DeepCollectionEquality().hash(_alternatives));
 
 @override
 String toString() {
-  return 'TranslationResult(translation: $translation, detectedLanguage: $detectedLanguage, targetLanguage: $targetLanguage, explanation: $explanation, alternatives: $alternatives)';
+  return 'TranslationResult(translation: $translation, detectedLanguage: $detectedLanguage, targetLanguage: $targetLanguage, explanation: $explanation, proofread: $proofread, alternatives: $alternatives)';
 }
 
 
@@ -815,7 +830,7 @@ abstract mixin class _$TranslationResultCopyWith<$Res> implements $TranslationRe
   factory _$TranslationResultCopyWith(_TranslationResult value, $Res Function(_TranslationResult) _then) = __$TranslationResultCopyWithImpl;
 @override @useResult
 $Res call({
- String translation,@JsonKey(name: 'detected_language') String detectedLanguage,@JsonKey(name: 'target_language') String targetLanguage, String explanation, List<TranslationCandidate> alternatives
+ String? translation,@JsonKey(name: 'detected_language') String? detectedLanguage,@JsonKey(name: 'target_language') String? targetLanguage, String? explanation, String? proofread, List<TranslationCandidate>? alternatives
 });
 
 
@@ -832,14 +847,15 @@ class __$TranslationResultCopyWithImpl<$Res>
 
 /// Create a copy of TranslationResult
 /// with the given fields replaced by the non-null parameter values.
-@override @pragma('vm:prefer-inline') $Res call({Object? translation = null,Object? detectedLanguage = null,Object? targetLanguage = null,Object? explanation = null,Object? alternatives = null,}) {
+@override @pragma('vm:prefer-inline') $Res call({Object? translation = freezed,Object? detectedLanguage = freezed,Object? targetLanguage = freezed,Object? explanation = freezed,Object? proofread = freezed,Object? alternatives = freezed,}) {
   return _then(_TranslationResult(
-translation: null == translation ? _self.translation : translation // ignore: cast_nullable_to_non_nullable
-as String,detectedLanguage: null == detectedLanguage ? _self.detectedLanguage : detectedLanguage // ignore: cast_nullable_to_non_nullable
-as String,targetLanguage: null == targetLanguage ? _self.targetLanguage : targetLanguage // ignore: cast_nullable_to_non_nullable
-as String,explanation: null == explanation ? _self.explanation : explanation // ignore: cast_nullable_to_non_nullable
-as String,alternatives: null == alternatives ? _self._alternatives : alternatives // ignore: cast_nullable_to_non_nullable
-as List<TranslationCandidate>,
+translation: freezed == translation ? _self.translation : translation // ignore: cast_nullable_to_non_nullable
+as String?,detectedLanguage: freezed == detectedLanguage ? _self.detectedLanguage : detectedLanguage // ignore: cast_nullable_to_non_nullable
+as String?,targetLanguage: freezed == targetLanguage ? _self.targetLanguage : targetLanguage // ignore: cast_nullable_to_non_nullable
+as String?,explanation: freezed == explanation ? _self.explanation : explanation // ignore: cast_nullable_to_non_nullable
+as String?,proofread: freezed == proofread ? _self.proofread : proofread // ignore: cast_nullable_to_non_nullable
+as String?,alternatives: freezed == alternatives ? _self._alternatives : alternatives // ignore: cast_nullable_to_non_nullable
+as List<TranslationCandidate>?,
   ));
 }
 

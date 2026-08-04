@@ -5,13 +5,13 @@ import 'package:kore_config/kore_config.dart';
 import 'package:kore_translation/app/constants/translation_prompt.dart';
 import 'package:kore_translation/app/i18n/translations.g.dart';
 import 'package:kore_translation/app/pages/settings/widgets/save_settings_button.dart';
-import 'package:kore_translation/app/pages/settings/widgets/thinking_switch_tile.dart';
 import 'package:kore_translation/app/providers/llm_config_provider.dart';
+import 'package:kore_translation/app/ui/scroll/use_animated_scroll_controller.dart';
 
 /// The whole settings form for the Codex app-server: the launch command, an
-/// optional model override, the thinking toggle, the system prompt and save;
-/// credentials come from `codex login`. Values are trimmed on save to shed
-/// clipboard artifacts that cause hard-to-diagnose launch failures.
+/// optional model override, the system prompt and save; credentials come
+/// from `codex login`. Values are trimmed on save to shed clipboard
+/// artifacts that cause hard-to-diagnose launch failures.
 class CodexConfigSection extends HookConsumerWidget {
   const CodexConfigSection({required this.initial, super.key});
 
@@ -20,11 +20,16 @@ class CodexConfigSection extends HookConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     // Fresh install or another provider: start from this provider's defaults.
-    final config = initial ?? const CodexConfig(systemPrompt: defaultTranslationPromptTemplate);
+    final config =
+        initial ??
+        const CodexConfig(
+          systemPrompt: defaultTranslationPromptTemplate,
+          proofreadPrompt: defaultProofreadingPromptTemplate,
+        );
     final command = useTextEditingController(text: config.command);
     final model = useTextEditingController(text: config.model);
-    final thinking = useState(config.thinking);
     final systemPrompt = useTextEditingController(text: config.systemPrompt);
+    final proofreadPrompt = useTextEditingController(text: config.proofreadPrompt);
 
     Future<void> save() async {
       FocusScope.of(context).unfocus();
@@ -34,8 +39,8 @@ class CodexConfigSection extends HookConsumerWidget {
             CodexConfig(
               command: command.text.trim(),
               model: model.text.trim(),
-              thinking: thinking.value,
               systemPrompt: systemPrompt.text.trim(),
+              proofreadPrompt: proofreadPrompt.text.trim(),
             ),
           );
       if (context.mounted) {
@@ -62,17 +67,28 @@ class CodexConfigSection extends HookConsumerWidget {
             helperText: context.t.settings.codex.modelHelper,
           ),
         ),
-        const SizedBox(height: 8),
-        ThinkingSwitchTile(value: thinking.value, onChanged: (value) => thinking.value = value),
         const SizedBox(height: 16),
         TextField(
           controller: systemPrompt,
+          scrollController: useAnimatedScrollController(),
           minLines: 3,
           maxLines: 16,
           decoration: InputDecoration(
             labelText: context.t.settings.api.systemPrompt,
             helperText: '${context.t.settings.api.systemPromptHelper}\n${context.t.settings.codex.promptNote}',
             helperMaxLines: 4,
+          ),
+        ),
+        const SizedBox(height: 16),
+        TextField(
+          controller: proofreadPrompt,
+          scrollController: useAnimatedScrollController(),
+          minLines: 3,
+          maxLines: 16,
+          decoration: InputDecoration(
+            labelText: context.t.settings.api.proofreadPrompt,
+            helperText: context.t.settings.api.proofreadPromptHelper,
+            helperMaxLines: 3,
           ),
         ),
         const SizedBox(height: 24),

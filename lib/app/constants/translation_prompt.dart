@@ -17,6 +17,28 @@ You are a professional translator. Translate the user's text into {{language}} i
 Write detected_language, target_language, nuance and explanation in {{app}}.
 $translationSchemaPrompt''';
 
+/// Default system prompt template for the proofread action: corrects the
+/// text in its own language instead of translating it. Same contract as the
+/// translation template — the WHOLE prompt, user-editable, with `{{app}}`
+/// and `{{tone}}` substituted on every request (no `{{language}}`: the text
+/// stays in its own language). Its response format, [proofreadSchemaPrompt],
+/// keeps the translation schema's parsed keys minus the language pair, so
+/// the result flows through the same stream, storage and result pane — the
+/// corrected text rides in the `translation` field.
+const defaultProofreadingPromptTemplate = '''
+You are a professional proofreader. Correct the user's text in its original language: fix grammar, spelling and unnatural phrasing while preserving the meaning.
+{{tone}}
+Write proofread and nuance in {{app}}.
+$proofreadSchemaPrompt''';
+
+/// Fills the proofreading template's placeholders. The template is the
+/// whole prompt, so nothing else is composed here.
+String buildProofreadingSystemPrompt({
+  required String template,
+  required String appLanguage,
+  required String toneInstruction,
+}) => template.replaceAll('{{app}}', appLanguage).replaceAll('{{tone}}', toneInstruction);
+
 /// Fills the template's placeholders. The template is the whole prompt, so
 /// nothing else is composed here.
 String buildTranslationSystemPrompt({

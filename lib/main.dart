@@ -26,6 +26,11 @@ void main() {
   );
 }
 
+/// Snackbars from above the router (see the session listener in [KoreApp])
+/// need the app-level messenger; `ScaffoldMessenger.of` has no ancestor
+/// there.
+final _messengerKey = GlobalKey<ScaffoldMessengerState>();
+
 class KoreApp extends ConsumerWidget {
   const KoreApp({super.key});
 
@@ -33,28 +38,19 @@ class KoreApp extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     // Warm-up: activating the session provider opens the backend (agent
     // spawn + handshake) at launch and right after a settings change,
-    // instead of inside the first translation. A failed open stays in the
-    // provider and surfaces when translating.
-    ref.listen(llmSessionProvider, (_, _) {});
-    final uiSettings = switch (ref.watch(uiSettingsStorageProvider)) {
-      AsyncData(:final value) => value,
-      // Loading or failed: keep rendering with the defaults. This fallback
-      // is only tolerable because the theme must exist for the first frame
-      // (a build-time need, unlike action-path values, which are awaited
-      // fresh) and because the load error surfaces on the advanced settings
-      // page, which also offers the recovery and must stay reachable.
-      _ => const UiSettings(),
-    };
+    // instead of inside the first translation. Failures surface here as a
+    // snackbar; a settings change rebuilds the provider and retries.
+    ref.listen(llmSessionProvider, (_, value) {
+      if (value case AsyncError()) {
+        _messengerKey.currentState?.showSnackBar(SnackBar(content: Text(context.t.error.sessionOpenFailed)));
+      } else if (value case AsyncData(value: null)) {
+        _messengerKey.currentState?.showSnackBar(SnackBar(content: Text(context.t.error.sessionNotConfigured)));
+      }
+    });
+    final uiSettings = ref.watch(uiSettingsStorageProvider).value ?? const UiSettings();
     return MaterialApp.router(
       title: 'Kore!?',
-      // Interactive widgets win the gesture arena, so only true background
-      // taps land here — dismissing the soft keyboard, which taps outside a
-      // field do not do by themselves on mobile.
-      builder: (context, child) => GestureDetector(
-        behavior: HitTestBehavior.translucent,
-        onTap: () => FocusManager.instance.primaryFocus?.unfocus(),
-        child: child,
-      ),
+      scaffoldMessengerKey: _messengerKey,
       locale: TranslationProvider.of(context).flutterLocale,
       supportedLocales: AppLocaleUtils.supportedLocales,
       localizationsDelegates: GlobalMaterialLocalizations.delegates,

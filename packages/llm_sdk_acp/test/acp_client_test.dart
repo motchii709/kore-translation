@@ -1,7 +1,4 @@
-import 'dart:convert';
-
 import 'package:llm_sdk_acp/llm_sdk_acp.dart';
-import 'package:llm_sdk_core/llm_sdk_core.dart';
 import 'package:test/test.dart';
 
 void main() {
@@ -9,16 +6,20 @@ void main() {
     final session = await AcpClient(command: 'dart test/fixtures/fake_acp_agent.dart').open();
     addTearDown(session.close);
 
-    final events = await session.streamText(system: 'Translate into English.', user: 'hello').toList();
+    final snapshots = await session
+        .streamObject(
+          system: 'Translate into English.',
+          user: 'hello',
+          thinking: true,
+          decoder: (thinking, reply) => (thinking, reply?['translation']),
+        )
+        .toList();
 
     expect(session.isAlive, isTrue);
-    expect(events.first, isA<LlmThinkingDelta>().having((e) => e.text, 'text', 'considering'));
+    expect(snapshots.first, ('considering', null));
     // The fake agent echoes the turn's text block back as the translation,
     // proving the system prompt arrived inside it (ACP has no system slot).
     const turnText = 'Translate into English.\n\nhello';
-    expect(
-      events.whereType<LlmTextDelta>().map((e) => e.text).join(),
-      '{"translation": ${jsonEncode(turnText)}}',
-    );
+    expect(snapshots.last, ('considering', turnText));
   });
 }

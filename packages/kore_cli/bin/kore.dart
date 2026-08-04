@@ -17,6 +17,7 @@ Future<void> main(List<String> arguments) async {
     ..addOption('to', abbr: 't', help: '翻訳先の言語 (既定: English)')
     ..addOption('tone', help: '翻訳のトーン (自由記述、例: "フランクな口調で")')
     ..addOption('config', help: '設定ファイルのパス (既定: ~/.kore/config.yaml)')
+    ..addFlag('thinking', defaultsTo: true, help: '対応プロバイダの思考のオン/オフ (--no-thinking で無効)')
     ..addFlag('interactive', abbr: 'i', negatable: false, help: '対話(TUI)モード')
     ..addFlag('json', negatable: false, help: '結果をJSONで出力')
     ..addFlag('help', abbr: 'h', negatable: false, help: 'ヘルプを表示');
@@ -47,11 +48,11 @@ Future<void> main(List<String> arguments) async {
   llm:
     provider: codex   # openai / openai-compatible / anthropic / google / deepseek / acp / codex
     # model: gpt-5.6-sol
-    # thinking: false # 対応プロバイダの思考のオン/オフ
     # system_prompt: ...               # プロンプト全体の差し替え (応答フォーマット指示も自前で書く)
   to: English         # 翻訳オプションの既定 (tone も可)
 
-llm のフィールドはプロバイダごとに api_key / base_url / model / command / thinking / system_prompt です。''');
+llm のフィールドはプロバイダごとに api_key / base_url / model / command / system_prompt です。
+思考のオン/オフは実行時の --thinking / --no-thinking で選びます。''');
     return;
   }
 
@@ -119,6 +120,7 @@ llm のフィールドはプロバイダごとに api_key / base_url / model / c
         initialTarget: target,
         initialTone: tone,
         customPrompt: customPrompt,
+        thinking: args.flag('thinking'),
       ).run();
       return;
     }
@@ -131,6 +133,7 @@ llm のフィールドはプロバイダごとに api_key / base_url / model / c
     }
 
     try {
+      // fold instead of .last: a turn that streams no events must not crash.
       final event = await streamTranslation(
         session,
         systemPrompt: buildCliSystemPrompt(
@@ -139,11 +142,12 @@ llm のフィールドはプロバイダごとに api_key / base_url / model / c
           customPrompt: customPrompt,
         ),
         text: text,
-      ).last;
-      final result = event.result;
-      if (result == null) {
-        // Unreachable by contract: assembleTranslationEvents either ends
-        // with a validated result or throws. Forced by the nullable field.
+        thinking: args.flag('thinking'),
+      ).fold<TranslationEvent?>(null, (_, event) => event);
+      final result = event?.result;
+      if (result == null || result.translation == null) {
+        // The turn completed without delivering a translation (an empty or
+        // schema-less reply).
         printer.printError('翻訳結果を取得できませんでした');
         exitCode = 1;
         return;

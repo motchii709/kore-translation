@@ -8,12 +8,13 @@ part 'history_provider.g.dart';
 @riverpod
 Stream<List<HistoryEntry>> historyEntries(Ref ref) => ref.watch(appDatabaseProvider).watchEntries();
 
-/// The history entry shown in the result pane; null shows the live
-/// translation instead.
+/// The id of the history entry shown in the result pane; null shows the
+/// placeholder. Starting a translation selects its just-inserted entry, so
+/// the pane follows the newest stream until the user picks another one.
 @riverpod
-class SelectedHistoryEntry extends _$SelectedHistoryEntry {
+class SelectedHistoryEntryId extends _$SelectedHistoryEntryId {
   @override
-  HistoryEntry? build() => null;
+  int? build() => null;
 
-  void select(HistoryEntry? entry) => state = entry;
+  void select(int? id) => state = id;
 }

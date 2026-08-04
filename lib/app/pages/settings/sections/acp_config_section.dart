@@ -6,6 +6,7 @@ import 'package:kore_translation/app/constants/translation_prompt.dart';
 import 'package:kore_translation/app/i18n/translations.g.dart';
 import 'package:kore_translation/app/pages/settings/widgets/save_settings_button.dart';
 import 'package:kore_translation/app/providers/llm_config_provider.dart';
+import 'package:kore_translation/app/ui/scroll/use_animated_scroll_controller.dart';
 
 /// The whole settings form for an Agent Client Protocol agent: the launch
 /// command, the system prompt and save. The agent brings its own credentials
@@ -19,9 +20,15 @@ class AcpConfigSection extends HookConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     // Fresh install or another provider: start from this provider's defaults.
-    final config = initial ?? const AcpConfig(systemPrompt: defaultTranslationPromptTemplate);
+    final config =
+        initial ??
+        const AcpConfig(
+          systemPrompt: defaultTranslationPromptTemplate,
+          proofreadPrompt: defaultProofreadingPromptTemplate,
+        );
     final command = useTextEditingController(text: config.command);
     final systemPrompt = useTextEditingController(text: config.systemPrompt);
+    final proofreadPrompt = useTextEditingController(text: config.proofreadPrompt);
 
     Future<void> save() async {
       FocusScope.of(context).unfocus();
@@ -31,6 +38,7 @@ class AcpConfigSection extends HookConsumerWidget {
             AcpConfig(
               command: command.text.trim(),
               systemPrompt: systemPrompt.text.trim(),
+              proofreadPrompt: proofreadPrompt.text.trim(),
             ),
           );
       if (context.mounted) {
@@ -50,16 +58,28 @@ class AcpConfigSection extends HookConsumerWidget {
             helperMaxLines: 2,
           ),
         ),
-        // No thinking toggle: ACP agents reason at their own discretion; AcpConfig has no thinking field.
         const SizedBox(height: 16),
         TextField(
           controller: systemPrompt,
+          scrollController: useAnimatedScrollController(),
           minLines: 3,
           maxLines: 16,
           decoration: InputDecoration(
             labelText: context.t.settings.api.systemPrompt,
             helperText: '${context.t.settings.api.systemPromptHelper}\n${context.t.settings.acp.promptNote}',
             helperMaxLines: 4,
+          ),
+        ),
+        const SizedBox(height: 16),
+        TextField(
+          controller: proofreadPrompt,
+          scrollController: useAnimatedScrollController(),
+          minLines: 3,
+          maxLines: 16,
+          decoration: InputDecoration(
+            labelText: context.t.settings.api.proofreadPrompt,
+            helperText: context.t.settings.api.proofreadPromptHelper,
+            helperMaxLines: 3,
           ),
         ),
         const SizedBox(height: 24),

@@ -2,7 +2,6 @@ import 'dart:convert';
 import 'dart:typed_data';
 
 import 'package:dio/dio.dart';
-import 'package:llm_sdk_core/llm_sdk_core.dart';
 import 'package:llm_sdk_google/src/gemini_client.dart';
 import 'package:test/test.dart';
 
@@ -45,15 +44,15 @@ Map<String, Object> _parts(List<Map<String, Object>> parts) => {
 };
 
 void main() {
-  test('treats thought parts as thinking and maps jsonOutput to the response MIME type', () async {
+  test('treats thought parts as thinking and always requests JSON via the response MIME type', () async {
     final adapter = _FakeAdapter(
       _sse([
         _parts([
           {'thought': true, 'text': '推論の要約'},
-          {'text': 'Hel'},
+          {'text': '{"translation": "Hel'},
         ]),
         _parts([
-          {'text': 'lo'},
+          {'text': 'lo"}'},
         ]),
       ]),
     );
@@ -61,15 +60,21 @@ void main() {
       apiKey: 'test-key',
       baseUrl: 'https://generativelanguage.googleapis.com',
       model: 'gemini-2.5-flash',
-      thinking: true,
       dio: Dio()..httpClientAdapter = adapter,
     );
-    final events = await session.streamText(system: 'sys', user: 'こんにちは', jsonOutput: true).toList();
+    final snapshots = await session
+        .streamObject(
+          system: 'sys',
+          user: 'こんにちは',
+          thinking: true,
+          decoder: (thinking, reply) => (thinking, reply?['translation']),
+        )
+        .toList();
 
-    expect(events, [
-      isA<LlmThinkingDelta>().having((e) => e.text, 'text', '推論の要約'),
-      isA<LlmTextDelta>().having((e) => e.text, 'text', 'Hel'),
-      isA<LlmTextDelta>().having((e) => e.text, 'text', 'lo'),
+    expect(snapshots, [
+      ('推論の要約', null),
+      ('推論の要約', 'Hel'),
+      ('推論の要約', 'Hello'),
     ]);
     final data = adapter.lastRequest?.data as Map<String, Object?>;
     expect(data['generationConfig'], {

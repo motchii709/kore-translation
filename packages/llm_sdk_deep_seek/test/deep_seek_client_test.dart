@@ -2,7 +2,6 @@ import 'dart:convert';
 import 'dart:typed_data';
 
 import 'package:dio/dio.dart';
-import 'package:llm_sdk_core/llm_sdk_core.dart';
 import 'package:llm_sdk_deep_seek/src/deep_seek_client.dart';
 import 'package:test/test.dart';
 
@@ -42,12 +41,16 @@ Map<String, Object> _delta(Map<String, Object> delta) => {
   ],
 };
 
-DeepSeekSession _session(_FakeAdapter adapter, {bool thinking = true}) => DeepSeekSession(
+Stream<(String?, Object?)> _stream(_FakeAdapter adapter, {bool thinking = true}) => DeepSeekSession(
   apiKey: 'test-key',
   baseUrl: 'https://api.deepseek.com',
   model: 'deepseek-chat',
-  thinking: thinking,
   dio: Dio()..httpClientAdapter = adapter,
+).streamObject(
+  system: 'sys',
+  user: 'こんにちは',
+  thinking: thinking,
+  decoder: (thinking, reply) => (thinking, reply?['translation']),
 );
 
 void main() {
@@ -55,16 +58,13 @@ void main() {
     final adapter = _FakeAdapter(
       _sse([
         _delta({'reasoning_content': '挨拶の翻訳を考える'}),
-        _delta({'content': 'Hello'}),
+        _delta({'content': '{"translation": "Hello"}'}),
         '[DONE]',
       ]),
     );
-    final events = await _session(adapter).streamText(system: 'sys', user: 'こんにちは', jsonOutput: true).toList();
+    final snapshots = await _stream(adapter).toList();
 
-    expect(events, [
-      isA<LlmThinkingDelta>().having((e) => e.text, 'text', '挨拶の翻訳を考える'),
-      isA<LlmTextDelta>().having((e) => e.text, 'text', 'Hello'),
-    ]);
+    expect(snapshots, [('挨拶の翻訳を考える', null), ('挨拶の翻訳を考える', 'Hello')]);
     final data = adapter.lastRequest?.data as Map<String, Object?>;
     expect(data, isNot(contains('response_format')));
   });
@@ -73,12 +73,12 @@ void main() {
     final adapter = _FakeAdapter(
       _sse([
         _delta({'reasoning_content': '挨拶の翻訳を考える'}),
-        _delta({'content': 'Hello'}),
+        _delta({'content': '{"translation": "Hello"}'}),
         '[DONE]',
       ]),
     );
-    final events = await _session(adapter, thinking: false).streamText(system: 'sys', user: 'こんにちは').toList();
+    final snapshots = await _stream(adapter, thinking: false).toList();
 
-    expect(events, [isA<LlmTextDelta>().having((e) => e.text, 'text', 'Hello')]);
+    expect(snapshots, [(null, 'Hello')]);
   });
 }
