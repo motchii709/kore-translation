@@ -34,6 +34,10 @@ jobs:
             echo "flutter-version=${flutter_version}"
           } >> "$GITHUB_OUTPUT"
 
+  test:
+    name: Test
+    uses: ./.github/workflows/ci.yml
+
   build-windows:
     name: Build Windows (${{ matrix.arch }})
     needs: check
@@ -155,7 +159,7 @@ jobs:
 
   release:
     name: Create release
-    needs: [check, build-windows, build-android, build-linux, build-macos, build-ios]
+    needs: [check, test, build-windows, build-android, build-linux, build-macos, build-ios]
     runs-on: ubuntu-latest
     steps:
       - uses: actions/download-artifact@v8
