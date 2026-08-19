@@ -22,6 +22,7 @@ jobs:
         uses: ./.github/actions/setup-flutter
         with:
           flutter-version: ${{ github.event.inputs.flutter_version || '3.44.8' }}
+      - run: flutter create . --platforms web
       - run: flutter pub get
       - run: flutter build web --release --base-href=/kore-translation/
       - uses: actions/configure-pages@v5
