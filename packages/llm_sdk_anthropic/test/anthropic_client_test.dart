@@ -2,6 +2,8 @@ import 'dart:convert';
 import 'dart:typed_data';
 
 import 'package:dio/dio.dart';
+import 'package:llm_sdk_http/llm_sdk_http.dart';
+import 'package:llm_sdk_http/src/streaming_http_client_io.dart';
 import 'package:llm_sdk_anthropic/src/anthropic_client.dart';
 import 'package:llm_sdk_core/llm_sdk_core.dart';
 import 'package:test/test.dart';
@@ -23,9 +25,7 @@ class _FakeAdapter implements HttpClientAdapter {
     return ResponseBody.fromString(
       body,
       200,
-      headers: {
-        Headers.contentTypeHeader: ['text/event-stream'],
-      },
+      headers: {Headers.contentTypeHeader: ['text/event-stream']},
     );
   }
 
@@ -41,17 +41,18 @@ Map<String, Object> _delta(Map<String, Object> delta) => {
   'delta': delta,
 };
 
-Stream<(String?, Object?)> _stream(_FakeAdapter adapter, {bool thinking = true}) => AnthropicSession(
-  apiKey: 'test-key',
-  baseUrl: 'https://api.anthropic.com',
-  model: 'claude-sonnet-5',
-  dio: Dio()..httpClientAdapter = adapter,
-).streamObject(
-  system: 'sys',
-  user: 'こんにちは',
-  thinking: thinking,
-  decoder: (thinking, reply) => (thinking, reply?['translation']),
-);
+Stream<(String?, Object?)> _stream(_FakeAdapter adapter, {bool thinking = true}) =>
+    AnthropicSession(
+      apiKey: 'test-key',
+      baseUrl: 'https://api.anthropic.com',
+      model: 'claude-sonnet-5',
+      client: DioStreamingHttpClient(dio: Dio()..httpClientAdapter = adapter),
+    ).streamObject(
+      system: 'sys',
+      user: 'こんにちは',
+      thinking: thinking,
+      decoder: (thinking, reply) => (thinking, reply?['translation']),
+    );
 
 void main() {
   test('accumulates thinking and decodes reply-object snapshots', () async {
@@ -99,9 +100,7 @@ void main() {
     );
     expect(
       _stream(adapter).drain<void>(),
-      throwsA(
-        isA<LlmApiException>().having((e) => e.message, 'message', 'Overloaded'),
-      ),
+      throwsA(isA<LlmApiException>().having((e) => e.message, 'message', 'Overloaded')),
     );
   });
 }

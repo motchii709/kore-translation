@@ -1,4 +1,4 @@
-import 'package:dio/dio.dart';
+import 'package:llm_sdk_http/llm_sdk_http.dart';
 import 'package:llm_sdk_anthropic/src/anthropic_llm_client.dart';
 import 'package:llm_sdk_anthropic/src/anthropic_stream_models.dart';
 import 'package:llm_sdk_core/llm_sdk_core.dart';
@@ -13,29 +13,29 @@ final class AnthropicClient implements LlmClient {
 
   @override
   Future<LlmSession> open() async => AnthropicSession(
-    apiKey: apiKey,
-    baseUrl: baseUrl,
-    model: model,
-    dio: Dio(
-      BaseOptions(
-        connectTimeout: const Duration(seconds: 10),
-        receiveTimeout: const Duration(seconds: 120),
-      ),
-    ),
-  );
+        apiKey: apiKey,
+        baseUrl: baseUrl,
+        model: model,
+        client: createStreamingHttpClient(),
+      );
 }
 
-/// The started session; owns [dio].
+/// The started session; owns [client].
 final class AnthropicSession implements LlmSession {
   AnthropicSession({
     required String apiKey,
     required String baseUrl,
     required String model,
-    required this.dio,
-  }) : _llm = AnthropicLlmClient(apiKey: apiKey, baseUrl: baseUrl, model: model, dio: dio);
+    required this.client,
+  }) : _llm = AnthropicLlmClient(
+          apiKey: apiKey,
+          baseUrl: baseUrl,
+          model: model,
+          client: client,
+        );
 
   /// The HTTP transport the session owns, from [AnthropicClient.open] to [close].
-  final Dio dio;
+  final StreamingHttpClient client;
 
   final AnthropicLlmClient _llm;
 
@@ -43,7 +43,7 @@ final class AnthropicSession implements LlmSession {
   bool get isAlive => true;
 
   @override
-  Future<void> close() async => dio.close(); // Graceful: in-flight requests finish.
+  Future<void> close() async => client.close(); // Graceful: in-flight requests finish.
 
   // The Messages API has no response-format parameter, so the JSON-only
   // reply rests on the prompt.
@@ -57,7 +57,6 @@ final class AnthropicSession implements LlmSession {
     final events = _llm.streamMessages(
       systemPrompt: system,
       userText: user,
-      // Thinking tokens count toward max_tokens, so leave generous headroom.
       maxTokens: 16384,
       thinking: thinking,
     );
