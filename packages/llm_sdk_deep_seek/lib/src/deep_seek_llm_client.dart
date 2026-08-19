@@ -1,6 +1,6 @@
 import 'dart:convert';
 
-import 'package:llm_sdk_http/llm_sdk_http.dart';
+import 'package:dio/dio.dart';
 import 'package:json_annotation/json_annotation.dart';
 import 'package:llm_sdk_core/llm_sdk_core.dart';
 import 'package:llm_sdk_deep_seek/src/api_error.dart';
@@ -10,17 +10,12 @@ import 'package:sse/sse.dart';
 
 /// Thin wrapper over the DeepSeek Chat Completions API.
 final class DeepSeekLlmClient {
-  DeepSeekLlmClient({
-    required this.apiKey,
-    required this.baseUrl,
-    required this.model,
-    required this.client,
-  });
+  DeepSeekLlmClient({required this.apiKey, required this.baseUrl, required this.model, required this.dio});
 
   final String apiKey;
   final String baseUrl;
   final String model;
-  final StreamingHttpClient client;
+  final Dio dio;
 
   /// Streams the chunks of one chat completion.
   ///
@@ -31,31 +26,48 @@ final class DeepSeekLlmClient {
     required String userText,
     Map<String, Object?>? responseFormat,
   }) async* {
-    final response = await client.post(
-      '$baseUrl/chat/completions',
-      headers: {'Authorization': 'Bearer $apiKey'},
-      body: {
-        'model': model,
-        'stream': true,
-        'response_format': responseFormat,
-        'messages': [
-          {'role': 'system', 'content': systemPrompt},
-          {'role': 'user', 'content': userText},
-        ],
-      },
-    );
-    await for (final event in sseDataEvents(response.body)) {
-      // Skip non-JSON lines such as "[DONE]".
-      final json = tryJsonDecode(event);
-      if (json is! Map<String, dynamic>) {
-        continue;
+    try {
+      final response = await dio.post<ResponseBody>(
+        '$baseUrl/chat/completions',
+        options: Options(
+          responseType: ResponseType.stream,
+          headers: {'Authorization': 'Bearer $apiKey'},
+        ),
+        data: {
+          'model': model,
+          'stream': true,
+          'response_format': ?responseFormat,
+          'messages': [
+            {'role': 'system', 'content': systemPrompt},
+            {'role': 'user', 'content': userText},
+          ],
+        },
+      );
+      final body = response.data;
+      if (body == null) {
+        throw const LlmApiException('Empty API response body');
       }
-      throwIfApiError(json);
-      try {
-        yield DeepSeekChatChunk.fromJson(json);
-      } on CheckedFromJsonException {
-        continue; // Skip events outside the chunk schema.
+      await for (final event in sseDataEvents(body.stream)) {
+        // Skip non-JSON lines such as "[DONE]".
+        final json = tryJsonDecode(event);
+        if (json is! Map<String, dynamic>) {
+          continue;
+        }
+        throwIfApiError(json);
+        try {
+          yield DeepSeekChatChunk.fromJson(json);
+        } on CheckedFromJsonException {
+          continue; // Skip events outside the chunk schema.
+        }
       }
+    } on DioException catch (e) {
+      // Materialize streamed error bodies so the raw exception is debuggable.
+      if (e.response case final response?) {
+        if (response.data case final ResponseBody body) {
+          response.data = await utf8.decodeStream(body.stream);
+        }
+      }
+      rethrow;
     }
   }
 }

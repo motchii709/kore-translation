@@ -1,4 +1,4 @@
-import 'package:llm_sdk_http/llm_sdk_http.dart';
+import 'package:dio/dio.dart';
 import 'package:llm_sdk_core/llm_sdk_core.dart';
 import 'package:llm_sdk_deep_seek/src/deep_seek_llm_client.dart';
 import 'package:llm_sdk_deep_seek/src/deep_seek_stream_models.dart';
@@ -14,35 +14,37 @@ final class DeepSeekClient implements LlmClient {
 
   @override
   Future<LlmSession> open() async => DeepSeekSession(
-        apiKey: apiKey,
-        baseUrl: baseUrl,
-        model: model,
-        client: createStreamingHttpClient(),
-      );
+    apiKey: apiKey,
+    baseUrl: baseUrl,
+    model: model,
+    dio: Dio(
+      BaseOptions(
+        connectTimeout: const Duration(seconds: 10),
+        receiveTimeout: const Duration(seconds: 120),
+      ),
+    ),
+  );
 }
 
-/// The started session; owns [client].
+/// The started session; owns [dio].
 final class DeepSeekSession implements LlmSession {
   DeepSeekSession({
     required String apiKey,
     required String baseUrl,
     required String model,
-    required this.client,
-  }) : _llm = DeepSeekLlmClient(
-          apiKey: apiKey,
-          baseUrl: baseUrl,
-          model: model,
-          client: client,
-        );
+    required this.dio,
+  }) : _llm = DeepSeekLlmClient(apiKey: apiKey, baseUrl: baseUrl, model: model, dio: dio);
 
-  final StreamingHttpClient client;
+  /// The HTTP transport the session owns, from [DeepSeekClient.open] to [close].
+  final Dio dio;
+
   final DeepSeekLlmClient _llm;
 
   @override
   bool get isAlive => true;
 
   @override
-  Future<void> close() async => client.close();
+  Future<void> close() async => dio.close(); // Graceful: in-flight requests finish.
 
   // deepseek-reasoner rejects `response_format`, so the JSON-only reply
   // rests on the prompt.
@@ -59,11 +61,15 @@ final class DeepSeekSession implements LlmSession {
 
   Iterable<LlmStreamEvent> _eventsOf(DeepSeekChatChunk chunk, {required bool thinking}) sync* {
     final delta = chunk.choices.isEmpty ? null : chunk.choices.first.delta;
+    // The DeepSeek API has no request parameter for reasoning (it depends
+    // on the model), so an unwanted reasoning stream is dropped here.
     if (thinking) {
       if (delta?.reasoningContent case final String reasoning when reasoning.isNotEmpty) {
         yield LlmThinkingDelta(reasoning);
       }
     }
+    // The first chunk arrives with empty content (OpenAI-compatible wire
+    // behavior); drop empty deltas here.
     if (delta?.content case final String text when text.isNotEmpty) {
       yield LlmTextDelta(text);
     }
