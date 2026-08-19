@@ -8,15 +8,16 @@ environment:
   sdk: ^3.12.2
 
 dependencies:
-  llm_sdk_http:
-    path: ../llm_sdk_http
   freezed_annotation: ^3.1.0
   json_annotation: ^4.12.0
   llm_sdk_core: ^0.1.0
+  llm_sdk_http:
+    path: ../llm_sdk_http
   sse: ^0.1.0
 
 dev_dependencies:
   build_runner: ^2.13.1
+  dio: ^5.11.0
   freezed: ^3.2.5
   json_serializable: ^6.14.1
   kore_lints: ^0.1.0
