@@ -2,6 +2,8 @@ import 'dart:convert';
 import 'dart:typed_data';
 
 import 'package:dio/dio.dart';
+import 'package:llm_sdk_http/llm_sdk_http.dart';
+import 'package:llm_sdk_http/src/streaming_http_client_io.dart';
 import 'package:llm_sdk_deep_seek/src/deep_seek_client.dart';
 import 'package:test/test.dart';
 
@@ -22,9 +24,7 @@ class _FakeAdapter implements HttpClientAdapter {
     return ResponseBody.fromString(
       body,
       200,
-      headers: {
-        Headers.contentTypeHeader: ['text/event-stream'],
-      },
+      headers: {Headers.contentTypeHeader: ['text/event-stream']},
     );
   }
 
@@ -41,17 +41,18 @@ Map<String, Object> _delta(Map<String, Object> delta) => {
   ],
 };
 
-Stream<(String?, Object?)> _stream(_FakeAdapter adapter, {bool thinking = true}) => DeepSeekSession(
-  apiKey: 'test-key',
-  baseUrl: 'https://api.deepseek.com',
-  model: 'deepseek-chat',
-  dio: Dio()..httpClientAdapter = adapter,
-).streamObject(
-  system: 'sys',
-  user: 'こんにちは',
-  thinking: thinking,
-  decoder: (thinking, reply) => (thinking, reply?['translation']),
-);
+Stream<(String?, Object?)> _stream(_FakeAdapter adapter, {bool thinking = true}) =>
+    DeepSeekSession(
+      apiKey: 'test-key',
+      baseUrl: 'https://api.deepseek.com',
+      model: 'deepseek-chat',
+      client: DioStreamingHttpClient(dio: Dio()..httpClientAdapter = adapter),
+    ).streamObject(
+      system: 'sys',
+      user: 'こんにちは',
+      thinking: thinking,
+      decoder: (thinking, reply) => (thinking, reply?['translation']),
+    );
 
 void main() {
   test('streams reasoning_content as thinking and never sends response_format', () async {
@@ -64,7 +65,10 @@ void main() {
     );
     final snapshots = await _stream(adapter).toList();
 
-    expect(snapshots, [('挨拶の翻訳を考える', null), ('挨拶の翻訳を考える', 'Hello')]);
+    expect(snapshots, [
+      ('挨拶の翻訳を考える', null),
+      ('挨拶の翻訳を考える', 'Hello'),
+    ]);
     final data = adapter.lastRequest?.data as Map<String, Object?>;
     expect(data, isNot(contains('response_format')));
   });
