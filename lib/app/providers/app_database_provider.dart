@@ -22,8 +22,8 @@ AppDatabase appDatabase(Ref ref) {
       name: _databaseName,
       native: const DriftNativeOptions(databasePath: _appDatabasePath),
       web: DriftWebOptions(
-        sqlite3WasmUri: 'sqlite3.wasm',
-        driftWorkerUri: 'drift_worker.dart.js',
+        sqlite3Wasm: Uri.parse('sqlite3.wasm'),
+        driftWorker: Uri.parse('drift_worker.js'),
       ),
     ),
   );
