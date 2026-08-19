@@ -24,6 +24,7 @@ workspace:
   - packages/partial_json
   - packages/sse
   - packages/stdio_agent
+  - packages/llm_sdk_http
 
 dependencies:
   dio: ^5.11.0
@@ -43,6 +44,8 @@ dependencies:
   kore_client: ^0.1.0
   kore_config: ^0.1.0
   llm_sdk_core: ^0.1.0
+  llm_sdk_http:
+    path: packages/llm_sdk_http
   path_provider: ^2.1.6
   riverpod_annotation: ^4.0.3 # riverpod_generator 4.0.5 pins 4.0.3
   scroll_animator: ^0.3.0
