@@ -21,6 +21,10 @@ AppDatabase appDatabase(Ref ref) {
     driftDatabase(
       name: _databaseName,
       native: const DriftNativeOptions(databasePath: _appDatabasePath),
+      web: DriftWebOptions(
+        sqlite3WasmUri: 'sqlite3.wasm',
+        driftWorkerUri: 'drift_worker.dart.js',
+      ),
     ),
   );
   ref.onDispose(database.close);
