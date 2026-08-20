@@ -15,20 +15,26 @@ final class FetchStreamingHttpClient implements StreamingHttpClient {
       Map<String, dynamic>? queryParameters,
       Object? body}) async {
     final uri = Uri.parse(url).replace(queryParameters: queryParameters);
-    final requestHeaders = (headers ?? {}).jsify() as JSObject?;
+    final requestHeaders = (headers ?? {}).jsify();
     final requestInit = web.RequestInit(
       method: 'POST',
       headers: requestHeaders,
       body: body != null ? jsonEncode(body).toJS : null,
     );
-    final response = await web.window.fetch(web.Request(uri.toString(), requestInit));
+    
+    // Use fetch with proper promise handling
+    final responsePromise = web.window.fetch(web.Request(uri.toString(), requestInit));
+    final response = await responsePromise.toDart;
     final status = response.status;
     final readable = response.body;
+    
     if (readable == null) {
       throw const StreamingHttpException(0, 'Empty API response body');
     }
+    
     // Convert ReadableStream to Dart Stream<List<int>>
     final stream = _readableStream(readable);
+    
     if (status < 200 || status >= 300) {
       // Materialise the error body.
       final errorBytes = await _readAllBytes(readable);
@@ -46,8 +52,9 @@ final class FetchStreamingHttpClient implements StreamingHttpClient {
 Stream<List<int>> _readableStream(web.ReadableStream stream) {
   final controller = StreamController<List<int>>();
   final reader = stream.getReader();
+  
   void pump() {
-    reader.read().then((result) {
+    reader.read().toDart.then((result) {
       // result is a ReadableStreamReadResult
       final done = result.done.toDart;
       if (done) {
