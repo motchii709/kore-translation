@@ -23,7 +23,7 @@ final class FetchStreamingHttpClient implements StreamingHttpClient {
     );
     
     // Use fetch with proper promise handling
-    final responsePromise = web.window.fetch(web.Request(uri.toString(), requestInit));
+    final responsePromise = web.window.fetch(uri.toString().toJS, requestInit);
     final response = await responsePromise.toDart;
     final status = response.status;
     final readable = response.body;
