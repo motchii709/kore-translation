@@ -54,14 +54,15 @@ Stream<List<int>> _readableStream(web.ReadableStream stream) {
   final reader = stream.getReader();
   
   void pump() {
-    reader.read().toDart.then((result) {
-      // result is a ReadableStreamReadResult
-      final done = result.done.toDart;
+    final promise = reader.read();
+    promise.toDart.then((result) {
+      // result is a JSObject that represents ReadableStreamReadResult
+      final done = (result as JSObject)['done'].toDart;
       if (done) {
         controller.close();
         return;
       }
-      final value = result.value;
+      final value = (result as JSObject)['value'];
       if (value != null) {
         // value is expected to be a JSUint8Array.
         final bytes = (value as JSUint8Array).toDart;
