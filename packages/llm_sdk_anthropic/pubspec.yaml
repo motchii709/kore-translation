@@ -8,7 +8,8 @@ environment:
   sdk: ^3.12.2
 
 dependencies:
-  llm_sdk_http: ^0.1.0
+  llm_sdk_http:
+    path: ../llm_sdk_http
   freezed_annotation: ^3.1.0
   json_annotation: ^4.12.0
   llm_sdk_core: ^0.1.0
