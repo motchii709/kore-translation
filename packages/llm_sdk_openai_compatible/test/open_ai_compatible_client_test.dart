@@ -2,6 +2,8 @@ import 'dart:convert';
 import 'dart:typed_data';
 
 import 'package:dio/dio.dart';
+import 'package:llm_sdk_http/llm_sdk_http.dart';
+import 'package:llm_sdk_http/src/streaming_http_client_io.dart';
 import 'package:llm_sdk_openai_compatible/src/open_ai_compatible_client.dart';
 import 'package:test/test.dart';
 
@@ -41,9 +43,7 @@ void main() {
       _sse([
         {
           'choices': [
-            {
-              'delta': {'content': '{"translation": "Hello"}'},
-            },
+            {'delta': {'content': '{"translation": "Hello"}'}},
           ],
         },
         '[DONE]',
@@ -53,7 +53,7 @@ void main() {
       apiKey: '',
       baseUrl: 'http://localhost:11434/v1',
       model: 'llama3',
-      dio: Dio()..httpClientAdapter = adapter,
+      client: DioStreamingHttpClient(dio: Dio()..httpClientAdapter = adapter),
     );
     final snapshots = await session
         .streamObject(

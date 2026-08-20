@@ -1,6 +1,6 @@
 import 'dart:convert';
 
-import 'package:dio/dio.dart';
+import 'package:llm_sdk_http/llm_sdk_http.dart';
 import 'package:json_annotation/json_annotation.dart';
 import 'package:llm_sdk_core/llm_sdk_core.dart';
 import 'package:llm_sdk_google/src/api_error.dart';
@@ -10,17 +10,22 @@ import 'package:sse/sse.dart';
 
 /// Thin wrapper over the Google AI (Gemini) generateContent API.
 final class GeminiLlmClient {
-  GeminiLlmClient({required this.apiKey, required this.baseUrl, required this.model, required this.dio});
+  GeminiLlmClient({
+    required this.apiKey,
+    required this.baseUrl,
+    required this.model,
+    required this.client,
+  });
 
   final String apiKey;
   final String baseUrl;
   final String model;
-  final Dio dio;
+  final StreamingHttpClient client;
 
   /// Streams the chunks of one generateContent call.
   ///
   /// [responseMimeType] is passed through inside `generationConfig` (e.g.
-  /// `"application/json"`); null omits it. [thinking] requests the model's
+  /// "application/json"); null omits it. [thinking] requests the model's
   /// thoughts in the response.
   Stream<GeminiStreamChunk> streamGenerateContent({
     required String systemPrompt,
@@ -28,59 +33,41 @@ final class GeminiLlmClient {
     required bool thinking,
     String? responseMimeType,
   }) async* {
-    try {
-      final response = await dio.post<ResponseBody>(
-        '$baseUrl/v1beta/models/$model:streamGenerateContent',
-        queryParameters: {'alt': 'sse'},
-        options: Options(
-          responseType: ResponseType.stream,
-          headers: {'x-goog-api-key': apiKey},
-        ),
-        data: {
-          'systemInstruction': {
+    final response = await client.post(
+      '$baseUrl/v1beta/models/$model:streamGenerateContent',
+      queryParameters: {'alt': 'sse'},
+      headers: {'x-goog-api-key': apiKey},
+      body: {
+        'systemInstruction': {
+          'parts': [
+            {'text': systemPrompt},
+          ],
+        },
+        'contents': [
+          {
+            'role': 'user',
             'parts': [
-              {'text': systemPrompt},
+              {'text': userText},
             ],
           },
-          'contents': [
-            {
-              'role': 'user',
-              'parts': [
-                {'text': userText},
-              ],
-            },
-          ],
-          'generationConfig': {
-            'responseMimeType': ?responseMimeType,
-            // Thoughts are only included in the response when explicitly requested.
-            if (thinking) 'thinkingConfig': {'includeThoughts': true},
-          },
+        ],
+        'generationConfig': {
+          'responseMimeType': responseMimeType,
+          if (thinking) 'thinkingConfig': {'includeThoughts': true},
         },
-      );
-      final body = response.data;
-      if (body == null) {
-        throw const LlmApiException('Empty API response body');
+      },
+    );
+    await for (final event in sseDataEvents(response.body)) {
+      final json = tryJsonDecode(event);
+      if (json is! Map<String, dynamic>) {
+        continue; // Skip non-JSON lines (this API is not expected to send any).
       }
-      await for (final event in sseDataEvents(body.stream)) {
-        final json = tryJsonDecode(event);
-        if (json is! Map<String, dynamic>) {
-          continue; // Skip non-JSON lines (this API is not expected to send any).
-        }
-        throwIfApiError(json);
-        try {
-          yield GeminiStreamChunk.fromJson(json);
-        } on CheckedFromJsonException {
-          continue; // Skip events outside the chunk schema.
-        }
+      throwIfApiError(json);
+      try {
+        yield GeminiStreamChunk.fromJson(json);
+      } on CheckedFromJsonException {
+        continue; // Skip events outside the chunk schema.
       }
-    } on DioException catch (e) {
-      // Materialize streamed error bodies so the raw exception is debuggable.
-      if (e.response case final response?) {
-        if (response.data case final ResponseBody body) {
-          response.data = await utf8.decodeStream(body.stream);
-        }
-      }
-      rethrow;
     }
   }
 }

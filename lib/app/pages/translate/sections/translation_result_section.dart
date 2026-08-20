@@ -10,6 +10,7 @@ import 'package:kore_translation/app/providers/history_provider.dart';
 import 'package:kore_translation/app/providers/translation_jobs_provider.dart';
 import 'package:kore_translation/app/ui/components/app_section_header.dart';
 import 'package:llm_sdk_core/llm_sdk_core.dart';
+import 'package:llm_sdk_http/llm_sdk_http.dart';
 
 /// The result pane: the selected history entry — live translations are
 /// history entries from the moment they start, so selecting one switches
@@ -288,7 +289,8 @@ class _ErrorCard extends StatelessWidget {
       final LlmApiException e => e.message,
       // DioException.toString() does not include the response body, which
       // carries the API's actual error message.
-      final DioException e when e.response?.data != null => '$e\n${e.response?.data}',
+        final DioException e when e.response?.data != null => '$e\n${e.response?.data}',
+        final StreamingHttpException e => e.body != null ? '${e.message}\n${e.body}' : e.message,
       _ => '$error',
     };
     return Card(

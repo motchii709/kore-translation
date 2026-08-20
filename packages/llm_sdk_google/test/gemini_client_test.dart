@@ -2,6 +2,8 @@ import 'dart:convert';
 import 'dart:typed_data';
 
 import 'package:dio/dio.dart';
+import 'package:llm_sdk_http/llm_sdk_http.dart';
+import 'package:llm_sdk_http/src/streaming_http_client_io.dart';
 import 'package:llm_sdk_google/src/gemini_client.dart';
 import 'package:test/test.dart';
 
@@ -60,7 +62,7 @@ void main() {
       apiKey: 'test-key',
       baseUrl: 'https://generativelanguage.googleapis.com',
       model: 'gemini-2.5-flash',
-      dio: Dio()..httpClientAdapter = adapter,
+      client: DioStreamingHttpClient(dio: Dio()..httpClientAdapter = adapter),
     );
     final snapshots = await session
         .streamObject(

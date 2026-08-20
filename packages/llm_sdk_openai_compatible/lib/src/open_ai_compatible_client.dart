@@ -1,4 +1,4 @@
-import 'package:dio/dio.dart';
+import 'package:llm_sdk_http/llm_sdk_http.dart';
 import 'package:llm_sdk_core/llm_sdk_core.dart';
 import 'package:llm_sdk_openai_compatible/src/open_ai_compatible_llm_client.dart';
 import 'package:llm_sdk_openai_compatible/src/open_ai_compatible_stream_models.dart';
@@ -13,25 +13,29 @@ final class OpenAiCompatibleClient implements LlmClient {
 
   @override
   Future<LlmSession> open() async => OpenAiCompatibleSession(
-    apiKey: apiKey,
-    baseUrl: baseUrl,
-    model: model,
-    dio: Dio(
-      BaseOptions(
-        connectTimeout: const Duration(seconds: 10),
-        receiveTimeout: const Duration(seconds: 120),
-      ),
-    ),
-  );
+        apiKey: apiKey,
+        baseUrl: baseUrl,
+        model: model,
+        client: createStreamingHttpClient(),
+      );
 }
 
-/// The started session; owns [dio].
+/// The started session; owns [client].
 final class OpenAiCompatibleSession implements LlmSession {
-  OpenAiCompatibleSession({required String apiKey, required String baseUrl, required String model, required this.dio})
-    : _llm = OpenAiCompatibleLlmClient(apiKey: apiKey, baseUrl: baseUrl, model: model, dio: dio);
+  OpenAiCompatibleSession({
+    required String apiKey,
+    required String baseUrl,
+    required String model,
+    required this.client,
+  }) : _llm = OpenAiCompatibleLlmClient(
+          apiKey: apiKey,
+          baseUrl: baseUrl,
+          model: model,
+          client: client,
+        );
 
   /// The HTTP transport the session owns, from [OpenAiCompatibleClient.open] to [close].
-  final Dio dio;
+  final StreamingHttpClient client;
 
   final OpenAiCompatibleLlmClient _llm;
 
@@ -39,7 +43,7 @@ final class OpenAiCompatibleSession implements LlmSession {
   bool get isAlive => true;
 
   @override
-  Future<void> close() async => dio.close(); // Graceful: in-flight requests finish.
+  Future<void> close() async => client.close();
 
   // [thinking] is ignored: the Chat Completions surface has no portable
   // switch for reasoning or for streaming it back.
@@ -50,7 +54,11 @@ final class OpenAiCompatibleSession implements LlmSession {
     required bool thinking,
     required T Function(String? thinking, Map<String, dynamic>? reply) decoder,
   }) {
-    final chunks = _llm.streamChatCompletions(systemPrompt: system, userText: user, jsonOutput: true);
+    final chunks = _llm.streamChatCompletions(
+      systemPrompt: system,
+      userText: user,
+      jsonOutput: true,
+    );
     return chunks.expand(_eventsOf).decodeSnapshots(decoder);
   }
 

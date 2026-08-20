@@ -1,4 +1,4 @@
-import 'package:dio/dio.dart';
+import 'package:llm_sdk_http/llm_sdk_http.dart';
 import 'package:llm_sdk_core/llm_sdk_core.dart';
 import 'package:llm_sdk_google/src/gemini_llm_client.dart';
 import 'package:llm_sdk_google/src/gemini_stream_models.dart';
@@ -13,29 +13,29 @@ final class GeminiClient implements LlmClient {
 
   @override
   Future<LlmSession> open() async => GeminiSession(
-    apiKey: apiKey,
-    baseUrl: baseUrl,
-    model: model,
-    dio: Dio(
-      BaseOptions(
-        connectTimeout: const Duration(seconds: 10),
-        receiveTimeout: const Duration(seconds: 120),
-      ),
-    ),
-  );
+        apiKey: apiKey,
+        baseUrl: baseUrl,
+        model: model,
+        client: createStreamingHttpClient(),
+      );
 }
 
-/// The started session; owns [dio].
+/// The started session; owns [client].
 final class GeminiSession implements LlmSession {
   GeminiSession({
     required String apiKey,
     required String baseUrl,
     required String model,
-    required this.dio,
-  }) : _llm = GeminiLlmClient(apiKey: apiKey, baseUrl: baseUrl, model: model, dio: dio);
+    required this.client,
+  }) : _llm = GeminiLlmClient(
+          apiKey: apiKey,
+          baseUrl: baseUrl,
+          model: model,
+          client: client,
+        );
 
   /// The HTTP transport the session owns, from [GeminiClient.open] to [close].
-  final Dio dio;
+  final StreamingHttpClient client;
 
   final GeminiLlmClient _llm;
 
@@ -43,7 +43,7 @@ final class GeminiSession implements LlmSession {
   bool get isAlive => true;
 
   @override
-  Future<void> close() async => dio.close(); // Graceful: in-flight requests finish.
+  Future<void> close() async => client.close(); // Graceful: in-flight requests finish.
 
   @override
   Stream<T> streamObject<T>({
@@ -67,9 +67,7 @@ final class GeminiSession implements LlmSession {
         : chunk.candidates.first.content?.parts ?? const <GeminiPart>[];
     for (final part in parts) {
       final text = part.text;
-      if (text == null) {
-        continue;
-      }
+      if (text == null) continue;
       yield part.thought ? LlmThinkingDelta(text) : LlmTextDelta(text);
     }
   }

@@ -1,4 +1,4 @@
-import 'package:dio/dio.dart';
+import 'package:llm_sdk_http/llm_sdk_http.dart';
 import 'package:llm_sdk_core/llm_sdk_core.dart';
 import 'package:llm_sdk_openai/src/open_ai_llm_client.dart';
 import 'package:llm_sdk_openai/src/open_ai_stream_models.dart';
@@ -16,22 +16,26 @@ final class OpenAiClient implements LlmClient {
     apiKey: apiKey,
     baseUrl: baseUrl,
     model: model,
-    dio: Dio(
-      BaseOptions(
-        connectTimeout: const Duration(seconds: 10),
-        receiveTimeout: const Duration(seconds: 120),
-      ),
-    ),
+      client: createStreamingHttpClient(),
   );
 }
 
-/// The started session; owns [dio].
+/// The started session; owns [client].
 final class OpenAiSession implements LlmSession {
-  OpenAiSession({required String apiKey, required String baseUrl, required String model, required this.dio})
-    : _llm = OpenAiLlmClient(apiKey: apiKey, baseUrl: baseUrl, model: model, dio: dio);
+  OpenAiSession({
+    required String apiKey,
+    required String baseUrl,
+    required String model,
+    required this.client,
+  }) : _llm = OpenAiLlmClient(
+          apiKey: apiKey,
+          baseUrl: baseUrl,
+          model: model,
+          client: client,
+        );
 
   /// The HTTP transport the session owns, from [OpenAiClient.open] to [close].
-  final Dio dio;
+  final StreamingHttpClient client;
 
   final OpenAiLlmClient _llm;
 
@@ -39,7 +43,7 @@ final class OpenAiSession implements LlmSession {
   bool get isAlive => true;
 
   @override
-  Future<void> close() async => dio.close(); // Graceful: in-flight requests finish.
+  Future<void> close() async => client.close(); // Graceful: in-flight requests finish.
 
   // [thinking] is ignored: this client speaks the Chat Completions API,
   // which has no switch for reasoning or for streaming it back.

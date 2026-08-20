@@ -1,0 +1,1 @@
+Task Mistral SDK: Verify packages/llm_sdk_openai_compatible/lib/src/open_ai_compatible_client.dart (same package as Groq) is correct for Mistral usage. Confirm StreamingHttpClient usage, imports clean. Report to task-mistral-report.md.

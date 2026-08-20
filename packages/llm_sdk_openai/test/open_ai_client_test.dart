@@ -2,6 +2,8 @@ import 'dart:convert';
 import 'dart:typed_data';
 
 import 'package:dio/dio.dart';
+import 'package:llm_sdk_http/llm_sdk_http.dart';
+import 'package:llm_sdk_http/src/streaming_http_client_io.dart';
 import 'package:llm_sdk_openai/src/open_ai_client.dart';
 import 'package:test/test.dart';
 
@@ -45,16 +47,16 @@ Map<String, Object> _delta(Map<String, Object> delta) => {
 };
 
 Stream<(String?, Object?)> _stream(_FakeAdapter adapter) => OpenAiSession(
-  apiKey: 'test-key',
-  baseUrl: 'https://api.openai.com/v1',
-  model: 'gpt-5-mini',
-  dio: Dio()..httpClientAdapter = adapter,
-).streamObject(
-  system: 'sys',
-  user: 'こんにちは',
-  thinking: false,
-  decoder: (thinking, reply) => (thinking, reply?['translation']),
-);
+      apiKey: 'test-key',
+      baseUrl: 'https://api.openai.com/v1',
+      model: 'gpt-5-mini',
+      client: DioStreamingHttpClient(dio: Dio()..httpClientAdapter = adapter),
+    ).streamObject(
+      system: 'sys',
+      user: 'こんにちは',
+      thinking: false,
+      decoder: (thinking, reply) => (thinking, reply?['translation']),
+    );
 
 void main() {
   test('decodes reply-object snapshots, dropping empty deltas, and always requests JSON via response_format', () async {
@@ -75,7 +77,7 @@ void main() {
     expect(data['response_format'], {'type': 'json_object'});
   });
 
-  test('an HTTP error propagates the raw DioException with a drained body', () {
+  test('an HTTP error propagates a StreamingHttpException with a drained body', () {
     final adapter = _FakeAdapter(
       '{"error": {"message": "Incorrect API key provided"}}',
       statusCode: 401,
@@ -83,13 +85,9 @@ void main() {
     expect(
       _stream(adapter).last,
       throwsA(
-        isA<DioException>()
-            .having((e) => e.response?.statusCode, 'statusCode', 401)
-            .having(
-              (e) => e.response?.data,
-              'response.data',
-              contains('Incorrect API key provided'),
-            ),
+        isA<StreamingHttpException>()
+            .having((e) => e.statusCode, 'statusCode', 401)
+            .having((e) => e.body, 'body', contains('Incorrect API key provided')),
       ),
     );
   });
