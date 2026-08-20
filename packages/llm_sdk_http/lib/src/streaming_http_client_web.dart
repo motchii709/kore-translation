@@ -15,7 +15,7 @@ final class FetchStreamingHttpClient implements StreamingHttpClient {
       Map<String, dynamic>? queryParameters,
       Object? body}) async {
     final uri = Uri.parse(url).replace(queryParameters: queryParameters);
-    final requestHeaders = (headers ?? {}).jsify();
+    final requestHeaders = (headers ?? {}).jsify() as JSObject;
     final requestInit = web.RequestInit(
       method: 'POST',
       headers: requestHeaders,
@@ -57,12 +57,12 @@ Stream<List<int>> _readableStream(web.ReadableStream stream) {
     final promise = reader.read();
     promise.toDart.then((result) {
       // result is a JSObject that represents ReadableStreamReadResult
-      final done = (result as JSObject)['done'].toDart;
+      final done = (result as JSObject)['done'.toJS].toDart;
       if (done) {
         controller.close();
         return;
       }
-      final value = (result as JSObject)['value'];
+      final value = (result as JSObject)['value'.toJS];
       if (value != null) {
         // value is expected to be a JSUint8Array.
         final bytes = (value as JSUint8Array).toDart;
