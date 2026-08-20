@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
@@ -9,6 +10,7 @@ import 'package:kore_translation/app/providers/llm_session_provider.dart';
 import 'package:kore_translation/app/providers/ui_settings_provider.dart';
 import 'package:kore_translation/app/router/app_router.dart';
 import 'package:kore_translation/app/ui/theme/app_theme.dart';
+import 'package:kore_translation/app/providers/secure_storage_web.dart';
 
 /// Beta policy: no automatic retries. Riverpod's default keeps a failed
 /// provider in loading state while retrying in the background, which turns
@@ -19,6 +21,12 @@ Duration? noRetry(int retryCount, Object error) => null;
 void main() {
   WidgetsFlutterBinding.ensureInitialized();
   unawaited(LocaleSettings.useDeviceLocale());
+  
+  // Register web-specific secure storage implementation
+  if (kIsWeb) {
+    SecureStorageWeb.registerWith(null);
+  }
+  
   runApp(
     TranslationProvider(
       child: const ProviderScope(retry: noRetry, child: KoreApp()),
